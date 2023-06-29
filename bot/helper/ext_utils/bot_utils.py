@@ -94,11 +94,11 @@ def bt_selection_buttons(id_):
 
 
 async def get_telegraph_list(telegraph_content):
-    path = [(await telegraph.create_page(title='Pencari Drive Pea Masamba', content=content))["path"] for content in telegraph_content]
+    path = [(await telegraph.create_page(title='Pencari Drive KQRM', content=content))["path"] for content in telegraph_content]
     if len(path) > 1:
         await telegraph.edit_telegraph(path, telegraph_content)
     buttons = ButtonMaker()
-    buttons.ubutton("👁‍🗨 VIEW", f"https://telegra.ph/{path[0]}")
+    buttons.ubutton("🔎 VIEW", f"https://telegra.ph/{path[0]}")
     return buttons.build_menu(1)
 
 
@@ -112,7 +112,7 @@ def get_progress_bar_string(pct):
 
 
 def get_readable_message():
-    msg = "<b><a href='https://subscene.com/u/1271292'>🄿🅴🄰 🅼🄰🅂🄰🅼🄱🄰</a> </b>\n\n"
+    msg = ""
     button = None
     STATUS_LIMIT = config_dict['STATUS_LIMIT']
     tasks = len(download_dict)
@@ -179,15 +179,14 @@ def get_readable_message():
     if tasks > STATUS_LIMIT:
         msg += f"<b>Halaman :</b> <code>{PAGE_NO}/{PAGES}</code> | <b>Total Tugas :</b> <code>{tasks}</code>\n"
         buttons = ButtonMaker()
-        buttons.ibutton("⫷", "status pre")
-        buttons.ibutton("🪫", "status ref")
-        buttons.ibutton("⫸", "status nex")
+        buttons.ibutton("⏪", "status pre")
+        buttons.ibutton("♻️", "status ref")
+        buttons.ibutton("⏩", "status nex")
         button = buttons.build_menu(3)
-    msg += "____________________________"
     msg += f"\n<b>🅲🄿🆄 :</b> <code>{cpu_percent()}%</code> | <b>🆁🄰🅼 :</b> <code>{virtual_memory().percent}%</code>"
-    msg += f"\n<b>🄳🅻🅂 :</b> <code>{get_readable_file_size(dl_speed)}/s</code> | <b>🅄🅻🅂 :</b> <code>{get_readable_file_size(up_speed)}/s</code>"
-    msg += f"\n<b>🆃🄳🅻 :</b> <code>{get_readable_file_size(net_io_counters().bytes_recv)}</code> | <b>🆃🅄🅻 :</b> <code>{get_readable_file_size(net_io_counters().bytes_sent)}</code>"
-    msg += f"\n<b>🄳🅸🆂🄺 :</b> <code>{get_readable_file_size(disk_usage(config_dict['DOWNLOAD_DIR']).free)}</code> | <b>🅃🅸🅼🄴 :</b> <code>{get_readable_time(time() - botStartTime)}</code>"
+    msg += f"\n<b>🅳🅻🆂 :</b> <code>{get_readable_file_size(dl_speed)}/s</code> | <b>🆄🅻🆂 :</b> <code>{get_readable_file_size(up_speed)}/s</code>"
+    msg += f"\n<b>🆃🅳🅻 :</b> <code>{get_readable_file_size(net_io_counters().bytes_recv)}</code> | <b>🆃🆄🅻 :</b> <code>{get_readable_file_size(net_io_counters().bytes_sent)}</code>"
+    msg += f"\n<b>🅳🅸🆂🅺 :</b> <code>{get_readable_file_size(disk_usage(config_dict['DOWNLOAD_DIR']).free)}</code> | <b>🆃🅸🅼🅴 :</b> <code>{get_readable_time(time() - botStartTime)}</code>"
     return msg, button
 
 
@@ -258,31 +257,39 @@ def get_mega_link_type(url):
 def arg_parser(items, arg_base):
     if not items:
         return arg_base
+    bool_arg_set = {'-b', '-e', '-z', '-s', '-j', '-d'}
     t = len(items)
     i = 0
+    arg_start = -1
+
     while i + 1 <= t:
         part = items[i].strip()
         if part in arg_base:
-            if part in ['-s', '-j']:
+            arg_start = i
+            if i + 1 == t and part in bool_arg_set or part in ['-s', '-j']:
                 arg_base[part] = True
-            elif t == i + 1:
-                if part in ['-b', '-e', '-z', '-s', '-j', '-d']:
-                    arg_base[part] = True
             else:
                 sub_list = []
-                for j in range(i+1, t):
+                for j in range(i + 1, t):
                     item = items[j].strip()
                     if item in arg_base:
-                        if part in ['-b', '-e', '-z', '-s', '-j', '-d']:
+                        if part in bool_arg_set and not sub_list:
                             arg_base[part] = True
                         break
-                    sub_list.append(item)
+                    sub_list.append(item.strip())
                     i += 1
                 if sub_list:
                     arg_base[part] = " ".join(sub_list)
         i += 1
-    if items[0] not in arg_base:
-        arg_base['link'] = items[0]
+
+    link = []
+    if items[0].strip() not in arg_base:
+        if arg_start == -1:
+            link.extend(item.strip() for item in items)
+        else:
+            link.extend(items[r].strip() for r in range(arg_start))
+        if link:
+            arg_base['link'] = " ".join(link)
     return arg_base
 
 
