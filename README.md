@@ -195,7 +195,7 @@ help - All cmds with description
 
 ```
 Go to Settings, Secrets and variables, Click Actions, New repository secret.
-- HEROKU_EMAIL: Heroku Account Email Id in which the above app will be deployed
+<b>- HEROKU_EMAIL:</b> Heroku Account Email Id in which the above app will be deployed
 - HEROKU_API_KEY: Your Heroku API key, get it from https://dashboard.heroku.com/account
 - HEROKU_APP_NAME: Your Heroku app name, Name Must be unique
 - CONFIG_FILE_URL: Copy This in any text editor.
@@ -214,7 +214,7 @@ This will be your CONFIG_FILE_URL. Refer to below images for clarity.
 
 3. Remove commit id from raw link to be able to change variables without updating the CONFIG_FILE_URL in secrets. Should be in this form: https://gist.githubusercontent.com/username/gist-id/raw/config.env
    - Before: https://gist.githubusercontent.com/PeaMasamba84/8cce4a4b4e7f4ea47e948b2d058e52ac/raw/19ba5ab5eb43016422193319f28bc3c7dfb60f25/config.env
-   - After: https://gist.githubusercontent.com/Dawn-India/8cce4a4b4e7f4ea47e948b2d058e52ac/raw/config.env
+   - After: https://gist.githubusercontent.com/PeaMasamba84/8cce4a4b4e7f4ea47e948b2d058e52ac/raw/config.env
 
 4. Add all your private files in this branch.
 
