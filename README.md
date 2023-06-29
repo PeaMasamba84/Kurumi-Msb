@@ -5,7 +5,7 @@
 
 ---
 <details>
-    <summary><b>View All Steps<b><sup><kbd>Click to Expand</kbd></sup></summary>
+    <summary><b>View All Steps<b></sup></summary>
     
 ```
 cp config_sample.env config.env
