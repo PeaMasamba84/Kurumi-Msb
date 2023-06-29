@@ -224,6 +224,20 @@ This will be your CONFIG_FILE_URL. Refer to below images for clarity.
 5. In yout app settings click on reveal config vars and add CONFIG_FILE_URL
 
 6. Click Action-->Manually Deploy to Heroku--->Run Workflow--->Select Branch heroku
+
+```
+
+</details></li></ol>
+</details>
+    
+------
+
+## Important Note
+
+<details>
+  <summary>Click Here.</kbd></sup></summary>
+UPLOAD ANYTHING HERE: Accounts, Token, Button, Terabox, rcl.conf, shorteners.txt, etc or you can upload in bsetting
+
 ```
 
 </details>
