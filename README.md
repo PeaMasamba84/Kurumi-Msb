@@ -236,6 +236,7 @@ This will be your CONFIG_FILE_URL. Refer to below images for clarity.
 
 <details>
   <summary>Click Here</kbd></sup></summary>
+    
 1. UPLOAD ANYTHING HERE: Accounts, Token, Button, Terabox, rcl.conf, shorteners.txt, etc or you can upload in bsetting
 
 2. Before deploying to Heroku, you must change or setting the repo to public, after successfully deploying to Heroku, please set your repo to Private or up to you.
