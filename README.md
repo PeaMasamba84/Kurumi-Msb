@@ -143,7 +143,10 @@ Fill up rest of the fields. Meaning of each field is discussed below. **NOTE**: 
 
 </div>
 
-### Bot commands to be set in [@BotFather](https://t.me/BotFather)
+---
+
+## 📑 ***Bot commands to be set in [@BotFather](https://t.me/BotFather)***
+
 <details>
   <summary>Bot commands can be automatically.</code></kbd></sup></summary>
 
