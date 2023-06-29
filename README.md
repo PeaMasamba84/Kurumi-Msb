@@ -1,6 +1,6 @@
 ### Setting Config File
 <details>
-  <summary>Bot commands can be automatically.</code></kbd></sup></summary>
+  <summary>Setting.</code></kbd></sup></summary>
 
 ```
 cp config_sample.env config.env
