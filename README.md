@@ -4,7 +4,8 @@
 </div>
 
 ---
-<klik>
+<details>
+    <summary><b>View All Steps<b><sup><kbd>Click to Expand</kbd></sup></summary>
     
 ```
 cp config_sample.env config.env
