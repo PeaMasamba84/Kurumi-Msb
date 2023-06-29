@@ -219,6 +219,7 @@ This will be your CONFIG_FILE_URL. Refer to below images for clarity.
 4. Add all your private files in this branch.
 
 5. In yout app settings click on reveal config vars and add CONFIG_FILE_URL
+6. Click Action-->Manually Deploy to Heroku--->Run Workflow--->Select Branch pea-deploy
 ```
 
 </details>
