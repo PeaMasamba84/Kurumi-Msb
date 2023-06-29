@@ -71,7 +71,7 @@ class TelegraphHelper:
                     nxt_page += 1
             await self.edit_page(
                 path=path[prev_page],
-                title='KQRM Mirror Search',
+                title='PEA MASAMBA Mirror Search',
                 content=content
             )
         return
