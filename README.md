@@ -251,7 +251,7 @@ This will be your CONFIG_FILE_URL. Refer to below images for clarity.
 
 |![](https://telegra.ph/file/e645015abe1fd104352e2.jpg)|![](https://avatars.githubusercontent.com/u/113664541)|
 |:---:|:---:|
-|[`Pea Masamba`](https://t.me/CollectionMovie_Subtitles)|
+|[`Pea Masamba`](https://t.me/CollectionMovie_Subtitles)|[`Anasty17`](https://github.com/anasty17)|
 |Author and Wraps Up Features|Base Repo: MLTB|
 
 </details>
