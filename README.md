@@ -1,6 +1,5 @@
 ### Setting Config File
 <details>
-  <summary>ol><li><details>
     
 ```
 cp config_sample.env config.env
