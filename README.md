@@ -235,9 +235,8 @@ This will be your CONFIG_FILE_URL. Refer to below images for clarity.
 ## Important Note
 
 <details>
-  <summary>Click Here.</kbd></sup></summary>
+  <summary>Click Here</kbd></sup></summary>
 UPLOAD ANYTHING HERE: Accounts, Token, Button, Terabox, rcl.conf, shorteners.txt, etc or you can upload in bsetting
 
 ```
 
-</details>
