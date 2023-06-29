@@ -142,7 +142,7 @@ Fill up rest of the fields. Meaning of each field is discussed below. **NOTE**: 
 
 ## Bot commands to be set in [@BotFather](https://t.me/BotFather)
 <details>
-  <summary>Bot commands can be automatically set by <code>SET_COMMANDS</code> Var <sup><kbd>View All Commands</kbd></sup></summary>
+  <summary>Bot commands can be automatically set by <code>SET_COMMANDS</code></kbd></sup></summary>
 
 ```
 mirror - or /m Mirror
@@ -153,9 +153,8 @@ clone - Copy file/folder to Drive
 count - Count file/folder from Drive
 ytdl - or /y Mirror yt-dlp supported link
 ytdlleech - or /yl Leech through yt-dlp supported link
-clone - Copy file/folder to Drive
-count - Count file/folder from Drive
 usetting - User settings
+bsetting - Bot settings
 status - Get Mirror Status message
 btsel - Select files from torrent
 rss - Rss menu
@@ -163,6 +162,10 @@ list - Search files in Drive
 search - Search for torrents with API
 cancel - Cancel a task
 cancelall - Cancel all tasks
+del - Delete file/folder from Drive
+log - Get the Bot Log
+shell - Run commands in Shell
+restart - Restart the Bot
 stats - Bot Usage Stats
 ping - Ping the Bot
 help - All cmds with description
