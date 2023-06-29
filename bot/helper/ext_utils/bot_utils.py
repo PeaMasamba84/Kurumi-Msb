@@ -112,7 +112,7 @@ def get_progress_bar_string(pct):
 
 
 def get_readable_message():
-    msg = ""
+    msg = "<b><a href='https://subscene.com/u/1271292'>𝑷𝒆𝒂 𝑴𝒂𝒔𝒂𝒎𝒃𝒂</a> </b>\n\n"
     button = None
     STATUS_LIMIT = config_dict['STATUS_LIMIT']
     tasks = len(download_dict)
@@ -183,6 +183,7 @@ def get_readable_message():
         buttons.ibutton("♻️", "status ref")
         buttons.ibutton("⏩", "status nex")
         button = buttons.build_menu(3)
+    msg += "____________________________"
     msg += f"\n<b>🅲🄿🆄 :</b> <code>{cpu_percent()}%</code> | <b>🆁🄰🅼 :</b> <code>{virtual_memory().percent}%</code>"
     msg += f"\n<b>🅳🅻🆂 :</b> <code>{get_readable_file_size(dl_speed)}/s</code> | <b>🆄🅻🆂 :</b> <code>{get_readable_file_size(up_speed)}/s</code>"
     msg += f"\n<b>🆃🅳🅻 :</b> <code>{get_readable_file_size(net_io_counters().bytes_recv)}</code> | <b>🆃🆄🅻 :</b> <code>{get_readable_file_size(net_io_counters().bytes_sent)}</code>"
