@@ -21,7 +21,7 @@ from bot.helper.telegram_helper.bot_commands import BotCommands
 from bot.helper.telegram_helper.filters import CustomFilters
 from bot.helper.telegram_helper.message_utils import sendMessage, get_tg_link_content
 from bot.helper.listeners.tasks_listener import MirrorLeechListener
-from bot.helper.ext_utils.help_messages import MIRROR_HELP_MESSAGE
+from bot.helper.ext_utils.help_messages import MIRROR_HELP_MESSAGE, LEECH_HELP_MESSAGE, QBMIRROR_HELP_MESSAGE, QBLEECH_HELP_MESSAGE
 from bot.helper.ext_utils.bulk_links import extract_bulk_links
 
 
@@ -168,7 +168,14 @@ async def _mirror_leech(client, message, isQbit=False, isLeech=False, sameDir=No
             file_ = None
 
     if not is_url(link) and not is_magnet(link) and not await aiopath.exists(link) and not is_rclone_path(link) and file_ is None:
-        await sendMessage(message, MIRROR_HELP_MESSAGE)
+        if isQbit and not isLeech:
+            await sendMessage(message, QBMIRROR_HELP_MESSAGE)
+        if isQbit and isLeech:
+            await sendMessage(message, QBLEECH_HELP_MESSAGE)
+        if not isQbit and not isLeech:
+            await sendMessage(message, MIRROR_HELP_MESSAGE)
+        if not isQbit and isLeech:
+            await sendMessage(message, LEECH_HELP_MESSAGE)
         return
 
     if link:
