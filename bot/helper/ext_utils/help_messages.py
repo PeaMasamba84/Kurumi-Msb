@@ -62,6 +62,8 @@ Reply to this example by this cmd <code>/{BotCommands.YtdlCommand[0]}</code> b(b
 You can set start and end of the links from the bulk with -b start:end or only end by -b :end or only start by -b start. The default start is from zero(first link) to inf.
 
 Check all yt-dlp api options from this <a href='https://github.com/yt-dlp/yt-dlp/blob/master/yt_dlp/YoutubeDL.py#L184'>FILE</a> or use this <a href='https://t.me/mltb_official_channel/177'>script</a> to convert cli arguments to api options.
+
+<b>PEA MASAMBA</b>
 """
 
 MIRROR_HELP_MESSAGE = f"""
@@ -150,6 +152,8 @@ Super: <code>https://t.me/c/channel_id/message_id</code>
 
 <b>NOTES:</b>
 1. Commands that start with <b>qb</b> are ONLY for torrents.
+
+<b>PEA MASAMBA</b>
 """
 
 RSS_HELP_MESSAGE = """
@@ -173,6 +177,8 @@ Filter Notes:
 3. You can add `or` and `|` as much as you want."
 4. Take look on title if it has static special character after or before the qualities or extensions or whatever and use them in filter to avoid wrong match.
 Timeout: 60 sec.
+
+<b>PEA MASAMBA</b>
 """
 
 CLONE_HELP_MESSAGE = f"""
@@ -188,4 +194,6 @@ Send Gdrive|Gdot|Filepress|Filebee|Appdrive|Gdflix link or rclone path along wit
 <code>/{BotCommands.CloneCommand[0]}</code> (rcl or rclone_path) -up (rcl or rclone_path) -rcf flagkey:flagvalue|flagkey|flagkey:flagvalue
 
 Note: If -up not specified then rclone destination will be the RCLONE_PATH from config.env
+
+<b>PEA MASAMBA</b>
 """
