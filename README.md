@@ -243,3 +243,13 @@ This will be your CONFIG_FILE_URL. Refer to below images for clarity.
 
 ```
 
+### 🏅 ***Bot Authors***
+<details>
+    <summary><b>Click Here For Description</b></summary>
+
+|![](https://avatars.githubusercontent.com/u/105407900)|![](https://avatars.githubusercontent.com/u/113664541)|![](https://avatars.githubusercontent.com/u/84721324)|![](https://avatars.githubusercontent.com/u/77075674)|
+|:---:|:---:|:---:|:---:|
+|[`SilentDemonSD`](https://github.com/SilentDemonSD)|[`CodeWithWeeb`](https://github.com/weebzone)|[`Maverick`](https://github.com/MajnuRangeela)|[`Anasty17`](https://github.com/anasty17)|
+|Author and DDL, UI Design, More Customs..|Author and Wraps Up Features|Co-Author & Bug Tester|Base Repo: MLTB|
+
+</details>
