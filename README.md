@@ -1,7 +1,8 @@
 ### Setting Config File
 <details>
-  <summary>Setting.</code></kbd></sup></summary>
-
+  <summary><b>View All Features <sup><kbd>Click Here</kbd></sup></b></summary>
+    <ol><li><details>
+      <summary><b>qBittorrent</b></summary>
 ```
 cp config_sample.env config.env
 ```
