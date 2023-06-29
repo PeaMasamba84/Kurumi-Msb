@@ -94,11 +94,11 @@ def bt_selection_buttons(id_):
 
 
 async def get_telegraph_list(telegraph_content):
-    path = [(await telegraph.create_page(title='Pencari Drive KQRM', content=content))["path"] for content in telegraph_content]
+    path = [(await telegraph.create_page(title='Pencari Drive PEA MASAMBA', content=content))["path"] for content in telegraph_content]
     if len(path) > 1:
         await telegraph.edit_telegraph(path, telegraph_content)
     buttons = ButtonMaker()
-    buttons.ubutton("🔎 VIEW", f"https://telegra.ph/{path[0]}")
+    buttons.ubutton("👁‍🗨 VIEW", f"https://telegra.ph/{path[0]}")
     return buttons.build_menu(1)
 
 
@@ -112,7 +112,7 @@ def get_progress_bar_string(pct):
 
 
 def get_readable_message():
-    msg = ""
+    msg = "<b><a href='https://subscene.com/u/1271292'>🄿🅴🄰 🅼🄰🅂🄰🅼🄱🄰</a> </b>\n\n"
     button = None
     STATUS_LIMIT = config_dict['STATUS_LIMIT']
     tasks = len(download_dict)
@@ -179,14 +179,15 @@ def get_readable_message():
     if tasks > STATUS_LIMIT:
         msg += f"<b>Halaman :</b> <code>{PAGE_NO}/{PAGES}</code> | <b>Total Tugas :</b> <code>{tasks}</code>\n"
         buttons = ButtonMaker()
-        buttons.ibutton("⏪", "status pre")
-        buttons.ibutton("♻️", "status ref")
-        buttons.ibutton("⏩", "status nex")
+        buttons.ibutton("⫷", "status pre")
+        buttons.ibutton("🪫", "status ref")
+        buttons.ibutton("⫸", "status nex")
         button = buttons.build_menu(3)
+    msg += "____________________________"
     msg += f"\n<b>🅲🄿🆄 :</b> <code>{cpu_percent()}%</code> | <b>🆁🄰🅼 :</b> <code>{virtual_memory().percent}%</code>"
-    msg += f"\n<b>🅳🅻🆂 :</b> <code>{get_readable_file_size(dl_speed)}/s</code> | <b>🆄🅻🆂 :</b> <code>{get_readable_file_size(up_speed)}/s</code>"
-    msg += f"\n<b>🆃🅳🅻 :</b> <code>{get_readable_file_size(net_io_counters().bytes_recv)}</code> | <b>🆃🆄🅻 :</b> <code>{get_readable_file_size(net_io_counters().bytes_sent)}</code>"
-    msg += f"\n<b>🅳🅸🆂🅺 :</b> <code>{get_readable_file_size(disk_usage(config_dict['DOWNLOAD_DIR']).free)}</code> | <b>🆃🅸🅼🅴 :</b> <code>{get_readable_time(time() - botStartTime)}</code>"
+    msg += f"\n<b>🄳🅻🅂 :</b> <code>{get_readable_file_size(dl_speed)}/s</code> | <b>🅄🅻🅂 :</b> <code>{get_readable_file_size(up_speed)}/s</code>"
+    msg += f"\n<b>🆃🄳🅻 :</b> <code>{get_readable_file_size(net_io_counters().bytes_recv)}</code> | <b>🆃🅄🅻 :</b> <code>{get_readable_file_size(net_io_counters().bytes_sent)}</code>"
+    msg += f"\n<b>🄳🅸🆂🄺 :</b> <code>{get_readable_file_size(disk_usage(config_dict['DOWNLOAD_DIR']).free)}</code> | <b>🅃🅸🅼🄴 :</b> <code>{get_readable_time(time() - botStartTime)}</code>"
     return msg, button
 
 
