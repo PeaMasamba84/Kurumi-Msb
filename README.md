@@ -4,7 +4,7 @@
 </div>
 
 ---
-<Klik>
+<klik>
     
 ```
 cp config_sample.env config.env
