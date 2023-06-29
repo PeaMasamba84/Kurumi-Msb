@@ -1,4 +1,4 @@
-Setting up config file
+### Setting Config File
 
 ```
 cp config_sample.env config.env
