@@ -195,6 +195,12 @@ help - All cmds with description
 
 ```
 Go to Settings, Secrets and variables, Click Actions, New repository secret.
+- `BUTTON_FOUR_NAME`:
+- `BUTTON_FOUR_URL`:
+- `BUTTON_FIVE_NAME`:
+- `BUTTON_FIVE_URL`:
+- `BUTTON_SIX_NAME`:
+- `BUTTON_SIX_URL`:
 ```
 
 </details>
