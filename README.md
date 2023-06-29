@@ -249,7 +249,7 @@ This will be your CONFIG_FILE_URL. Refer to below images for clarity.
 <details>
     <summary><b>Click Here For Description</b></summary>
 
-|![](https://telegra.ph/file/9213ca143c5c63548c0b4.jpg)|![](https://telegra.ph/file/909c042e7da86ae11dfde.jpg)|
+|![](https://telegra.ph/file/e645015abe1fd104352e2.jpg)|![](https://telegra.ph/file/909c042e7da86ae11dfde.jpg)|
 |:---:|:---:|
 |[`Pea Masamba`](https://t.me/CollectionMovie_Subtitles)|[`Kurumi`](https://t.me/arakurumi)|
 |Only Modif, etc|Base Repo: Kurumi|
