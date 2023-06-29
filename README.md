@@ -249,9 +249,9 @@ This will be your CONFIG_FILE_URL. Refer to below images for clarity.
 <details>
     <summary><b>Click Here For Description</b></summary>
 
-|![](https://telegra.ph/file/e645015abe1fd104352e2.jpg)|![](https://avatars.githubusercontent.com/u/113664541)|![](https://avatars.githubusercontent.com/u/84721324)|![](https://avatars.githubusercontent.com/u/77075674)|
-|:---:|:---:|:---:|:---:|
+|![](https://telegra.ph/file/e645015abe1fd104352e2.jpg)|![](https://avatars.githubusercontent.com/u/113664541)|
+|:---:|:---:|
 |[`Pea Masamba`](https://t.me/CollectionMovie_Subtitles)|
-|Author and DDL, UI Design, More Customs..|Author and Wraps Up Features|Co-Author & Bug Tester|Base Repo: MLTB|
+|Author and Wraps Up Features|Base Repo: MLTB|
 
 </details>
