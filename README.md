@@ -145,16 +145,16 @@ Fill up rest of the fields. Meaning of each field is discussed below. **NOTE**: 
 - `LOG_CHAT_ID`: Fill chat_id of the group/channel. It will send mirror/clone links in the log chat. `Int`
   - **Note**: Bot should be added in the log chat as admin.
 
-```
     
+</details></li></ol>
 </details>
     
 ------
 
-## 📑 ***Bot commands to be set in [@BotFather](https://t.me/BotFather)***
+### 🤖 ***Bot Commands***
 
 <details>
-  <summary>Bot commands can be automatically.</code></kbd></sup></summary>
+  <summary>Bot commands can be automatically set by <code>SET_COMMANDS</code> Var <sup><kbd>View All Commands</kbd></sup></summary>
 
 ```
 mirror - or /m Mirror
@@ -183,5 +183,4 @@ ping - Ping the Bot
 help - All cmds with description
 ```
 
-------
 </details>
