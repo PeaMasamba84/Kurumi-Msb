@@ -154,7 +154,7 @@ Fill up rest of the fields. Meaning of each field is discussed below. **NOTE**: 
 ## Bot Commands
 
 <details>
-  <summary>Bot commands can be automatically set by <code>SET_COMMANDS</code> Var <sup><kbd>View All Commands</kbd></sup></summary>
+  <summary>Bot commands can be automatically.</kbd></sup></summary>
 
 ```
 mirror - or /m Mirror
