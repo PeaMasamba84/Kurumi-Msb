@@ -241,7 +241,9 @@ This will be your CONFIG_FILE_URL. Refer to below images for clarity.
 
 2. Before deploying to Heroku, you must change or setting the repo to public, after successfully deploying to Heroku, please set your repo to Private or up to you.
 
-```
+</details>
+    
+-----
 
 ### 🏅 ***Bot Authors***
 <details>
