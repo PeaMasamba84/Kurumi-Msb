@@ -142,7 +142,7 @@ Fill up rest of the fields. Meaning of each field is discussed below. **NOTE**: 
 
 ## Bot commands to be set in [@BotFather](https://t.me/BotFather)
 <details>
-  <summary>Bot commands can be automatically set by <code>SET_COMMANDS</code></kbd></sup></summary>
+  <summary>Bot commands can be automatically.</code></kbd></sup></summary>
 
 ```
 mirror - or /m Mirror
