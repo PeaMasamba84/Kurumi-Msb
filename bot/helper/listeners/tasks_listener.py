@@ -104,7 +104,11 @@ class MirrorLeechListener:
             return
         
         if name == "None" or self.isQbit or not await aiopath.exists(f"{self.dir}/{name}"):
-            files = await listdir(self.dir)
+            try:
+                files = await listdir(self.dir)
+            except Exception as e:
+                await self.onUploadError(str(e))
+                return
             name = files[-1]
             if name == "yt-dlp-thumb":
                 name = files[0]
@@ -366,7 +370,7 @@ class MirrorLeechListener:
             if link or rclonePath and config_dict['RCLONE_SERVE_URL']:
                 buttons = ButtonMaker()
                 if link:
-                    buttons.ubutton("Cloud Link", link)
+                    buttons.ubutton("☁️ Cloud Link", link)
                 else:
                     msg += f'\n\n<b>Path :</b> <code>{rclonePath}</code>'
                 if rclonePath and (RCLONE_SERVE_URL := config_dict['RCLONE_SERVE_URL']):
@@ -375,18 +379,18 @@ class MirrorLeechListener:
                     share_url = f'{RCLONE_SERVE_URL}/{remote}/{url_path}'
                     if mime_type == "Folder":
                         share_url += '/'
-                    buttons.ubutton("Rclone Link", share_url)
+                    buttons.ubutton("🔗 Rclone Link", share_url)
                 elif (INDEX_URL := config_dict['INDEX_URL']) and not rclonePath:
                     url_path = rutils.quote(f'{name}')
                     share_url = f'{INDEX_URL}/{url_path}'
                     if mime_type == "Folder":
                         share_url += '/'
-                        buttons.ubutton("Index Link", share_url)
+                        buttons.ubutton("⚡ Index Link", share_url)
                     else:
-                        buttons.ubutton("Index Link", share_url)
+                        buttons.ubutton("⚡ Index Link", share_url)
                         if mime_type.startswith(('image', 'video', 'audio')):
                             share_urls = f'{INDEX_URL}/{url_path}?a=view'
-                            buttons.ubutton("View Link", share_urls)
+                            buttons.ubutton("🌐 View Link", share_urls)
                 button = buttons.build_menu(2)
             else:
                 msg += f'\n\n<b>Path :</b> <code>{rclonePath}</code>'
