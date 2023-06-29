@@ -112,7 +112,7 @@ def get_progress_bar_string(pct):
 
 
 def get_readable_message():
-    msg = "<b><a href='https://subscene.com/u/1271292'>𝑷𝒆𝒂 𝑴𝒂𝒔𝒂𝒎𝒃𝒂</a> </b>\n\n"
+    msg = "<b><a href='https://subscene.com/u/1271292'>🄿🅴🄰 🅼🄰🅂🄰🅼🄱🄰</a> </b>\n\n"
     button = None
     STATUS_LIMIT = config_dict['STATUS_LIMIT']
     tasks = len(download_dict)
