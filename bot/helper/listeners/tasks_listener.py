@@ -381,7 +381,7 @@ class MirrorLeechListener:
                     share_url = f'{INDEX_URL}/{url_path}'
                     if mime_type == "Folder":
                         share_url += '/'
-                        buttons.ubutton("\Index Link", share_url)
+                        buttons.ubutton("Index Link", share_url)
                     else:
                         buttons.ubutton("Index Link", share_url)
                         if mime_type.startswith(('image', 'video', 'audio')):
