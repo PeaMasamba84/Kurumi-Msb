@@ -179,9 +179,9 @@ def get_readable_message():
     if tasks > STATUS_LIMIT:
         msg += f"<b>Halaman :</b> <code>{PAGE_NO}/{PAGES}</code> | <b>Total Tugas :</b> <code>{tasks}</code>\n"
         buttons = ButtonMaker()
-        buttons.ibutton("⏪", "status pre")
-        buttons.ibutton("♻️", "status ref")
-        buttons.ibutton("⏩", "status nex")
+        buttons.ibutton("⫷", "status pre")
+        buttons.ibutton("🪫", "status ref")
+        buttons.ibutton("⫸", "status nex")
         button = buttons.build_menu(3)
     msg += "____________________________"
     msg += f"\n<b>🅲🄿🆄 :</b> <code>{cpu_percent()}%</code> | <b>🆁🄰🅼 :</b> <code>{virtual_memory().percent}%</code>"
