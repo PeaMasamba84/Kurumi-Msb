@@ -28,14 +28,14 @@ PAGE_NO = 1
 
 
 class MirrorStatus:
-    STATUS_UPLOADING = "Mengunggah..."
-    STATUS_DOWNLOADING = "Mengunduh..."
-    STATUS_CLONING = "Mengclone..."
-    STATUS_QUEUEDL = "Menunggu antrian download..."
-    STATUS_QUEUEUP = "Menunggu antrian upload..."
+    STATUS_UPLOADING = "Unggah..."
+    STATUS_DOWNLOADING = "Unduh..."
+    STATUS_CLONING = "Kloning..."
+    STATUS_QUEUEDL = "Menunggu Antri Unduh..."
+    STATUS_QUEUEUP = "Menunggu Antri Unggah..."
     STATUS_PAUSED = "Dihentikan."
-    STATUS_ARCHIVING = "Mengarsip..."
-    STATUS_EXTRACTING = "Mengekstrak..."
+    STATUS_ARCHIVING = "Arsip..."
+    STATUS_EXTRACTING = "Ekstrak..."
     STATUS_SPLITTING = "Membagi..."
     STATUS_CHECKING = "Mengecek..."
     STATUS_SEEDING = "Mengeseed..."
@@ -125,10 +125,10 @@ def get_readable_message():
         if download.status() not in [MirrorStatus.STATUS_SPLITTING, MirrorStatus.STATUS_SEEDING]:
             msg += f"\n<b>┌┤{get_progress_bar_string(download.progress())} <code>{download.progress()}</code>├┐</b>"
             if download.message.chat.type.name in ['SUPERGROUP', 'CHANNEL']:
-                msg += f"\n<b>├ Status :</b> <a href='{download.message.link}'>{download.status()}</a>"
+                msg += f"\n<b>├ Sta :</b> <a href='{download.message.link}'>{download.status()}</a>"
             else:
-                msg += f"\n<b>├ Status :</b> <code>{download.status()}</code>"
-            msg += f"\n<b>├ Proses :</b> <code>{download.processed_bytes()}</code> dari <code>{download.size()}</code>"
+                msg += f"\n<b>├ Sta :</b> <code>{download.status()}</code>"
+            msg += f"\n<b>├ Pros :</b> <code>{download.processed_bytes()}</code> dari <code>{download.size()}</code>"
             msg += f"\n<b>├ Kec :</b> <code>{download.speed()}</code> | <b>ETA :</b> <code>{download.eta()}</code>"
             if hasattr(download, 'seeders_num'):
                 try:
@@ -140,15 +140,15 @@ def get_readable_message():
                 msg += f"\n<b>┌ Status :</b> <a href='{download.message.link}'>{download.status()}</a>"
             else:
                 msg += f"\n<b>┌ Status :</b> <code>{download.status()}</code>"
-            msg += f"\n<b>├ Ukuran :</b> <code>{download.size()}</code>"
+            msg += f"\n<b>├ Ukrn :</b> <code>{download.size()}</code>"
             msg += f"\n<b>├ Kec :</b> <code>{download.upload_speed()}</code> | <b>Diupload :</b> <code>{download.uploaded_bytes()}</code>"
             msg += f"\n<b>├ Ratio :</b> <code>{download.ratio()}</code> | <b>Waktu :</b> <code>{download.seeding_time()}</code>"
         else:
             if download.message.chat.type.name in ['SUPERGROUP', 'CHANNEL']:
-                msg += f"\n<b>┌ Status :</b> <a href='{download.message.link}'>{download.status()}</a>"
+                msg += f"\n<b>┌ Sta :</b> <a href='{download.message.link}'>{download.status()}</a>"
             else:
-                msg += f"\n<b>┌ Status :</b> <code>{download.status()}</code>"
-            msg += f"\n<b>├ Ukuran :</b> <code>{download.size()}</code>"
+                msg += f"\n<b>┌ Sta :</b> <code>{download.status()}</code>"
+            msg += f"\n<b>├ Ukrn :</b> <code>{download.size()}</code>"
         # <a href='tg://user?id={download.message.from_user.id}'>{download.message.from_user.first_name}</a>
         msg += f"\n<b>├ Pgn :</b> <code>{download.message.from_user.first_name}</code> | <b>ID :</b> <code>{download.message.from_user.id}</code>"
         msg += f"\n<b>└ Stop :</b> <code>/{BotCommands.CancelMirror[0]} {download.gid()}</code>\n\n"
