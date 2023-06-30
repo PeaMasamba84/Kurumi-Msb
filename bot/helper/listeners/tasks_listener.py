@@ -336,12 +336,14 @@ class MirrorLeechListener:
             await DbManger().rm_complete_task(self.message.link)
         msg = f"<b>Nama :</b> <code>{escape(name)}</code>"
         msg += f"\n\n<b>Ukuran :</b> <code>{get_readable_file_size(size)}</code>"
+        msg += f"\n\n</b>Hasil mirror sudah kami pindahkan<a href='https://t.me/peamasambamirror'> 𝑫𝒊𝒔𝒊𝒏𝒊</a> </b>"
         LOGGER.info(f'Task Done: {name}')
         if self.isLeech:
             msg += f'\n\n<b>Jumlah File :</b> <code>{folders}</code>'
             if mime_type != 0:
                 msg += f'\n\n<b>File Rusak :</b> <code>{mime_type}</code>'
             msg += f'\n\n<b>Oleh :</b> {self.tag}\n\n'
+            msg += f'\n\n<b>𝐏𝐄𝐀 𝐌𝐀𝐒𝐀𝐌𝐁𝐀\n\n'
             if not files:
                 await sendMessage(self.message, msg)
             else:
