@@ -94,7 +94,7 @@ def bt_selection_buttons(id_):
 
 
 async def get_telegraph_list(telegraph_content):
-    path = [(await telegraph.create_page(title='Pencari Drive PEA MASAMBA', content=content))["path"] for content in telegraph_content]
+    path = [(await telegraph.create_page(title='Drive Pea Masamba', content=content))["path"] for content in telegraph_content]
     if len(path) > 1:
         await telegraph.edit_telegraph(path, telegraph_content)
     buttons = ButtonMaker()
@@ -125,9 +125,9 @@ def get_readable_message():
         if download.status() not in [MirrorStatus.STATUS_SPLITTING, MirrorStatus.STATUS_SEEDING]:
             msg += f"\n<b>┌┤{get_progress_bar_string(download.progress())} <code>{download.progress()}</code>├┐</b>"
             if download.message.chat.type.name in ['SUPERGROUP', 'CHANNEL']:
-                msg += f"\n<b>├ Sta :</b> <a href='{download.message.link}'>{download.status()}</a>"
+                msg += f"\n<b>├ Sts :</b> <a href='{download.message.link}'>{download.status()}</a>"
             else:
-                msg += f"\n<b>├ Sta :</b> <code>{download.status()}</code>"
+                msg += f"\n<b>├ Sts :</b> <code>{download.status()}</code>"
             msg += f"\n<b>├ Pros :</b> <code>{download.processed_bytes()}</code> dari <code>{download.size()}</code>"
             msg += f"\n<b>├ Kec :</b> <code>{download.speed()}</code> | <b>ETA :</b> <code>{download.eta()}</code>"
             if hasattr(download, 'seeders_num'):
@@ -137,17 +137,17 @@ def get_readable_message():
                     pass
         elif download.status() == MirrorStatus.STATUS_SEEDING:
             if download.message.chat.type.name in ['SUPERGROUP', 'CHANNEL']:
-                msg += f"\n<b>┌ Status :</b> <a href='{download.message.link}'>{download.status()}</a>"
+                msg += f"\n<b>┌ Sts :</b> <a href='{download.message.link}'>{download.status()}</a>"
             else:
-                msg += f"\n<b>┌ Status :</b> <code>{download.status()}</code>"
-            msg += f"\n<b>├ Ukrn :</b> <code>{download.size()}</code>"
+                msg += f"\n<b>┌ Sts :</b> <code>{download.status()}</code>"
+            msg += f"\n<b>├ Ukuran :</b> <code>{download.size()}</code>"
             msg += f"\n<b>├ Kec :</b> <code>{download.upload_speed()}</code> | <b>Diupload :</b> <code>{download.uploaded_bytes()}</code>"
             msg += f"\n<b>├ Ratio :</b> <code>{download.ratio()}</code> | <b>Waktu :</b> <code>{download.seeding_time()}</code>"
         else:
             if download.message.chat.type.name in ['SUPERGROUP', 'CHANNEL']:
-                msg += f"\n<b>┌ Sta :</b> <a href='{download.message.link}'>{download.status()}</a>"
+                msg += f"\n<b>┌ Sts :</b> <a href='{download.message.link}'>{download.status()}</a>"
             else:
-                msg += f"\n<b>┌ Sta :</b> <code>{download.status()}</code>"
+                msg += f"\n<b>┌ Sts :</b> <code>{download.status()}</code>"
             msg += f"\n<b>├ Ukrn :</b> <code>{download.size()}</code>"
         # <a href='tg://user?id={download.message.from_user.id}'>{download.message.from_user.first_name}</a>
         msg += f"\n<b>├ Pgn :</b> <code>{download.message.from_user.first_name}</code> | <b>ID :</b> <code>{download.message.from_user.id}</code>"
@@ -266,7 +266,8 @@ def arg_parser(items, arg_base):
     while i + 1 <= t:
         part = items[i].strip()
         if part in arg_base:
-            arg_start = i
+            if arg_start == -1:
+                arg_start = i
             if i + 1 == t and part in bool_arg_set or part in ['-s', '-j']:
                 arg_base[part] = True
             else:
