@@ -371,27 +371,28 @@ class MirrorLeechListener:
                 msg += f'\n\n<b>Files :</b> <code>{files}</code>'
             if link or rclonePath and config_dict['RCLONE_SERVE_URL']:
                 buttons = ButtonMaker()
-                msg += f'\n\n<b>Path :</b> <code>{rclonePath}</code>'
                 if link:
-                    buttons.ubutton("Cloud Link", link)
-                if rclonePath and (RCLONE_SERVE_URL := config_dict['RCLONE_SERVE_URL']):
-                    remote, path = rclonePath.split(':', 1)
-                    url_path = rutils.quote(f'{path}')
-                    share_url = f'{RCLONE_SERVE_URL}/{remote}/{url_path}'
-                    if mime_type == "Folder":
-                        share_url += '/'
-                    buttons.ubutton("Rclone Link", share_url)
+                    buttons.ubutton("☁️ Cloud Link", link)
+                if rclonePath:
+                    msg += f'\n\n<b>Path :</b> <code>{rclonePath}</code>'
+                    if (RCLONE_SERVE_URL := config_dict['RCLONE_SERVE_URL']):
+                        remote, path = rclonePath.split(':', 1)
+                        url_path = rutils.quote(f'{path}')
+                        share_url = f'{RCLONE_SERVE_URL}/{remote}/{url_path}'
+                        if mime_type == "Folder":
+                            share_url += '/'
+                    buttons.ubutton("🔗 Rclone Link", share_url)
                 elif (INDEX_URL := config_dict['INDEX_URL']) and not rclonePath:
                     url_path = rutils.quote(f'{name}')
                     share_url = f'{INDEX_URL}/{url_path}'
                     if mime_type == "Folder":
                         share_url += '/'
-                        buttons.ubutton("Index Link", share_url)
+                        buttons.ubutton("⚡ Index Link", share_url)
                     else:
-                        buttons.ubutton("Index Link", share_url)
+                        buttons.ubutton("⚡ Index Link", share_url)
                         if mime_type.startswith(('image', 'video', 'audio')):
                             share_urls = f'{INDEX_URL}/{url_path}?a=view'
-                            buttons.ubutton("View Link", share_urls)
+                            buttons.ubutton("🌐 View Link", share_urls)
                 button = buttons.build_menu(2)
             else:
                 msg += f'\n\n<b>Path :</b> <code>{rclonePath}</code>'
