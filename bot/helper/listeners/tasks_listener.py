@@ -336,7 +336,8 @@ class MirrorLeechListener:
             await DbManger().rm_complete_task(self.message.link)
         msg = f"<b>Nama :</b> <code>{escape(name)}</code>"
         msg += f"\n\n<b>Ukuran :</b> <code>{get_readable_file_size(size)}</code>"
-        msg += f"\n\n</b>Hasil mirror sudah kami pindahkan<a href='https://t.me/peamasambamirror'> 𝑫𝒊𝒔𝒊𝒏𝒊</a> </b>"
+        msg += f"\n\n</b>Hasil mirror sudah kami pindahkan<a href='https://t.me/peamasambamirror'> 𝑫𝒊𝒔𝒊𝒏𝒊</a> </b>\n\n"
+        msg += f'\n\n<b>𝐏𝐄𝐀 𝐌𝐀𝐒𝐀𝐌𝐁𝐀\n\n'
         LOGGER.info(f'Task Done: {name}')
         if self.isLeech:
             msg += f'\n\n<b>Jumlah File :</b> <code>{folders}</code>'
@@ -375,13 +376,13 @@ class MirrorLeechListener:
                     buttons.ubutton("☁️ Cloud Link", link)
                 if rclonePath:
                     msg += f'\n\n<b>Path :</b> <code>{rclonePath}</code>'
-                    if (RCLONE_SERVE_URL := config_dict['RCLONE_SERVE_URL']):
+                if rclonePath and (RCLONE_SERVE_URL := config_dict['RCLONE_SERVE_URL']):
                         remote, path = rclonePath.split(':', 1)
                         url_path = rutils.quote(f'{path}')
                         share_url = f'{RCLONE_SERVE_URL}/{remote}/{url_path}'
                         if mime_type == "Folder":
                             share_url += '/'
-                    buttons.ubutton("🔗 Rclone Link", share_url)
+                        buttons.ubutton("🔗 Rclone Link", share_url)
                 elif (INDEX_URL := config_dict['INDEX_URL']) and not rclonePath:
                     url_path = rutils.quote(f'{name}')
                     share_url = f'{INDEX_URL}/{url_path}'
