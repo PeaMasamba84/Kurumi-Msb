@@ -1,894 +1,504 @@
 #!/usr/bin/env python3
-from pyrogram.handlers import MessageHandler, CallbackQueryHandler
-from pyrogram.filters import command, regex, create
-from functools import partial
-from asyncio import create_subprocess_exec, create_subprocess_shell, sleep, gather
-from aiofiles.os import remove, rename, path as aiopath
-from aiofiles import open as aiopen
-from os import environ, getcwd
-from dotenv import load_dotenv
-from time import time
-from io import BytesIO
-from aioshutil import rmtree as aiormtree
+from tzlocal import get_localzone
+from apscheduler.schedulers.asyncio import AsyncIOScheduler
+from pyrogram import Client as tgClient, enums
+from pymongo import MongoClient
+from asyncio import Lock
+from dotenv import load_dotenv, dotenv_values
+from threading import Thread
+from time import sleep, time
+from subprocess import Popen, run as srun
+from os import remove as osremove, path as ospath, environ, getcwd
+from aria2p import API as ariaAPI, Client as ariaClient
+from qbittorrentapi import Client as qbClient
+from faulthandler import enable as faulthandler_enable
+from socket import setdefaulttimeout
+from logging import getLogger, FileHandler, StreamHandler, INFO, basicConfig, error as log_error, info as log_info, warning as log_warning
+from uvloop import install
+install()
 
-from bot import config_dict, user_data, DATABASE_URL, MAX_SPLIT_SIZE, DRIVES_IDS, DRIVES_NAMES, INDEX_URLS, aria2, GLOBAL_EXTENSION_FILTER, status_reply_dict_lock, Interval, aria2_options, aria2c_global, IS_PREMIUM_USER, download_dict, qbit_options, get_client, LOGGER, bot
-from bot.helper.telegram_helper.message_utils import sendMessage, sendFile, editMessage, update_all_messages
-from bot.helper.telegram_helper.filters import CustomFilters
-from bot.helper.telegram_helper.bot_commands import BotCommands
-from bot.helper.telegram_helper.button_build import ButtonMaker
-from bot.helper.ext_utils.bot_utils import setInterval, sync_to_async, new_thread
-from bot.helper.ext_utils.db_handler import DbManger
-from bot.helper.ext_utils.task_manager import start_from_queued
-from bot.helper.mirror_utils.rclone_utils.serve import rclone_serve_booter
-from bot.modules.torrent_search import initiate_search_tools
-from bot.modules.rss import addJob
+faulthandler_enable()
 
-START = 0
-STATE = 'view'
-handler_dict = {}
-default_values = {'AUTO_DELETE_MESSAGE_DURATION': 30,
-                  'DOWNLOAD_DIR': '/usr/src/app/downloads/',
-                  'LEECH_SPLIT_SIZE': MAX_SPLIT_SIZE,
-                  'RSS_DELAY': 900,
-                  'STATUS_UPDATE_INTERVAL': 10,
-                  'SEARCH_LIMIT': 0,
-                  'UPSTREAM_BRANCH': 'master'}
+setdefaulttimeout(600)
 
+botStartTime = time()
 
-async def get_buttons(key=None, edit_type=None):
-    buttons = ButtonMaker()
-    if key is None:
-        buttons.ibutton('Config Variables', "botset var")
-        buttons.ibutton('Private Files', "botset private")
-        buttons.ibutton('Qbit Settings', "botset qbit")
-        buttons.ibutton('Aria2c Settings', "botset aria")
-        buttons.ibutton('Close', "botset close")
-        msg = 'Bot Settings:'
-    elif key == 'var':
-        for k in list(config_dict.keys())[START:10+START]:
-            buttons.ibutton(k, f"botset editvar {k}")
-        if STATE == 'view':
-            buttons.ibutton('Edit', "botset edit var")
-        else:
-            buttons.ibutton('View', "botset view var")
-        buttons.ibutton('Back', "botset back")
-        buttons.ibutton('Close', "botset close")
-        for x in range(0, len(config_dict), 10):
-            buttons.ibutton(
-                f'{int(x/10)}', f"botset start var {x}", position='footer')
-        msg = f'Config Variables | Page: {int(START/10)} | State: {STATE}'
-    elif key == 'private':
-        buttons.ibutton('Back', "botset back")
-        buttons.ibutton('Close', "botset close")
-        msg = '''Send private file: config.env, token.pickle, rclone.conf, accounts.zip, list_drives.txt, cookies.txt, terabox.txt, .netrc or any other private file!
-To delete private file send only the file name as text message.
-Note: Changing .netrc will not take effect for aria2c until restart.
-Timeout: 60 sec'''
-    elif key == 'aria':
-        for k in list(aria2_options.keys())[START:10+START]:
-            buttons.ibutton(k, f"botset editaria {k}")
-        if STATE == 'view':
-            buttons.ibutton('Edit', "botset edit aria")
-        else:
-            buttons.ibutton('View', "botset view aria")
-        buttons.ibutton('Add new key', "botset editaria newkey")
-        buttons.ibutton('Back', "botset back")
-        buttons.ibutton('Close', "botset close")
-        for x in range(0, len(aria2_options), 10):
-            buttons.ibutton(
-                f'{int(x/10)}', f"botset start aria {x}", position='footer')
-        msg = f'Aria2c Options | Page: {int(START/10)} | State: {STATE}'
-    elif key == 'qbit':
-        for k in list(qbit_options.keys())[START:10+START]:
-            buttons.ibutton(k, f"botset editqbit {k}")
-        if STATE == 'view':
-            buttons.ibutton('Edit', "botset edit qbit")
-        else:
-            buttons.ibutton('View', "botset view qbit")
-        buttons.ibutton('Back', "botset back")
-        buttons.ibutton('Close', "botset close")
-        for x in range(0, len(qbit_options), 10):
-            buttons.ibutton(
-                f'{int(x/10)}', f"botset start qbit {x}", position='footer')
-        msg = f'Qbittorrent Options | Page: {int(START/10)} | State: {STATE}'
-    elif edit_type == 'editvar':
-        msg = ''
-        buttons.ibutton('Back', "botset back var")
-        if key not in ['TELEGRAM_HASH', 'TELEGRAM_API', 'OWNER_ID', 'BOT_TOKEN']:
-            buttons.ibutton('Default', f"botset resetvar {key}")
-        buttons.ibutton('Close', "botset close")
-        if key in ['SUDO_USERS', 'CMD_SUFFIX', 'OWNER_ID', 'USER_SESSION_STRING', 'TELEGRAM_HASH',
-                   'TELEGRAM_API', 'TELEGRAM_HASH_PREMIUM', 'TELEGRAM_API_PREMIUM', 'AUTHORIZED_CHATS', 
-                   'DATABASE_URL', 'BOT_TOKEN', 'DOWNLOAD_DIR']:
-            msg += 'Restart required for this edit to take effect!\n\n'
-        msg += f'Send a valid value for {key}. Timeout: 60 sec'
-    elif edit_type == 'editaria':
-        buttons.ibutton('Back', "botset back aria")
-        if key != 'newkey':
-            buttons.ibutton('Default', f"botset resetaria {key}")
-            buttons.ibutton('Empty String', f"botset emptyaria {key}")
-        buttons.ibutton('Close', "botset close")
-        if key == 'newkey':
-            msg = 'Send a key with value. Example: https-proxy-user:value'
-        else:
-            msg = f'Send a valid value for {key}. Timeout: 60 sec'
-    elif edit_type == 'editqbit':
-        buttons.ibutton('Back', "botset back qbit")
-        buttons.ibutton('Empty String', f"botset emptyqbit {key}")
-        buttons.ibutton('Close', "botset close")
-        msg = f'Send a valid value for {key}. Timeout: 60 sec'
-    button = buttons.build_menu(1) if key is None else buttons.build_menu(2)
-    return msg, button
+basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+            handlers=[FileHandler('log.txt'), StreamHandler()],
+            level=INFO)
 
+LOGGER = getLogger(__name__)
 
-async def update_buttons(message, key=None, edit_type=None):
-    msg, button = await get_buttons(key, edit_type)
-    await editMessage(message, msg, button)
+load_dotenv('config.env', override=True)
 
+Interval = []
+QbInterval = []
+QbTorrents = {}
+DRIVES_NAMES = []
+DRIVES_IDS = []
+INDEX_URLS = []
+GLOBAL_EXTENSION_FILTER = ['aria2', '!qB']
+user_data = {}
+aria2_options = {}
+qbit_options = {}
+queued_dl = {}
+queued_up = {}
+non_queued_dl = set()
+non_queued_up = set()
 
-async def edit_variable(_, message, pre_message, key):
-    handler_dict[message.chat.id] = False
-    value = message.text
-    if value.lower() == 'true':
-        value = True
-    elif value.lower() == 'false':
-        value = False
-        if key == 'INCOMPLETE_TASK_NOTIFIER' and DATABASE_URL:
-            await DbManger().trunc_table('tasks')
-    elif key == 'RSS_DELAY':
-        value = int(value)
-        addJob(value)
-    elif key == 'DOWNLOAD_DIR':
-        if not value.endswith('/'):
-            value += '/'
-    elif key in ['LOG_CHAT_ID', 'DUMP_CHAT_ID', 'RSS_CHAT_ID']:
-        if value.isdigit() or value.startswith('-'):
-            value = int(value)
-    elif key == 'STATUS_UPDATE_INTERVAL':
-        value = int(value)
-        if len(download_dict) != 0:
-            async with status_reply_dict_lock:
-                if Interval:
-                    Interval[0].cancel()
-                    Interval.clear()
-                    Interval.append(setInterval(value, update_all_messages))
-    elif key == 'TORRENT_TIMEOUT':
-        value = int(value)
-        downloads = await sync_to_async(aria2.get_downloads)
-        for download in downloads:
-            if not download.is_complete:
-                try:
-                    await sync_to_async(aria2.client.change_option, download.gid, {'bt-stop-timeout': f'{value}'})
-                except Exception as e:
-                    LOGGER.error(e)
-        aria2_options['bt-stop-timeout'] = f'{value}'
-    elif key == 'LEECH_SPLIT_SIZE':
-        value = min(int(value), MAX_SPLIT_SIZE)
-    elif key == 'BASE_URL_PORT':
-        value = int(value)
-        if config_dict['BASE_URL']:
-            await (await create_subprocess_exec("pkill", "-9", "-f", "gunicorn")).wait()
-            await create_subprocess_shell(f"gunicorn web.wserver:app --bind 0.0.0.0:{value} --worker-class gevent")
-    elif key == 'EXTENSION_FILTER':
-        fx = value.split()
-        GLOBAL_EXTENSION_FILTER.clear()
-        GLOBAL_EXTENSION_FILTER.extend(['aria2', '!qB'])
-        for x in fx:
-            x = x.lstrip('.')
-            GLOBAL_EXTENSION_FILTER.append(x.strip().lower())
-    elif key == 'GDRIVE_ID':
-        if DRIVES_NAMES and DRIVES_NAMES[0] == 'Main':
-            DRIVES_IDS[0] = value
-        else:
-            DRIVES_IDS.insert(0, value)
-    elif key == 'INDEX_URL':
-        if DRIVES_NAMES and DRIVES_NAMES[0] == 'Main':
-            INDEX_URLS[0] = value
-        else:
-            INDEX_URLS.insert(0, value)
-    elif value.isdigit():
-        value = int(value)
-    config_dict[key] = value
-    await update_buttons(pre_message, 'var')
-    await message.delete()
-    if DATABASE_URL:
-        await DbManger().update_config({key: value})
-    if key in ['SEARCH_PLUGINS', 'SEARCH_API_LINK']:
-        await initiate_search_tools()
-    elif key in ['QUEUE_ALL', 'QUEUE_DOWNLOAD', 'QUEUE_UPLOAD']:
-        await start_from_queued()
-    elif key in ['RCLONE_SERVE_URL', 'RCLONE_SERVE_PORT', 'RCLONE_SERVE_USER', 'RCLONE_SERVE_PASS']:
-        await rclone_serve_booter()
+try:
+    if bool(environ.get('_____REMOVE_THIS_LINE_____')):
+        log_error('The README.md file there to be read! Exiting now!')
+        exit()
+except:
+    pass
 
+download_dict_lock = Lock()
+status_reply_dict_lock = Lock()
+queue_dict_lock = Lock()
+qb_listener_lock = Lock()
+status_reply_dict = {}
+download_dict = {}
+rss_dict = {}
 
-async def edit_aria(_, message, pre_message, key):
-    handler_dict[message.chat.id] = False
-    value = message.text
-    if key == 'newkey':
-        key, value = [x.strip() for x in value.split(':', 1)]
-    elif value.lower() == 'true':
-        value = "true"
-    elif value.lower() == 'false':
-        value = "false"
-    if key in aria2c_global:
-        await sync_to_async(aria2.set_global_options, {key: value})
+BOT_TOKEN = environ.get('BOT_TOKEN', '')
+if len(BOT_TOKEN) == 0:
+    log_error("BOT_TOKEN variable is missing! Exiting now")
+    exit(1)
+
+bot_id = BOT_TOKEN.split(':', 1)[0]
+
+DATABASE_URL = environ.get('DATABASE_URL', '')
+if len(DATABASE_URL) == 0:
+    DATABASE_URL = ''
+
+if DATABASE_URL:
+    conn = MongoClient(DATABASE_URL)
+    db = conn.mltb
+    current_config = dict(dotenv_values('config.env'))
+    old_config = db.settings.deployConfig.find_one({'_id': bot_id})
+    if old_config is None:
+        db.settings.deployConfig.replace_one(
+            {'_id': bot_id}, current_config, upsert=True)
     else:
-        downloads = await sync_to_async(aria2.get_downloads)
-        for download in downloads:
-            if not download.is_complete:
-                try:
-                    await sync_to_async(aria2.client.change_option, download.gid, {key: value})
-                except Exception as e:
-                    LOGGER.error(e)
-    aria2_options[key] = value
-    await update_buttons(pre_message, 'aria')
-    await message.delete()
-    if DATABASE_URL:
-        await DbManger().update_aria2(key, value)
-
-
-async def edit_qbit(_, message, pre_message, key):
-    handler_dict[message.chat.id] = False
-    value = message.text
-    if value.lower() == 'true':
-        value = True
-    elif value.lower() == 'false':
-        value = False
-    elif key == 'max_ratio':
-        value = float(value)
-    elif value.isdigit():
-        value = int(value)
-    await sync_to_async(get_client().app_set_preferences, {key: value})
-    qbit_options[key] = value
-    await update_buttons(pre_message, 'qbit')
-    await message.delete()
-    if DATABASE_URL:
-        await DbManger().update_qbittorrent(key, value)
-
-
-async def update_private_file(_, message, pre_message):
-    handler_dict[message.chat.id] = False
-    if not message.media and (file_name := message.text):
-        fn = file_name.rsplit('.zip', 1)[0]
-        if await aiopath.isfile(fn) and file_name != 'config.env':
-            await remove(fn)
-        if fn == 'accounts':
-            if await aiopath.exists('accounts'):
-                await aiormtree('accounts')
-            if await aiopath.exists('rclone_sa'):
-                await aiormtree('rclone_sa')
-            config_dict['USE_SERVICE_ACCOUNTS'] = False
-            if DATABASE_URL:
-                await DbManger().update_config({'USE_SERVICE_ACCOUNTS': False})
-        elif file_name in ['.netrc', 'netrc']:
-            await (await create_subprocess_exec("touch", ".netrc")).wait()
-            await (await create_subprocess_exec("chmod", "600", ".netrc")).wait()
-            await (await create_subprocess_exec("cp", ".netrc", "/root/.netrc")).wait()
-        await message.delete()
-    elif doc := message.document:
-        file_name = doc.file_name
-        await message.download(file_name=f'{getcwd()}/{file_name}')
-        if file_name == 'accounts.zip':
-            if await aiopath.exists('accounts'):
-                await aiormtree('accounts')
-            if await aiopath.exists('rclone_sa'):
-                await aiormtree('rclone_sa')
-            await (await create_subprocess_exec("7z", "x", "-o.", "-aoa", "accounts.zip", "accounts/*.json")).wait()
-            await (await create_subprocess_exec("chmod", "-R", "777", "accounts")).wait()
-        elif file_name == 'list_drives.txt':
-            DRIVES_IDS.clear()
-            DRIVES_NAMES.clear()
-            INDEX_URLS.clear()
-            if GDRIVE_ID := config_dict['GDRIVE_ID']:
-                DRIVES_NAMES.append("Main")
-                DRIVES_IDS.append(GDRIVE_ID)
-                INDEX_URLS.append(config_dict['INDEX_URL'])
-            async with aiopen('list_drives.txt', 'r+') as f:
-                lines = await f.readlines()
-                for line in lines:
-                    temp = line.strip().split()
-                    DRIVES_IDS.append(temp[1])
-                    DRIVES_NAMES.append(temp[0].replace("_", " "))
-                    if len(temp) > 2:
-                        INDEX_URLS.append(temp[2])
-                    else:
-                        INDEX_URLS.append('')
-        elif file_name in ['.netrc', 'netrc']:
-            if file_name == 'netrc':
-                await rename('netrc', '.netrc')
-                file_name = '.netrc'
-            await (await create_subprocess_exec("chmod", "600", ".netrc")).wait()
-            await (await create_subprocess_exec("cp", ".netrc", "/root/.netrc")).wait()
-        elif file_name == 'config.env':
-            load_dotenv('config.env', override=True)
-            await load_config()
-        if '@github.com' in config_dict['UPSTREAM_REPO']:
-            buttons = ButtonMaker()
-            msg = 'Push to UPSTREAM_REPO ?'
-            buttons.ibutton('Yes!', f"botset push {file_name}")
-            buttons.ibutton('No', "botset close")
-            await sendMessage(message, msg, buttons.build_menu(2))
-        else:
-            await message.delete()
-    if file_name == 'rclone.conf':
-        await rclone_serve_booter()
-    await update_buttons(pre_message)
-    if DATABASE_URL:
-        await DbManger().update_private_file(file_name)
-    if await aiopath.exists('accounts.zip'):
-        await remove('accounts.zip')
-
-
-async def event_handler(client, query, pfunc, rfunc, document=False):
-    chat_id = query.message.chat.id
-    handler_dict[chat_id] = True
-    start_time = time()
-
-    async def event_filter(_, __, event):
-        user = event.from_user or event.sender_chat
-        return bool(user.id == query.from_user.id and event.chat.id == chat_id and (event.text or event.document and document))
-    handler = client.add_handler(MessageHandler(
-        pfunc, filters=create(event_filter)), group=-1)
-    while handler_dict[chat_id]:
-        await sleep(0.5)
-        if time() - start_time > 60:
-            handler_dict[chat_id] = False
-            await rfunc()
-    client.remove_handler(*handler)
-
-
-@new_thread
-async def edit_bot_settings(client, query):
-    data = query.data.split()
-    message = query.message
-    if data[1] == 'close':
-        handler_dict[message.chat.id] = False
-        await query.answer()
-        await message.reply_to_message.delete()
-        await message.delete()
-    elif data[1] == 'back':
-        handler_dict[message.chat.id] = False
-        await query.answer()
-        key = data[2] if len(data) == 3 else None
-        if key is None:
-            globals()['START'] = 0
-        await update_buttons(message, key)
-    elif data[1] in ['var', 'aria', 'qbit']:
-        await query.answer()
-        await update_buttons(message, data[1])
-    elif data[1] == 'resetvar':
-        handler_dict[message.chat.id] = False
-        await query.answer()
-        value = ''
-        if data[2] in default_values:
-            value = default_values[data[2]]
-            if data[2] == "STATUS_UPDATE_INTERVAL" and len(download_dict) != 0:
-                async with status_reply_dict_lock:
-                    if Interval:
-                        Interval[0].cancel()
-                        Interval.clear()
-                        Interval.append(setInterval(
-                            value, update_all_messages))
-        elif data[2] == 'EXTENSION_FILTER':
-            GLOBAL_EXTENSION_FILTER.clear()
-            GLOBAL_EXTENSION_FILTER.extend(['aria2', '!qB'])
-        elif data[2] == 'TORRENT_TIMEOUT':
-            downloads = await sync_to_async(aria2.get_downloads)
-            for download in downloads:
-                if not download.is_complete:
-                    try:
-                        await sync_to_async(aria2.client.change_option, download.gid, {'bt-stop-timeout': '0'})
-                    except Exception as e:
-                        LOGGER.error(e)
-            aria2_options['bt-stop-timeout'] = '0'
-            if DATABASE_URL:
-                await DbManger().update_aria2('bt-stop-timeout', '0')
-        elif data[2] == 'BASE_URL':
-            await (await create_subprocess_exec("pkill", "-9", "-f", "gunicorn")).wait()
-        elif data[2] == 'BASE_URL_PORT':
-            value = 80
-            if config_dict['BASE_URL']:
-                await (await create_subprocess_exec("pkill", "-9", "-f", "gunicorn")).wait()
-                await create_subprocess_shell("gunicorn web.wserver:app --bind 0.0.0.0:80 --worker-class gevent")
-        elif data[2] == 'GDRIVE_ID':
-            if DRIVES_NAMES and DRIVES_NAMES[0] == 'Main':
-                DRIVES_NAMES.pop(0)
-                DRIVES_IDS.pop(0)
-                INDEX_URLS.pop(0)
-        elif data[2] == 'INDEX_URL':
-            if DRIVES_NAMES and DRIVES_NAMES[0] == 'Main':
-                INDEX_URLS[0] = ''
-        elif data[2] == 'INCOMPLETE_TASK_NOTIFIER' and DATABASE_URL:
-            await DbManger().trunc_table('tasks')
-        config_dict[data[2]] = value
-        await update_buttons(message, 'var')
-        if DATABASE_URL:
-            await DbManger().update_config({data[2]: value})
-        if data[2] in ['SEARCH_PLUGINS', 'SEARCH_API_LINK']:
-            await initiate_search_tools()
-        elif data[2] in ['QUEUE_ALL', 'QUEUE_DOWNLOAD', 'QUEUE_UPLOAD']:
-            await start_from_queued()
-        elif data[2] in ['RCLONE_SERVE_URL', 'RCLONE_SERVE_PORT', 'RCLONE_SERVE_USER', 'RCLONE_SERVE_PASS']:
-            await rclone_serve_booter()
-    elif data[1] == 'resetaria':
-        handler_dict[message.chat.id] = False
-        aria2_defaults = await sync_to_async(aria2.client.get_global_option)
-        if aria2_defaults[data[2]] == aria2_options[data[2]]:
-            await query.answer('Value already same as you added in aria.sh!')
-            return
-        await query.answer()
-        value = aria2_defaults[data[2]]
-        aria2_options[data[2]] = value
-        await update_buttons(message, 'aria')
-        downloads = await sync_to_async(aria2.get_downloads)
-        for download in downloads:
-            if not download.is_complete:
-                try:
-                    await sync_to_async(aria2.client.change_option, download.gid, {data[2]: value})
-                except Exception as e:
-                    LOGGER.error(e)
-        if DATABASE_URL:
-            await DbManger().update_aria2(data[2], value)
-    elif data[1] == 'emptyaria':
-        handler_dict[message.chat.id] = False
-        await query.answer()
-        aria2_options[data[2]] = ''
-        await update_buttons(message, 'aria')
-        downloads = await sync_to_async(aria2.get_downloads)
-        for download in downloads:
-            if not download.is_complete:
-                try:
-                    await sync_to_async(aria2.client.change_option, download.gid, {data[2]: ''})
-                except Exception as e:
-                    LOGGER.error(e)
-        if DATABASE_URL:
-            await DbManger().update_aria2(data[2], '')
-    elif data[1] == 'emptyqbit':
-        handler_dict[message.chat.id] = False
-        await query.answer()
-        await sync_to_async(get_client().app_set_preferences, {data[2]: value})
-        qbit_options[data[2]] = ''
-        await update_buttons(message, 'qbit')
-        if DATABASE_URL:
-            await DbManger().update_qbittorrent(data[2], '')
-    elif data[1] == 'private':
-        handler_dict[message.chat.id] = False
-        await query.answer()
-        await update_buttons(message, data[1])
-        pfunc = partial(update_private_file, pre_message=message)
-        rfunc = partial(update_buttons, message)
-        await event_handler(client, query, pfunc, rfunc, True)
-    elif data[1] == 'editvar' and STATE == 'edit':
-        handler_dict[message.chat.id] = False
-        await query.answer()
-        await update_buttons(message, data[2], data[1])
-        pfunc = partial(edit_variable, pre_message=message, key=data[2])
-        rfunc = partial(update_buttons, message, 'var')
-        await event_handler(client, query, pfunc, rfunc)
-    elif data[1] == 'editvar' and STATE == 'view':
-        value = config_dict[data[2]]
-        if len(str(value)) > 200:
-            await query.answer()
-            with BytesIO(str.encode(value)) as out_file:
-                out_file.name = f"{data[2]}.txt"
-                await sendFile(message, out_file)
-            return
-        elif value == '':
-            value = None
-        await query.answer(f'{value}', show_alert=True)
-    elif data[1] == 'editaria' and (STATE == 'edit' or data[2] == 'newkey'):
-        handler_dict[message.chat.id] = False
-        await query.answer()
-        await update_buttons(message, data[2], data[1])
-        pfunc = partial(edit_aria, pre_message=message, key=data[2])
-        rfunc = partial(update_buttons, message, 'aria')
-        await event_handler(client, query, pfunc, rfunc)
-    elif data[1] == 'editaria' and STATE == 'view':
-        value = aria2_options[data[2]]
-        if len(str(value)) > 200:
-            await query.answer()
-            with BytesIO(str.encode(value)) as out_file:
-                out_file.name = f"{data[2]}.txt"
-                await sendFile(message, out_file)
-            return
-        elif value == '':
-            value = None
-        await query.answer(f'{value}', show_alert=True)
-    elif data[1] == 'editqbit' and STATE == 'edit':
-        handler_dict[message.chat.id] = False
-        await query.answer()
-        await update_buttons(message, data[2], data[1])
-        pfunc = partial(edit_qbit, pre_message=message, key=data[2])
-        rfunc = partial(update_buttons, message, 'var')
-        await event_handler(client, query, pfunc, rfunc)
-    elif data[1] == 'editqbit' and STATE == 'view':
-        value = qbit_options[data[2]]
-        if len(str(value)) > 200:
-            await query.answer()
-            with BytesIO(str.encode(value)) as out_file:
-                out_file.name = f"{data[2]}.txt"
-                await sendFile(message, out_file)
-            return
-        elif value == '':
-            value = None
-        await query.answer(f'{value}', show_alert=True)
-    elif data[1] == 'edit':
-        await query.answer()
-        globals()['STATE'] = 'edit'
-        await update_buttons(message, data[2])
-    elif data[1] == 'view':
-        await query.answer()
-        globals()['STATE'] = 'view'
-        await update_buttons(message, data[2])
-    elif data[1] == 'start':
-        await query.answer()
-        if START != int(data[3]):
-            globals()['START'] = int(data[3])
-            await update_buttons(message, data[2])
-    elif data[1] == 'push':
-        await query.answer()
-        filename = data[2].rsplit('.zip', 1)[0]
-        if await aiopath.exists(filename):
-            await (await create_subprocess_shell(f"git add -f {filename} \
-                                                   && git commit -sm botsettings -q \
-                                                   && git push origin {config_dict['UPSTREAM_BRANCH']} -qf")).wait()
-        else:
-            await (await create_subprocess_shell(f"git rm -r --cached {filename} \
-                                                   && git commit -sm botsettings -q \
-                                                   && git push origin {config_dict['UPSTREAM_BRANCH']} -qf")).wait()
-        await message.reply_to_message.delete()
-        await message.delete()
-
-
-async def bot_settings(_, message):
-    handler_dict[message.chat.id] = False
-    msg, button = await get_buttons()
-    globals()['START'] = 0
-    await sendMessage(message, msg, button)
-
-
-async def load_config():
+        del old_config['_id']
+    if old_config and old_config != current_config:
+        db.settings.deployConfig.replace_one(
+            {'_id': bot_id}, current_config, upsert=True)
+    elif config_dict := db.settings.config.find_one({'_id': bot_id}):
+        del config_dict['_id']
+        for key, value in config_dict.items():
+            environ[key] = str(value)
+    if pf_dict := db.settings.files.find_one({'_id': bot_id}):
+        del pf_dict['_id']
+        for key, value in pf_dict.items():
+            if value:
+                file_ = key.replace('__', '.')
+                with open(file_, 'wb+') as f:
+                    f.write(value)
+    if a2c_options := db.settings.aria2c.find_one({'_id': bot_id}):
+        del a2c_options['_id']
+        aria2_options = a2c_options
+    if qbit_opt := db.settings.qbittorrent.find_one({'_id': bot_id}):
+        del qbit_opt['_id']
+        qbit_options = qbit_opt
+    conn.close()
     BOT_TOKEN = environ.get('BOT_TOKEN', '')
-    if len(BOT_TOKEN) == 0:
-        BOT_TOKEN = config_dict['BOT_TOKEN']
-
-    TELEGRAM_API = environ.get('TELEGRAM_API', '')
-    if len(TELEGRAM_API) == 0:
-        TELEGRAM_API = config_dict['TELEGRAM_API']
-    else:
-        TELEGRAM_API = int(TELEGRAM_API)
-
-    TELEGRAM_HASH = environ.get('TELEGRAM_HASH', '')
-    if len(TELEGRAM_HASH) == 0:
-        TELEGRAM_HASH = config_dict['TELEGRAM_HASH']
-
-    TELEGRAM_API_PREMIUM = environ.get('TELEGRAM_API_PREMIUM', '')
-    if len(TELEGRAM_API_PREMIUM) == 0:
-        TELEGRAM_API_PREMIUM = config_dict['TELEGRAM_API_PREMIUM']
-    else:
-        TELEGRAM_API_PREMIUM = int(TELEGRAM_API_PREMIUM)
-
-    TELEGRAM_HASH_PREMIUM = environ.get('TELEGRAM_HASH_PREMIUM', '')
-    if len(TELEGRAM_HASH_PREMIUM) == 0:
-        TELEGRAM_HASH_PREMIUM = config_dict['TELEGRAM_HASH_PREMIUM']
-
-    OWNER_ID = environ.get('OWNER_ID', '')
-    OWNER_ID = config_dict['OWNER_ID'] if len(OWNER_ID) == 0 else int(OWNER_ID)
-
+    bot_id = BOT_TOKEN.split(':', 1)[0]
     DATABASE_URL = environ.get('DATABASE_URL', '')
-    if len(DATABASE_URL) == 0:
-        DATABASE_URL = ''
+else:
+    config_dict = {}
 
-    DOWNLOAD_DIR = environ.get('DOWNLOAD_DIR', '')
-    if len(DOWNLOAD_DIR) == 0:
-        DOWNLOAD_DIR = '/usr/src/app/downloads/'
-    elif not DOWNLOAD_DIR.endswith("/"):
-        DOWNLOAD_DIR = f'{DOWNLOAD_DIR}/'
+OWNER_ID = environ.get('OWNER_ID', '')
+if len(OWNER_ID) == 0:
+    log_error("OWNER_ID variable is missing! Exiting now")
+    exit(1)
+else:
+    OWNER_ID = int(OWNER_ID)
 
-    GDRIVE_ID = environ.get('GDRIVE_ID', '')
-    if len(GDRIVE_ID) == 0:
-        GDRIVE_ID = ''
+TELEGRAM_API = environ.get('TELEGRAM_API', '')
+if len(TELEGRAM_API) == 0:
+    log_error("TELEGRAM_API variable is missing! Exiting now")
+    exit(1)
+else:
+    TELEGRAM_API = int(TELEGRAM_API)
 
-    RCLONE_PATH = environ.get('RCLONE_PATH', '')
-    if len(RCLONE_PATH) == 0:
-        RCLONE_PATH = ''
+TELEGRAM_HASH = environ.get('TELEGRAM_HASH', '')
+if len(TELEGRAM_HASH) == 0:
+    log_error("TELEGRAM_HASH variable is missing! Exiting now")
+    exit(1)
 
-    DEFAULT_UPLOAD = environ.get('DEFAULT_UPLOAD', '')
-    if DEFAULT_UPLOAD != 'rc':
-        DEFAULT_UPLOAD = 'gd'
+GDRIVE_ID = environ.get('GDRIVE_ID', '')
+if len(GDRIVE_ID) == 0:
+    GDRIVE_ID = ''
 
-    RCLONE_FLAGS = environ.get('RCLONE_FLAGS', '')
-    if len(RCLONE_FLAGS) == 0:
-        RCLONE_FLAGS = ''
+RCLONE_PATH = environ.get('RCLONE_PATH', '')
+if len(RCLONE_PATH) == 0:
+    RCLONE_PATH = ''
 
-    AUTHORIZED_CHATS = environ.get('AUTHORIZED_CHATS', '')
-    if len(AUTHORIZED_CHATS) != 0:
-        aid = AUTHORIZED_CHATS.split()
-        for id_ in aid:
-            user_data[int(id_.strip())] = {'is_auth': True}
+RCLONE_FLAGS = environ.get('RCLONE_FLAGS', '')
+if len(RCLONE_FLAGS) == 0:
+    RCLONE_FLAGS = ''
 
-    SUDO_USERS = environ.get('SUDO_USERS', '')
-    if len(SUDO_USERS) != 0:
-        aid = SUDO_USERS.split()
-        for id_ in aid:
-            user_data[int(id_.strip())] = {'is_sudo': True}
+DEFAULT_UPLOAD = environ.get('DEFAULT_UPLOAD', '')
+if DEFAULT_UPLOAD != 'rc':
+    DEFAULT_UPLOAD = 'gd'
 
-    EXTENSION_FILTER = environ.get('EXTENSION_FILTER', '')
-    if len(EXTENSION_FILTER) > 0:
-        fx = EXTENSION_FILTER.split()
-        GLOBAL_EXTENSION_FILTER.clear()
-        GLOBAL_EXTENSION_FILTER.extend(['aria2', '!qB'])
-        for x in fx:
-            if x.strip().startswith('.'):
-                x = x.lstrip('.')
-            GLOBAL_EXTENSION_FILTER.append(x.strip().lower())
+DOWNLOAD_DIR = environ.get('DOWNLOAD_DIR', '')
+if len(DOWNLOAD_DIR) == 0:
+    DOWNLOAD_DIR = '/usr/src/app/downloads/'
+elif not DOWNLOAD_DIR.endswith("/"):
+    DOWNLOAD_DIR = f'{DOWNLOAD_DIR}/'
 
-    MEGA_EMAIL = environ.get('MEGA_EMAIL', '')
-    MEGA_PASSWORD = environ.get('MEGA_PASSWORD', '')
-    if len(MEGA_EMAIL) == 0 or len(MEGA_PASSWORD) == 0:
-        MEGA_EMAIL = ''
-        MEGA_PASSWORD = ''
+AUTHORIZED_CHATS = environ.get('AUTHORIZED_CHATS', '')
+if len(AUTHORIZED_CHATS) != 0:
+    aid = AUTHORIZED_CHATS.split()
+    for id_ in aid:
+        user_data[int(id_.strip())] = {'is_auth': True}
 
-    UPTOBOX_TOKEN = environ.get('UPTOBOX_TOKEN', '')
-    if len(UPTOBOX_TOKEN) == 0:
-        UPTOBOX_TOKEN = ''
+SUDO_USERS = environ.get('SUDO_USERS', '')
+if len(SUDO_USERS) != 0:
+    aid = SUDO_USERS.split()
+    for id_ in aid:
+        user_data[int(id_.strip())] = {'is_sudo': True}
 
-    INDEX_URL = environ.get('INDEX_URL', '').rstrip("/")
-    if len(INDEX_URL) == 0:
-        INDEX_URL = ''
+EXTENSION_FILTER = environ.get('EXTENSION_FILTER', '')
+if len(EXTENSION_FILTER) > 0:
+    fx = EXTENSION_FILTER.split()
+    for x in fx:
+        x = x.lstrip('.')
+        GLOBAL_EXTENSION_FILTER.append(x.strip().lower())
 
-    SEARCH_API_LINK = environ.get('SEARCH_API_LINK', '').rstrip("/")
-    if len(SEARCH_API_LINK) == 0:
-        SEARCH_API_LINK = ''
-
-    LEECH_FILENAME_PREFIX = environ.get('LEECH_FILENAME_PREFIX', '')
-    if len(LEECH_FILENAME_PREFIX) == 0:
-        LEECH_FILENAME_PREFIX = ''
-
-    SEARCH_PLUGINS = environ.get('SEARCH_PLUGINS', '')
-    if len(SEARCH_PLUGINS) == 0:
-        SEARCH_PLUGINS = ''
-
-    MAX_SPLIT_SIZE = 4194304000 if IS_PREMIUM_USER else 2097152000
-
-    LEECH_SPLIT_SIZE = environ.get('LEECH_SPLIT_SIZE', '')
-    if len(LEECH_SPLIT_SIZE) == 0 or int(LEECH_SPLIT_SIZE) > MAX_SPLIT_SIZE:
-        LEECH_SPLIT_SIZE = MAX_SPLIT_SIZE
+IS_PREMIUM_USER = False
+user = ''
+USER_SESSION_STRING = environ.get('USER_SESSION_STRING', '')
+# Premium account using other Api & Hash
+TELEGRAM_API_PREMIUM = environ.get('TELEGRAM_API_PREMIUM', '')
+TELEGRAM_HASH_PREMIUM = environ.get('TELEGRAM_HASH_PREMIUM', '')
+if len(USER_SESSION_STRING) != 0:
+    log_info("Creating client from USER_SESSION_STRING")
+    # If Using Other Account
+    if len(TELEGRAM_API_PREMIUM) != 0:
+        log_info("Using another Telegram Api & Telegram Hash for User Session...")
+        TELEGRAM_API_PREMIUM = int(TELEGRAM_API_PREMIUM)
+        user = tgClient('user', TELEGRAM_API_PREMIUM, TELEGRAM_HASH_PREMIUM, session_string=USER_SESSION_STRING,
+                        parse_mode=enums.ParseMode.HTML, no_updates=True, max_concurrent_transmissions=1000).start()
     else:
-        LEECH_SPLIT_SIZE = int(LEECH_SPLIT_SIZE)
+        user = tgClient('user', TELEGRAM_API, TELEGRAM_HASH, session_string=USER_SESSION_STRING,
+                        parse_mode=enums.ParseMode.HTML, no_updates=True, max_concurrent_transmissions=1000).start()
+    IS_PREMIUM_USER = user.me.is_premium
 
-    STATUS_UPDATE_INTERVAL = environ.get('STATUS_UPDATE_INTERVAL', '')
-    if len(STATUS_UPDATE_INTERVAL) == 0:
-        STATUS_UPDATE_INTERVAL = 10
+MEGA_EMAIL = environ.get('MEGA_EMAIL', '')
+MEGA_PASSWORD = environ.get('MEGA_PASSWORD', '')
+if len(MEGA_EMAIL) == 0 or len(MEGA_PASSWORD) == 0:
+    log_warning('MEGA Credentials not provided!')
+    MEGA_EMAIL = ''
+    MEGA_PASSWORD = ''
+
+UPTOBOX_TOKEN = environ.get('UPTOBOX_TOKEN', '')
+if len(UPTOBOX_TOKEN) == 0:
+    UPTOBOX_TOKEN = ''
+
+INDEX_URL = environ.get('INDEX_URL', '').rstrip("/")
+if len(INDEX_URL) == 0:
+    INDEX_URL = ''
+
+SEARCH_API_LINK = environ.get('SEARCH_API_LINK', '').rstrip("/")
+if len(SEARCH_API_LINK) == 0:
+    SEARCH_API_LINK = ''
+
+LEECH_FILENAME_PREFIX = environ.get('LEECH_FILENAME_PREFIX', '')
+if len(LEECH_FILENAME_PREFIX) == 0:
+    LEECH_FILENAME_PREFIX = ''
+
+SEARCH_PLUGINS = environ.get('SEARCH_PLUGINS', '')
+if len(SEARCH_PLUGINS) == 0:
+    SEARCH_PLUGINS = ''
+
+MAX_SPLIT_SIZE = 4194304000 if IS_PREMIUM_USER else 2097152000
+log_info(f"Max Split Size : {MAX_SPLIT_SIZE}")
+
+LEECH_SPLIT_SIZE = environ.get('LEECH_SPLIT_SIZE', '')
+if len(LEECH_SPLIT_SIZE) == 0 or int(LEECH_SPLIT_SIZE) > MAX_SPLIT_SIZE:
+    LEECH_SPLIT_SIZE = MAX_SPLIT_SIZE
+else:
+    LEECH_SPLIT_SIZE = int(LEECH_SPLIT_SIZE)
+
+STATUS_UPDATE_INTERVAL = environ.get('STATUS_UPDATE_INTERVAL', '')
+if len(STATUS_UPDATE_INTERVAL) == 0:
+    STATUS_UPDATE_INTERVAL = 10
+else:
+    STATUS_UPDATE_INTERVAL = int(STATUS_UPDATE_INTERVAL)
+
+AUTO_DELETE_MESSAGE_DURATION = environ.get('AUTO_DELETE_MESSAGE_DURATION', '')
+if len(AUTO_DELETE_MESSAGE_DURATION) == 0:
+    AUTO_DELETE_MESSAGE_DURATION = 30
+else:
+    AUTO_DELETE_MESSAGE_DURATION = int(AUTO_DELETE_MESSAGE_DURATION)
+
+YT_DLP_OPTIONS = environ.get('YT_DLP_OPTIONS', '')
+if len(YT_DLP_OPTIONS) == 0:
+    YT_DLP_OPTIONS = ''
+
+SEARCH_LIMIT = environ.get('SEARCH_LIMIT', '')
+SEARCH_LIMIT = 0 if len(SEARCH_LIMIT) == 0 else int(SEARCH_LIMIT)
+
+DUMP_CHAT_ID = environ.get('DUMP_CHAT_ID', '')
+DUMP_CHAT_ID = '' if len(DUMP_CHAT_ID) == 0 else int(DUMP_CHAT_ID)
+
+LOG_CHAT_ID = environ.get('LOG_CHAT_ID', '')
+LOG_CHAT_ID = '' if len(LOG_CHAT_ID) == 0 else int(LOG_CHAT_ID)
+
+STATUS_LIMIT = environ.get('STATUS_LIMIT', '')
+STATUS_LIMIT = 10 if len(STATUS_LIMIT) == 0 else int(STATUS_LIMIT)
+
+CMD_SUFFIX = environ.get('CMD_SUFFIX', '')
+
+RSS_CHAT_ID = environ.get('RSS_CHAT_ID', '')
+RSS_CHAT_ID = '' if len(RSS_CHAT_ID) == 0 else int(RSS_CHAT_ID)
+
+RSS_DELAY = environ.get('RSS_DELAY', '')
+RSS_DELAY = 900 if len(RSS_DELAY) == 0 else int(RSS_DELAY)
+
+TORRENT_TIMEOUT = environ.get('TORRENT_TIMEOUT', '')
+TORRENT_TIMEOUT = '' if len(TORRENT_TIMEOUT) == 0 else int(TORRENT_TIMEOUT)
+
+QUEUE_ALL = environ.get('QUEUE_ALL', '')
+QUEUE_ALL = '' if len(QUEUE_ALL) == 0 else int(QUEUE_ALL)
+
+QUEUE_DOWNLOAD = environ.get('QUEUE_DOWNLOAD', '')
+QUEUE_DOWNLOAD = '' if len(QUEUE_DOWNLOAD) == 0 else int(QUEUE_DOWNLOAD)
+
+QUEUE_UPLOAD = environ.get('QUEUE_UPLOAD', '')
+QUEUE_UPLOAD = '' if len(QUEUE_UPLOAD) == 0 else int(QUEUE_UPLOAD)
+
+INCOMPLETE_TASK_NOTIFIER = environ.get('INCOMPLETE_TASK_NOTIFIER', '')
+INCOMPLETE_TASK_NOTIFIER = INCOMPLETE_TASK_NOTIFIER.lower() == 'true'
+
+STOP_DUPLICATE = environ.get('STOP_DUPLICATE', '')
+STOP_DUPLICATE = STOP_DUPLICATE.lower() == 'true'
+
+IS_TEAM_DRIVE = environ.get('IS_TEAM_DRIVE', '')
+IS_TEAM_DRIVE = IS_TEAM_DRIVE.lower() == 'true'
+
+USE_SERVICE_ACCOUNTS = environ.get('USE_SERVICE_ACCOUNTS', '')
+USE_SERVICE_ACCOUNTS = USE_SERVICE_ACCOUNTS.lower() == 'true'
+
+WEB_PINCODE = environ.get('WEB_PINCODE', '')
+WEB_PINCODE = WEB_PINCODE.lower() == 'true'
+
+AS_DOCUMENT = environ.get('AS_DOCUMENT', '')
+AS_DOCUMENT = AS_DOCUMENT.lower() == 'true'
+
+EQUAL_SPLITS = environ.get('EQUAL_SPLITS', '')
+EQUAL_SPLITS = EQUAL_SPLITS.lower() == 'true'
+
+MEDIA_GROUP = environ.get('MEDIA_GROUP', '')
+MEDIA_GROUP = MEDIA_GROUP.lower() == 'true'
+
+BASE_URL_PORT = environ.get('BASE_URL_PORT', '')
+BASE_URL_PORT = 80 if len(BASE_URL_PORT) == 0 else int(BASE_URL_PORT)
+
+BASE_URL = environ.get('BASE_URL', '').rstrip("/")
+if len(BASE_URL) == 0:
+    HEROKU_APP_NAME = environ.get('HEROKU_APP_NAME', '')
+    RENDER_APP_NAME = environ.get('RENDER_APP_NAME', '')
+    if not len(HEROKU_APP_NAME) == 0:
+        log_info('Using HEROKU_APP_NAME as BASE_URL!')
+        BASE_URL = 'https://{HEROKU_APP_NAME}.herokuapp.com'
+    elif not len(RENDER_APP_NAME) == 0:
+        log_info('Using RENDER_APP_NAME as BASE_URL!')
+        BASE_URL = 'https://{RENDER_APP_NAME}.onrender.com'     
     else:
-        STATUS_UPDATE_INTERVAL = int(STATUS_UPDATE_INTERVAL)
-    if len(download_dict) != 0:
-        async with status_reply_dict_lock:
-            if Interval:
-                Interval[0].cancel()
-                Interval.clear()
-                Interval.append(setInterval(
-                    STATUS_UPDATE_INTERVAL, update_all_messages))
-
-    AUTO_DELETE_MESSAGE_DURATION = environ.get(
-        'AUTO_DELETE_MESSAGE_DURATION', '')
-    if len(AUTO_DELETE_MESSAGE_DURATION) == 0:
-        AUTO_DELETE_MESSAGE_DURATION = 30
-    else:
-        AUTO_DELETE_MESSAGE_DURATION = int(AUTO_DELETE_MESSAGE_DURATION)
-
-    YT_DLP_OPTIONS = environ.get('YT_DLP_OPTIONS', '')
-    if len(YT_DLP_OPTIONS) == 0:
-        YT_DLP_OPTIONS = ''
-
-    SEARCH_LIMIT = environ.get('SEARCH_LIMIT', '')
-    SEARCH_LIMIT = 0 if len(SEARCH_LIMIT) == 0 else int(SEARCH_LIMIT)
-
-    LOG_CHAT_ID = environ.get('LOG_CHAT_ID', '')
-    LOG_CHAT_ID = '' if len(LOG_CHAT_ID) == 0 else LOG_CHAT_ID
-    if LOG_CHAT_ID.isdigit() or LOG_CHAT_ID.startswith('-'):
-        LOG_CHAT_ID = int(LOG_CHAT_ID)
-
-    DUMP_CHAT_ID = environ.get('DUMP_CHAT_ID', '')
-    DUMP_CHAT_ID = '' if len(DUMP_CHAT_ID) == 0 else DUMP_CHAT_ID
-    if DUMP_CHAT_ID.isdigit() or DUMP_CHAT_ID.startswith('-'):
-        DUMP_CHAT_ID = int(DUMP_CHAT_ID)
-
-    STATUS_LIMIT = environ.get('STATUS_LIMIT', '')
-    STATUS_LIMIT = 10 if len(STATUS_LIMIT) == 0 else int(STATUS_LIMIT)
-
-    RSS_CHAT_ID = environ.get('RSS_CHAT_ID', '')
-    RSS_CHAT_ID = '' if len(RSS_CHAT_ID) == 0 else RSS_CHAT_ID
-    if RSS_CHAT_ID.isdigit() or RSS_CHAT_ID.startswith('-'):
-        RSS_CHAT_ID = int(RSS_CHAT_ID)
-
-    RSS_DELAY = environ.get('RSS_DELAY', '')
-    RSS_DELAY = 900 if len(RSS_DELAY) == 0 else int(RSS_DELAY)
-
-    CMD_SUFFIX = environ.get('CMD_SUFFIX', '')
-
-    USER_SESSION_STRING = environ.get('USER_SESSION_STRING', '')
-
-    TORRENT_TIMEOUT = environ.get('TORRENT_TIMEOUT', '')
-    downloads = aria2.get_downloads()
-    if len(TORRENT_TIMEOUT) == 0:
-        for download in downloads:
-            if not download.is_complete:
-                try:
-                    await sync_to_async(aria2.client.change_option, download.gid, {'bt-stop-timeout': '0'})
-                except Exception as e:
-                    LOGGER.error(e)
-        aria2_options['bt-stop-timeout'] = '0'
-        if DATABASE_URL:
-            await DbManger().update_aria2('bt-stop-timeout', '0')
-        TORRENT_TIMEOUT = ''
-    else:
-        for download in downloads:
-            if not download.is_complete:
-                try:
-                    await sync_to_async(aria2.client.change_option, download.gid, {'bt-stop-timeout': TORRENT_TIMEOUT})
-                except Exception as e:
-                    LOGGER.error(e)
-        aria2_options['bt-stop-timeout'] = TORRENT_TIMEOUT
-        if DATABASE_URL:
-            await DbManger().update_aria2('bt-stop-timeout', TORRENT_TIMEOUT)
-        TORRENT_TIMEOUT = int(TORRENT_TIMEOUT)
-
-    QUEUE_ALL = environ.get('QUEUE_ALL', '')
-    QUEUE_ALL = '' if len(QUEUE_ALL) == 0 else int(QUEUE_ALL)
-
-    QUEUE_DOWNLOAD = environ.get('QUEUE_DOWNLOAD', '')
-    QUEUE_DOWNLOAD = '' if len(QUEUE_DOWNLOAD) == 0 else int(QUEUE_DOWNLOAD)
-
-    QUEUE_UPLOAD = environ.get('QUEUE_UPLOAD', '')
-    QUEUE_UPLOAD = '' if len(QUEUE_UPLOAD) == 0 else int(QUEUE_UPLOAD)
-
-    INCOMPLETE_TASK_NOTIFIER = environ.get('INCOMPLETE_TASK_NOTIFIER', '')
-    INCOMPLETE_TASK_NOTIFIER = INCOMPLETE_TASK_NOTIFIER.lower() == 'true'
-    if not INCOMPLETE_TASK_NOTIFIER and DATABASE_URL:
-        await DbManger().trunc_table('tasks')
-
-    STOP_DUPLICATE = environ.get('STOP_DUPLICATE', '')
-    STOP_DUPLICATE = STOP_DUPLICATE.lower() == 'true'
-
-    IS_TEAM_DRIVE = environ.get('IS_TEAM_DRIVE', '')
-    IS_TEAM_DRIVE = IS_TEAM_DRIVE.lower() == 'true'
-
-    USE_SERVICE_ACCOUNTS = environ.get('USE_SERVICE_ACCOUNTS', '')
-    USE_SERVICE_ACCOUNTS = USE_SERVICE_ACCOUNTS.lower() == 'true'
-
-    WEB_PINCODE = environ.get('WEB_PINCODE', '')
-    WEB_PINCODE = WEB_PINCODE.lower() == 'true'
-
-    AS_DOCUMENT = environ.get('AS_DOCUMENT', '')
-    AS_DOCUMENT = AS_DOCUMENT.lower() == 'true'
-
-    AS_PM = environ.get('AS_PM', '')
-    AS_PM = AS_PM.lower() == 'true'
-
-    EQUAL_SPLITS = environ.get('EQUAL_SPLITS', '')
-    EQUAL_SPLITS = EQUAL_SPLITS.lower() == 'true'
-
-    MEDIA_GROUP = environ.get('MEDIA_GROUP', '')
-    MEDIA_GROUP = MEDIA_GROUP.lower() == 'true'
-
-    BASE_URL_PORT = environ.get('BASE_URL_PORT', '')
-    BASE_URL_PORT = 80 if len(BASE_URL_PORT) == 0 else int(BASE_URL_PORT)
-
-    RCLONE_SERVE_URL = environ.get('RCLONE_SERVE_URL', '')
-    if len(RCLONE_SERVE_URL) == 0:
-        RCLONE_SERVE_URL = ''
-
-    RCLONE_SERVE_PORT = environ.get('RCLONE_SERVE_PORT', '')
-    RCLONE_SERVE_PORT = 8080 if len(
-        RCLONE_SERVE_PORT) == 0 else int(RCLONE_SERVE_PORT)
-
-    RCLONE_SERVE_USER = environ.get('RCLONE_SERVE_USER', '')
-    if len(RCLONE_SERVE_USER) == 0:
-        RCLONE_SERVE_USER = ''
-
-    RCLONE_SERVE_PASS = environ.get('RCLONE_SERVE_PASS', '')
-    if len(RCLONE_SERVE_PASS) == 0:
-        RCLONE_SERVE_PASS = ''
-
-    await (await create_subprocess_exec("pkill", "-9", "-f", "gunicorn")).wait()
-    BASE_URL = environ.get('BASE_URL', '').rstrip("/")
-    if len(BASE_URL) == 0:
+        log_warning('BASE_URL not provided!')
         BASE_URL = ''
-    else:
-        await create_subprocess_shell(f"gunicorn web.wserver:app --bind 0.0.0.0:{BASE_URL_PORT} --worker-class gevent")
 
-    UPSTREAM_REPO = environ.get('UPSTREAM_REPO', '')
-    if len(UPSTREAM_REPO) == 0:
-        UPSTREAM_REPO = ''
+UPSTREAM_REPO = environ.get('UPSTREAM_REPO', '')
+if len(UPSTREAM_REPO) == 0:
+    UPSTREAM_REPO = ''
 
-    UPSTREAM_BRANCH = environ.get('UPSTREAM_BRANCH', '')
-    if len(UPSTREAM_BRANCH) == 0:
-        UPSTREAM_BRANCH = 'master'
+UPSTREAM_BRANCH = environ.get('UPSTREAM_BRANCH', '')
+if len(UPSTREAM_BRANCH) == 0:
+    UPSTREAM_BRANCH = 'master'
 
-    DRIVES_IDS.clear()
-    DRIVES_NAMES.clear()
-    INDEX_URLS.clear()
+RCLONE_SERVE_URL = environ.get('RCLONE_SERVE_URL', '')
+if len(RCLONE_SERVE_URL) == 0:
+    RCLONE_SERVE_URL = ''
 
-    if GDRIVE_ID:
-        DRIVES_NAMES.append("Main")
-        DRIVES_IDS.append(GDRIVE_ID)
-        INDEX_URLS.append(INDEX_URL)
+RCLONE_SERVE_PORT = environ.get('RCLONE_SERVE_PORT', '')
+RCLONE_SERVE_PORT = 8080 if len(
+    RCLONE_SERVE_PORT) == 0 else int(RCLONE_SERVE_PORT)
 
-    if await aiopath.exists('list_drives.txt'):
-        async with aiopen('list_drives.txt', 'r+') as f:
-            lines = await f.readlines()
-            for line in lines:
-                temp = line.strip().split()
-                DRIVES_IDS.append(temp[1])
-                DRIVES_NAMES.append(temp[0].replace("_", " "))
-                if len(temp) > 2:
-                    INDEX_URLS.append(temp[2])
-                else:
-                    INDEX_URLS.append('')
+RCLONE_SERVE_USER = environ.get('RCLONE_SERVE_USER', '')
+if len(RCLONE_SERVE_USER) == 0:
+    RCLONE_SERVE_USER = ''
 
-    config_dict.update({'AS_PM': AS_PM,
-                        'AS_DOCUMENT': AS_DOCUMENT,
-                        'AUTHORIZED_CHATS': AUTHORIZED_CHATS,
-                        'AUTO_DELETE_MESSAGE_DURATION': AUTO_DELETE_MESSAGE_DURATION,
-                        'BASE_URL': BASE_URL,
-                        'BASE_URL_PORT': BASE_URL_PORT,
-                        'BOT_TOKEN': BOT_TOKEN,
-                        'CMD_SUFFIX': CMD_SUFFIX,
-                        'DATABASE_URL': DATABASE_URL,
-                        'DEFAULT_UPLOAD': DEFAULT_UPLOAD,
-                        'DOWNLOAD_DIR': DOWNLOAD_DIR,
-                        'DUMP_CHAT_ID': DUMP_CHAT_ID,
-                        'EQUAL_SPLITS': EQUAL_SPLITS,
-                        'EXTENSION_FILTER': EXTENSION_FILTER,
-                        'GDRIVE_ID': GDRIVE_ID,
-                        'INCOMPLETE_TASK_NOTIFIER': INCOMPLETE_TASK_NOTIFIER,
-                        'INDEX_URL': INDEX_URL,
-                        'IS_TEAM_DRIVE': IS_TEAM_DRIVE,
-                        'LEECH_FILENAME_PREFIX': LEECH_FILENAME_PREFIX,
-                        'LEECH_SPLIT_SIZE': LEECH_SPLIT_SIZE,
-                        'LOG_CHAT_ID': LOG_CHAT_ID,
-                        'MEDIA_GROUP': MEDIA_GROUP,
-                        'MEGA_EMAIL': MEGA_EMAIL,
-                        'MEGA_PASSWORD': MEGA_PASSWORD,
-                        'OWNER_ID': OWNER_ID,
-                        'QUEUE_ALL': QUEUE_ALL,
-                        'QUEUE_DOWNLOAD': QUEUE_DOWNLOAD,
-                        'QUEUE_UPLOAD': QUEUE_UPLOAD,
-                        'RCLONE_FLAGS': RCLONE_FLAGS,
-                        'RCLONE_PATH': RCLONE_PATH,
-                        'RCLONE_SERVE_URL': RCLONE_SERVE_URL,
-                        'RCLONE_SERVE_USER': RCLONE_SERVE_USER,
-                        'RCLONE_SERVE_PASS': RCLONE_SERVE_PASS,
-                        'RCLONE_SERVE_PORT': RCLONE_SERVE_PORT,
-                        'RSS_CHAT_ID': RSS_CHAT_ID,
-                        'RSS_DELAY': RSS_DELAY,
-                        'SEARCH_API_LINK': SEARCH_API_LINK,
-                        'SEARCH_LIMIT': SEARCH_LIMIT,
-                        'SEARCH_PLUGINS': SEARCH_PLUGINS,
-                        'STATUS_LIMIT': STATUS_LIMIT,
-                        'STATUS_UPDATE_INTERVAL': STATUS_UPDATE_INTERVAL,
-                        'STOP_DUPLICATE': STOP_DUPLICATE,
-                        'SUDO_USERS': SUDO_USERS,
-                        'TELEGRAM_API': TELEGRAM_API,
-                        'TELEGRAM_HASH': TELEGRAM_HASH,
-                        'TELEGRAM_API_PREMIUM': TELEGRAM_API_PREMIUM,
-                        'TELEGRAM_HASH_PREMIUM': TELEGRAM_HASH_PREMIUM,
-                        'TORRENT_TIMEOUT': TORRENT_TIMEOUT,
-                        'UPSTREAM_REPO': UPSTREAM_REPO,
-                        'UPSTREAM_BRANCH': UPSTREAM_BRANCH,
-                        'UPTOBOX_TOKEN': UPTOBOX_TOKEN,
-                        'USER_SESSION_STRING': USER_SESSION_STRING,
-                        'USE_SERVICE_ACCOUNTS': USE_SERVICE_ACCOUNTS,
-                        'WEB_PINCODE': WEB_PINCODE,
-                        'YT_DLP_OPTIONS': YT_DLP_OPTIONS})
-
-    if DATABASE_URL:
-        await DbManger().update_config(config_dict)
-    await gather(initiate_search_tools(), start_from_queued(), rclone_serve_booter())
+RCLONE_SERVE_PASS = environ.get('RCLONE_SERVE_PASS', '')
+if len(RCLONE_SERVE_PASS) == 0:
+    RCLONE_SERVE_PASS = ''
 
 
-bot.add_handler(MessageHandler(bot_settings, filters=command(
-    BotCommands.BotSetCommand) & CustomFilters.sudo))
-bot.add_handler(CallbackQueryHandler(edit_bot_settings,
-                filters=regex("^botset") & CustomFilters.sudo))
+config_dict = {'AS_DOCUMENT': AS_DOCUMENT,
+               'AUTHORIZED_CHATS': AUTHORIZED_CHATS,
+               'AUTO_DELETE_MESSAGE_DURATION': AUTO_DELETE_MESSAGE_DURATION,
+               'BASE_URL': BASE_URL,
+               'BASE_URL_PORT': BASE_URL_PORT,
+               'BOT_TOKEN': BOT_TOKEN,
+               'CMD_SUFFIX': CMD_SUFFIX,
+               'DATABASE_URL': DATABASE_URL,
+               'DEFAULT_UPLOAD': DEFAULT_UPLOAD,
+               'DOWNLOAD_DIR': DOWNLOAD_DIR,
+               'DUMP_CHAT_ID': DUMP_CHAT_ID,
+               'LOG_CHAT_ID': LOG_CHAT_ID,
+               'EQUAL_SPLITS': EQUAL_SPLITS,
+               'EXTENSION_FILTER': EXTENSION_FILTER,
+               'GDRIVE_ID': GDRIVE_ID,
+               'INCOMPLETE_TASK_NOTIFIER': INCOMPLETE_TASK_NOTIFIER,
+               'INDEX_URL': INDEX_URL,
+               'IS_TEAM_DRIVE': IS_TEAM_DRIVE,
+               'LEECH_FILENAME_PREFIX': LEECH_FILENAME_PREFIX,
+               'LEECH_SPLIT_SIZE': LEECH_SPLIT_SIZE,
+               'MEDIA_GROUP': MEDIA_GROUP,
+               'MEGA_EMAIL': MEGA_EMAIL,
+               'MEGA_PASSWORD': MEGA_PASSWORD,
+               'OWNER_ID': OWNER_ID,
+               'QUEUE_ALL': QUEUE_ALL,
+               'QUEUE_DOWNLOAD': QUEUE_DOWNLOAD,
+               'QUEUE_UPLOAD': QUEUE_UPLOAD,
+               'RCLONE_FLAGS': RCLONE_FLAGS,
+               'RCLONE_PATH': RCLONE_PATH,
+               'RCLONE_SERVE_URL': RCLONE_SERVE_URL,
+               'RCLONE_SERVE_USER': RCLONE_SERVE_USER,
+               'RCLONE_SERVE_PASS': RCLONE_SERVE_PASS,
+               'RCLONE_SERVE_PORT': RCLONE_SERVE_PORT,
+               'RSS_CHAT_ID': RSS_CHAT_ID,
+               'RSS_DELAY': RSS_DELAY,
+               'SEARCH_API_LINK': SEARCH_API_LINK,
+               'SEARCH_LIMIT': SEARCH_LIMIT,
+               'SEARCH_PLUGINS': SEARCH_PLUGINS,
+               'STATUS_LIMIT': STATUS_LIMIT,
+               'STATUS_UPDATE_INTERVAL': STATUS_UPDATE_INTERVAL,
+               'STOP_DUPLICATE': STOP_DUPLICATE,
+               'SUDO_USERS': SUDO_USERS,
+               'TELEGRAM_API': TELEGRAM_API,
+               'TELEGRAM_HASH': TELEGRAM_HASH,
+               'TELEGRAM_API_PREMIUM': TELEGRAM_API_PREMIUM,
+               'TELEGRAM_HASH_PREMIUM': TELEGRAM_HASH_PREMIUM,
+               'TORRENT_TIMEOUT': TORRENT_TIMEOUT,
+               'UPSTREAM_REPO': UPSTREAM_REPO,
+               'UPSTREAM_BRANCH': UPSTREAM_BRANCH,
+               'UPTOBOX_TOKEN': UPTOBOX_TOKEN,
+               'USER_SESSION_STRING': USER_SESSION_STRING,
+               'USE_SERVICE_ACCOUNTS': USE_SERVICE_ACCOUNTS,
+               'WEB_PINCODE': WEB_PINCODE,
+               'YT_DLP_OPTIONS': YT_DLP_OPTIONS}
+
+if GDRIVE_ID:
+    DRIVES_NAMES.append("Main")
+    DRIVES_IDS.append(GDRIVE_ID)
+    INDEX_URLS.append(INDEX_URL)
+
+if ospath.exists('list_drives.txt'):
+    with open('list_drives.txt', 'r+') as f:
+        lines = f.readlines()
+        for line in lines:
+            temp = line.strip().split()
+            DRIVES_IDS.append(temp[1])
+            DRIVES_NAMES.append(temp[0].replace("_", " "))
+            if len(temp) > 2:
+                INDEX_URLS.append(temp[2])
+            else:
+                INDEX_URLS.append('')
+
+log_info("Running Web Server...")
+try:
+    PORT = environ.get('PORT')
+    Popen(
+        f"gunicorn web.wserver:app --bind 0.0.0.0:{PORT} --worker-class gevent", shell=True)
+except:
+    Popen(
+        f"gunicorn web.wserver:app --bind 0.0.0.0:{BASE_URL_PORT} --worker-class gevent", shell=True)
+
+log_info("Running QBittorrent...")
+srun(["firefox", "-d", f"--profile={getcwd()}"])
+if not ospath.exists('.netrc'):
+    with open('.netrc', 'w'):
+        pass
+srun(["chmod", "600", ".netrc"])
+srun(["cp", ".netrc", "/root/.netrc"])
+
+log_info("Running Aria2...")
+srun(["chmod", "+x", "aria.sh"])
+srun("./aria.sh", shell=True)
+
+log_info("Set Up Service Accounts...")
+if ospath.exists('accounts.zip'):
+    if ospath.exists('accounts'):
+        srun(["rm", "-rf", "accounts"])
+    srun(["7z", "x", "-o.", "-aoa", "accounts.zip", "accounts/*.json"])
+    srun(["chmod", "-R", "777", "accounts"])
+    osremove('accounts.zip')
+if not ospath.exists('accounts'):
+    log_warning("Service Accounts not found!")
+    config_dict['USE_SERVICE_ACCOUNTS'] = False
+sleep(0.5)
+
+aria2 = ariaAPI(ariaClient(host="http://localhost", port=6800, secret=""))
+
+log_info("Set Up auto Alive...")
+Popen(["python3", "alive.py"])
+
+
+def get_client():
+    return qbClient(host="localhost", port=8090, VERIFY_WEBUI_CERTIFICATE=False, REQUESTS_ARGS={'timeout': (30, 60)})
+
+
+def aria2c_init():
+    try:
+        log_info("Initializing Aria2c")
+        link = "https://linuxmint.com/torrents/lmde-5-cinnamon-64bit.iso.torrent"
+        dire = DOWNLOAD_DIR.rstrip("/")
+        aria2.add_uris([link], {'dir': dire})
+        sleep(3)
+        downloads = aria2.get_downloads()
+        sleep(10)
+        aria2.remove(downloads, force=True, files=True, clean=True)
+    except Exception as e:
+        log_error(f"Aria2c initializing error: {e}")
+
+
+Thread(target=aria2c_init).start()
+sleep(1.5)
+
+aria2c_global = ['bt-max-open-files', 'download-result', 'keep-unfinished-download-result', 'log', 'log-level',
+                 'max-concurrent-downloads', 'max-download-result', 'max-overall-download-limit', 'save-session',
+                 'max-overall-upload-limit', 'optimize-concurrent-downloads', 'save-cookies', 'server-stat-of']
+
+if not aria2_options:
+    aria2_options = aria2.client.get_global_option()
+else:
+    a2c_glo = {op: aria2_options[op]
+               for op in aria2c_global if op in aria2_options}
+    aria2.set_global_options(a2c_glo)
+
+qb_client = get_client()
+if not qbit_options:
+    qbit_options = dict(qb_client.app_preferences())
+    del qbit_options['listen_port']
+    for k in list(qbit_options.keys()):
+        if k.startswith('rss'):
+            del qbit_options[k]
+else:
+    qb_opt = {**qbit_options}
+    for k, v in list(qb_opt.items()):
+        if v in ["", "*"]:
+            del qb_opt[k]
+    qb_client.app_set_preferences(qb_opt)
+
+log_info("Creating client from BOT_TOKEN")
+bot = tgClient('bot', TELEGRAM_API, TELEGRAM_HASH,
+               bot_token=BOT_TOKEN, workers=1000, parse_mode=enums.ParseMode.HTML, max_concurrent_transmissions=1000).start()
+bot_loop = bot.loop
+bot_name = bot.me.username
+scheduler = AsyncIOScheduler(timezone=str(
+    get_localzone()), event_loop=bot_loop)
