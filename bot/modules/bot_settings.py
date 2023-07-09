@@ -98,7 +98,8 @@ Timeout: 60 sec'''
             buttons.ibutton('Default', f"botset resetvar {key}")
         buttons.ibutton('Close', "botset close")
         if key in ['SUDO_USERS', 'CMD_SUFFIX', 'OWNER_ID', 'USER_SESSION_STRING', 'TELEGRAM_HASH',
-                   'TELEGRAM_API', 'AUTHORIZED_CHATS', 'DATABASE_URL', 'BOT_TOKEN', 'DOWNLOAD_DIR']:
+                   'TELEGRAM_API', 'TELEGRAM_HASH_PREMIUM', 'TELEGRAM_API_PREMIUM', 'AUTHORIZED_CHATS', 
+                   'DATABASE_URL', 'BOT_TOKEN', 'DOWNLOAD_DIR']:
             msg += 'Restart required for this edit to take effect!\n\n'
         msg += f'Send a valid value for {key}. Timeout: 60 sec'
     elif edit_type == 'editaria':
@@ -561,6 +562,16 @@ async def load_config():
     if len(TELEGRAM_HASH) == 0:
         TELEGRAM_HASH = config_dict['TELEGRAM_HASH']
 
+    TELEGRAM_API_PREMIUM = environ.get('TELEGRAM_API_PREMIUM', '')
+    if len(TELEGRAM_API_PREMIUM) == 0:
+        TELEGRAM_API_PREMIUM = config_dict['TELEGRAM_API_PREMIUM']
+    else:
+        TELEGRAM_API_PREMIUM = int(TELEGRAM_API_PREMIUM)
+
+    TELEGRAM_HASH_PREMIUM = environ.get('TELEGRAM_HASH_PREMIUM', '')
+    if len(TELEGRAM_HASH_PREMIUM) == 0:
+        TELEGRAM_HASH_PREMIUM = config_dict['TELEGRAM_HASH_PREMIUM']
+
     OWNER_ID = environ.get('OWNER_ID', '')
     OWNER_ID = config_dict['OWNER_ID'] if len(OWNER_ID) == 0 else int(OWNER_ID)
 
@@ -861,6 +872,8 @@ async def load_config():
                         'SUDO_USERS': SUDO_USERS,
                         'TELEGRAM_API': TELEGRAM_API,
                         'TELEGRAM_HASH': TELEGRAM_HASH,
+                        'TELEGRAM_API_PREMIUM': TELEGRAM_API_PREMIUM,
+                        'TELEGRAM_HASH_PREMIUM': TELEGRAM_HASH_PREMIUM,
                         'TORRENT_TIMEOUT': TORRENT_TIMEOUT,
                         'UPSTREAM_REPO': UPSTREAM_REPO,
                         'UPSTREAM_BRANCH': UPSTREAM_BRANCH,
