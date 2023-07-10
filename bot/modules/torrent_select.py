@@ -17,7 +17,7 @@ async def select(client, message):
         gid = msg[1]
         dl = await getDownloadByGid(gid)
         if dl is None:
-            await sendMessage(message, f"Tugas dengan GDrive ID <code>{gid}</code> tidak ditemukan!")
+            await sendMessage(message, f"Tugas dengan ID Google Drive <code>{gid}</code> tidak ditemukan!")
             return
     elif reply_to_id := message.reply_to_message_id:
         async with download_dict_lock:
