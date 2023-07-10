@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 from pyrogram.handlers import MessageHandler, CallbackQueryHandler
 from pyrogram.filters import command, regex
-from psutil import cpu_percent, virtual_memory, disk_usage
+from psutil import cpu_percent, virtual_memory, disk_usage, net_io_counters
 from time import time
 
 from bot import status_reply_dict_lock, download_dict, download_dict_lock, botStartTime, DOWNLOAD_DIR, Interval, config_dict, bot
@@ -18,8 +18,18 @@ async def mirror_status(_, message):
     if count == 0:
         currentTime = get_readable_time(time() - botStartTime)
         free = get_readable_file_size(disk_usage(DOWNLOAD_DIR).free)
+        try:
+            sent = get_readable_file_size(net_io_counters().bytes_sent)
+        except:
+            sent = 'n/a'
+        try:
+            recv = get_readable_file_size(net_io_counters().bytes_recv)
+        except:
+            recv = 'n/a'
+        msg = '<b>Uninstall Telegram dan semoga hari indah!</b>'
         msg = '<code>Tidak ada Tugas Aktif!</code>\n___________________________'
-        msg += f"\n<b>CPU :</b> <code>{cpu_percent()}%</code> | <b>FREE :</b> <code>{free}</code>" \
+        msg += f"\n<b>T.DL :</b> <code>{sent}</code> | <b>T.UP :</b> <code>{recv}</code>" \
+            f"\n<b>CPU :</b> <code>{cpu_percent()}%</code> | <b>FREE :</b> <code>{free}</code>" \
             f"\n<b>RAM :</b> <code>{virtual_memory().percent}%</code> | <b>UPTIME :</b> <code>{currentTime}</code>"
         reply_message = await sendMessage(message, msg)
         await auto_delete_message(message, reply_message)
