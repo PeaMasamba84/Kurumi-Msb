@@ -24,7 +24,7 @@ async def deletefile(_, message):
         drive = GoogleDriveHelper()
         msg = await sync_to_async(drive.deletefile, link)
     else:
-        msg = 'Send Gdrive link along with command or by replying to the link by command'
+        msg = '<b>Kirim perintah dengan Link Google Drive atau balas Link Google Drive dengan perintah!</b>'
     reply_message = await sendMessage(message, msg)
     await auto_delete_message(message, reply_message)
 
