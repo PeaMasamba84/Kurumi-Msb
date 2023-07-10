@@ -27,8 +27,8 @@ async def cancel_mirror(_, message):
             await sendMessage(message, "<b>Bukan Tugas Aktif!</b>")
             return
     elif len(msg) == 1:
-        msg = "Reply to an active Command message which was used to start the download" \
-              f" or send <code>/{BotCommands.CancelMirror[0]} or /{BotCommands.CancelMirror[1]} GID</code> to cancel it!"
+        msg = "Balas ke pesan perintah saat digunakan untuk memulai Tugas" \
+              f" atau kirim <code>/{BotCommands.CancelMirror[0]} atau /{BotCommands.CancelMirror[1]} GID</code> untuk membatalkan Tugas!"
         await sendMessage(message, msg)
         return
 
@@ -70,7 +70,7 @@ async def cancell_all_buttons(_, message):
     buttons.ibutton("All", "canall all")
     buttons.ibutton("Close", "canall close")
     button = buttons.build_menu(2)
-    can_msg = await sendMessage(message, '<b>Pilih jenis tugas yang ingin dibatalkan :</b>', button)
+    can_msg = await sendMessage(message, '<b>Pilih jenis Tugas yang ingin dibatalkan :</b>', button)
     await auto_delete_message(message, can_msg)
 
 
