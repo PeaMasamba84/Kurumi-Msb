@@ -137,7 +137,7 @@ async def gdcloneNode(message, link, tag):
             LOGGER.info('Checking File/Folder if already in Drive...')
             telegraph_content, contents_no = await sync_to_async(gd.drive_list, name, True, True)
             if telegraph_content:
-                msg = f"File/Folder ini sudah ada di GDrive!\n{contents_no} Hasil pencarian :"
+                msg = f"File/Folder ini sudah ada di Google Drive!\n{contents_no} Hasil pencarian :"
                 button = await get_telegraph_list(telegraph_content)
                 await sendMessage(message, msg, button)
                 return
