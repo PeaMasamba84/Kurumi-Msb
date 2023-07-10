@@ -7,7 +7,9 @@
 from https://github.com/AvinashReddy3108/PaperplaneExtended . I hereby take no credit of the following code other
 than the modifications. See https://github.com/AvinashReddy3108/PaperplaneExtended/commits/master/userbot/modules/direct_links.py
 for original authorship. """
-
+import json
+import requests
+from base64 import b64decode
 from http.cookiejar import MozillaCookieJar
 from json import loads
 from os import path
@@ -73,7 +75,7 @@ def direct_link_generator(link: str):
         return uploadee(link)
     elif 'akmfiles' in domain:
         return akmfiles(link)
-    elif 'linkbox' in domain:
+    elif 'linkbox' in domain or 'ibx.to' in domain:
         return linkbox(link)
     elif 'shrdsk' in domain:
         return shrdsk(link)
@@ -98,9 +100,32 @@ def direct_link_generator(link: str):
             return sharer_scraper(link)
     elif 'zippyshare.com' in domain:
         raise DirectDownloadLinkException('ERROR: R.I.P Zippyshare')
+    # Add custom (Dunno work or not)
+    elif 'mp4upload.com' in domain:
+        return mp4upload(link)
+    elif 'androiddatahost.com' in domain:
+        return androiddatahost(link)
+    elif "apkadmin.com" in domain or "sharemods.com" in domain:
+        return apkadmin(link)
+    elif 'sourceforge' in domain:
+        return sourceforge(link)
+    elif 'androidfilehost.com' in link:
+        return androidfilehost(link)
+    elif 'tusfiles.net' in domain or 'tusfiles.com' in domain:
+        return tusfiles(link)
+    elif 'pandafiles.com' in domain:
+        return pandafiles(link)
+    elif 'uploadhaven.com' in domain:
+        return uploadhaven(link)
+    elif "uploadrar.com" in domain:
+        return uploadrar(link)
+    elif "romsget.io" in domain:
+        return link if domain == "static.romsget.io" else romsget(link)
+    elif "hexupload.net" in domain:
+        return hexupload(link)    
     else:
         raise DirectDownloadLinkException(
-            f'No Direct link function found for {link}')
+            f'Tidak ada fungsi direct link untuk {link}')
 
 
 def yandex_disk(url: str) -> str:
@@ -109,14 +134,14 @@ def yandex_disk(url: str) -> str:
     try:
         link = findall(r'\b(https?://(yadi.sk|disk.yandex.com)\S+)', url)[0][0]
     except IndexError:
-        return "No Yandex.Disk links found\n"
+        return "Link Yandex.Disk tidak ditemukan!\n"
     api = 'https://cloud-api.yandex.net/v1/disk/public/resources/download?public_key={}'
     cget = create_scraper().request
     try:
         return cget('get', api.format(link)).json()['href']
     except KeyError:
         raise DirectDownloadLinkException(
-            "ERROR: File not found/Download limit reached")
+            "ERROR: Link File tidak ditemukan!")
 
 
 def uptobox(url: str) -> str:
@@ -146,7 +171,7 @@ def uptobox(url: str) -> str:
         sleep(res["data"]["waiting"])
     elif res['statusCode'] == 39:
         raise DirectDownloadLinkException(
-            f"ERROR: Uptobox is being limited please wait {get_readable_time(res['data']['waiting'])}")
+            f"ERROR: Uptobox sedang limit. Silahkan tunggu {get_readable_time(res['data']['waiting'])} lagi!")
     else:
         raise DirectDownloadLinkException(f"ERROR: {res['message']}")
     try:
@@ -166,7 +191,7 @@ def mediafire(url: str) -> str:
     except Exception as e:
         raise DirectDownloadLinkException(f"ERROR: {e.__class__.__name__}")
     if not (final_link := findall(r"\'(https?:\/\/download\d+\.mediafire\.com\/\S+\/\S+\/\S+)\'", page)):
-        raise DirectDownloadLinkException("ERROR: No links found in this page")
+        raise DirectDownloadLinkException("ERROR: Link File tidak ditemukan!")
     return final_link[0]
 
 
@@ -176,7 +201,7 @@ def osdn(url: str) -> str:
     try:
         link = findall(r'\bhttps?://.*osdn\.net\S+', url)[0]
     except IndexError:
-        raise DirectDownloadLinkException("No OSDN links found")
+        raise DirectDownloadLinkException("Link OSDN tidak ditemukan!")
     cget = create_scraper().request
     try:
         page = BeautifulSoup(
@@ -198,13 +223,13 @@ def github(url: str) -> str:
     try:
         findall(r'\bhttps?://.*github\.com.*releases\S+', url)[0]
     except IndexError:
-        raise DirectDownloadLinkException("No GitHub Releases links found")
+        raise DirectDownloadLinkException("Link Github Release tidak ditemukan!")
     cget = create_scraper().request
     download = cget('get', url, stream=True, allow_redirects=False)
     try:
         return download.headers["location"]
     except KeyError:
-        raise DirectDownloadLinkException("ERROR: Can't extract the link")
+        raise DirectDownloadLinkException("ERROR: Link File tidak ditemukan!")
 
 
 def hxfile(url: str) -> str:
@@ -226,7 +251,7 @@ def letsupload(url: str) -> str:
     if direct_link := findall(r"(https?://letsupload\.io\/.+?)\'", res.text):
         return direct_link[0]
     else:
-        raise DirectDownloadLinkException('ERROR: Direct Link not found')
+        raise DirectDownloadLinkException('ERROR: Link file tidak ditemukan!')
 
 
 def anonfilesBased(url: str) -> str:
@@ -237,7 +262,7 @@ def anonfilesBased(url: str) -> str:
         raise DirectDownloadLinkException(f"ERROR: {e.__class__.__name__}")
     if sa := soup.find(id="download-url"):
         return sa['href']
-    raise DirectDownloadLinkException("ERROR: File not found!")
+    raise DirectDownloadLinkException("ERROR: Link File tidak ditemukan!")
 
 
 def fembed(link: str) -> str:
@@ -275,14 +300,14 @@ def onedrive(link: str) -> str:
     except Exception as e:
         raise DirectDownloadLinkException(f"ERROR: {e.__class__.__name__}")
     if not link_data:
-        raise DirectDownloadLinkException("ERROR: Unable to find link_data")
+        raise DirectDownloadLinkException("ERROR: Link File tidak ditemukan!")
     folder_id = link_data.get('resid')
     if not folder_id:
-        raise DirectDownloadLinkException('ERROR: folder id not found')
+        raise DirectDownloadLinkException('ERROR: Folder ID tidak ditemukan!')
     folder_id = folder_id[0]
     authkey = link_data.get('authkey')
     if not authkey:
-        raise DirectDownloadLinkException('ERROR: authkey not found')
+        raise DirectDownloadLinkException('ERROR: Authkey tidak ditemukan!')
     authkey = authkey[0]
     boundary = uuid4()
     headers = {'content-type': f'multipart/form-data;boundary={boundary}'}
@@ -293,7 +318,7 @@ def onedrive(link: str) -> str:
     except Exception as e:
         raise DirectDownloadLinkException(f'ERROR: {e.__class__.__name__}')
     if "@content.downloadUrl" not in resp:
-        raise DirectDownloadLinkException('ERROR: Direct link not found')
+        raise DirectDownloadLinkException('ERROR: Link file tidak ditemukan!')
     return resp['@content.downloadUrl']
 
 
@@ -316,7 +341,7 @@ def pixeldrain(url: str) -> str:
         return dl_link
     else:
         raise DirectDownloadLinkException(
-            f"ERROR: Cant't download due {resp['message']}.")
+            f"ERROR: {resp['message']}.")
 
 
 def antfiles(url: str) -> str:
@@ -328,7 +353,7 @@ def antfiles(url: str) -> str:
     except Exception as e:
         raise DirectDownloadLinkException(f"ERROR: {e.__class__.__name__}")
     if not link:
-        raise DirectDownloadLinkException("ERROR: Download link not found")
+        raise DirectDownloadLinkException("ERROR: Link File tidak ditemukan!")
     return link
 
 
@@ -341,7 +366,7 @@ def streamtape(url: str) -> str:
     except Exception as e:
         raise DirectDownloadLinkException(f"ERROR: {e.__class__.__name__}")
     if not link:
-        raise DirectDownloadLinkException("ERROR: Download link not found")
+        raise DirectDownloadLinkException("ERROR: Link File tidak ditemukan!")
     return link
 
 
@@ -361,7 +386,7 @@ def racaty(url: str) -> str:
     if (direct_link := etree.HTML(res.text).xpath("//a[contains(@id,'uniqueExpirylink')]/@href")):
         return direct_link[0]
     else:
-        raise DirectDownloadLinkException('ERROR: Direct link not found')
+        raise DirectDownloadLinkException('ERROR: Link File tidak ditemukan!')
 
 
 def fichier(link: str) -> str:
@@ -372,7 +397,7 @@ def fichier(link: str) -> str:
     gan = match(regex, link)
     if not gan:
         raise DirectDownloadLinkException(
-            "ERROR: The link you entered is wrong!")
+            "ERROR: Link 1Fichier tidak ditemukan!")
     if "::" in link:
         pswd = link.split("::")[-1]
         url = link.split("::")[-2]
@@ -390,47 +415,47 @@ def fichier(link: str) -> str:
         raise DirectDownloadLinkException(f"ERROR: {e.__class__.__name__}")
     if req.status_code == 404:
         raise DirectDownloadLinkException(
-            "ERROR: File not found/The link you entered is wrong!")
+            "ERROR: File tidak ditemukan!")
     soup = BeautifulSoup(req.content, 'lxml')
     if soup.find("a", {"class": "ok btn-general btn-orange"}):
         if dl_url := soup.find("a", {"class": "ok btn-general btn-orange"})["href"]:
             return dl_url
         raise DirectDownloadLinkException(
-            "ERROR: Unable to generate Direct Link 1fichier!")
+            "ERROR: Link File tidak ditemukan!")
     elif len(soup.find_all("div", {"class": "ct_warn"})) == 3:
         str_2 = soup.find_all("div", {"class": "ct_warn"})[-1]
         if "you must wait" in str(str_2).lower():
             if numbers := [int(word) for word in str(str_2).split() if word.isdigit()]:
                 raise DirectDownloadLinkException(
-                    f"ERROR: 1fichier is on a limit. Please wait {numbers[0]} minute.")
+                    f"ERROR: 1Fichier sedang limit. Silahkan tunggu {numbers[0]} menit lagi!")
             else:
                 raise DirectDownloadLinkException(
-                    "ERROR: 1fichier is on a limit. Please wait a few minutes/hour.")
+                    "ERROR: 1Fichier sedang limit!")
         elif "protect access" in str(str_2).lower():
             raise DirectDownloadLinkException(
-                "ERROR: This link requires a password!\n\n<b>This link requires a password!</b>\n- Insert sign <b>::</b> after the link and write the password after the sign.\n\n<b>Example:</b> https://1fichier.com/?smmtd8twfpm66awbqz04::love you\n\n* No spaces between the signs <b>::</b>\n* For the password, you can use a space!")
+                "ERROR: Link ini memerlukan password!\n\n- Masukkan password dengan <code>::</code> setelah link dan masukkan password setelah tanda <code>::</code>\n\n<b>Contoh :</b> https://1fichier.com/?smmtd8twfpm66awbqz04::love you\n\n* <code>::</code> Tanpa spasi!\n* Untuk password bisa menggunakan spasi!")
         else:
             raise DirectDownloadLinkException(
-                "ERROR: Failed to generate Direct Link from 1fichier!")
+                "ERROR: Link File tidak ditemukan!")
     elif len(soup.find_all("div", {"class": "ct_warn"})) == 4:
         str_1 = soup.find_all("div", {"class": "ct_warn"})[-2]
         str_3 = soup.find_all("div", {"class": "ct_warn"})[-1]
         if "you must wait" in str(str_1).lower():
             if numbers := [int(word) for word in str(str_1).split() if word.isdigit()]:
                 raise DirectDownloadLinkException(
-                    f"ERROR: 1fichier is on a limit. Please wait {numbers[0]} minute.")
+                    f"ERROR: 1Fichier sedang limit. Silahkan tunggu {numbers[0]} menit lagi!")
             else:
                 raise DirectDownloadLinkException(
-                    "ERROR: 1fichier is on a limit. Please wait a few minutes/hour.")
+                    "ERROR: 1Fichier sedang limit!")
         elif "bad password" in str(str_3).lower():
             raise DirectDownloadLinkException(
-                "ERROR: The password you entered is wrong!")
+                "ERROR: Password salah!")
         else:
             raise DirectDownloadLinkException(
-                "ERROR: Error trying to generate Direct Link from 1fichier!")
+                "ERROR: Link File tidak ditemukan!")
     else:
         raise DirectDownloadLinkException(
-            "ERROR: Error trying to generate Direct Link from 1fichier!")
+            "ERROR: Link File tidak ditemukan!")
 
 
 def solidfiles(url: str) -> str:
@@ -464,14 +489,14 @@ def krakenfiles(page_link: str) -> str:
         token = soup.find("input", id="dl-token")["value"]
     except:
         raise DirectDownloadLinkException(
-            f"ERROR: Page link is wrong: {page_link}")
+            f"ERROR: Link File tidak ditemukan!")
     hashes = [
         item["data-file-hash"]
         for item in soup.find_all("div", attrs={"data-file-hash": True})
     ]
     if not hashes:
         raise DirectDownloadLinkException(
-            f"ERROR: Hash not found for : {page_link}")
+            f"ERROR: Hash tidak ditemukan!")
     dl_hash = hashes[0]
     payload = f'------WebKitFormBoundary7MA4YWxkTrZu0gW\r\nContent-Disposition: form-data; name="token"\r\n\r\n{token}\r\n------WebKitFormBoundary7MA4YWxkTrZu0gW--'
     headers = {
@@ -486,7 +511,7 @@ def krakenfiles(page_link: str) -> str:
         return dl_link_json["url"]
     else:
         raise DirectDownloadLinkException(
-            f"ERROR: Failed to acquire download URL from kraken for : {page_link}")
+            f"ERROR: Link File tidak ditemukan!")
 
 
 def uploadee(url: str) -> str:
@@ -499,31 +524,48 @@ def uploadee(url: str) -> str:
         return sa['href']
     except:
         raise DirectDownloadLinkException(
-            f"ERROR: Failed to acquire download URL from upload.ee for : {url}")
+            f"ERROR: Link File tidak ditemukan!")
 
 
 def terabox(url) -> str:
     if not path.isfile('terabox.txt'):
-        raise DirectDownloadLinkException("ERROR: terabox.txt not found")
+        raise DirectDownloadLinkException("ERROR: Terabox.txt tidak ditemukan!")
     session = create_scraper()
     try:
-        res = session.request('GET', url)
-        key = res.url.split('?surl=')[-1]
         jar = MozillaCookieJar('terabox.txt')
         jar.load()
+        cookie_string = ''
+        for cookie in jar: cookie_string += f'{cookie.name}={cookie.value}; '
         session.cookies.update(jar)
+        res = session.request('GET', url)
+        key = res.url.split('?surl=')[-1]
+        soup = BeautifulSoup(res.content, 'lxml')
+        jsToken = None
+        for fs in soup.find_all('script'):
+            fstring = fs.string
+            if fstring and fstring.startswith('try {eval(decodeURIComponent'):
+                jsToken = fstring.split('%22')[1]
+        headers = {"Cookie": cookie_string}
         res = session.request(
-            'GET', f'https://www.terabox.com/share/list?app_id=250528&shorturl={key}&root=1')
-        result = res.json()['list']
+            'GET', f'https://www.terabox.com/share/list?app_id=250528&jsToken={jsToken}&shorturl={key}&root=1', headers=headers)
+        result = res.json()
     except Exception as e:
         raise DirectDownloadLinkException(f"ERROR: {e.__class__.__name__}")
+    if result['errno'] != 0: raise DirectDownloadLinkException(f"ERROR: '{result['errmsg']}' Check cookies")
+    result = result['list']
     if len(result) > 1:
         raise DirectDownloadLinkException(
-            "ERROR: Can't download mutiple files")
+            "ERROR: Tidak dapat mendownload multi file!")
     result = result[0]
+    
     if result['isdir'] != '0':
-        raise DirectDownloadLinkException("ERROR: Can't download folder")
-    return result['dlink']
+        raise DirectDownloadLinkException("ERROR: Tidak dapat mendownload folder!")
+    
+    try:
+        dlink = result['dlink']
+    except Exception as e:
+        raise DirectDownloadLinkException(f"ERROR: {e.__class__.__name__}")
+    return dlink
 
 
 def filepress(url):
@@ -565,7 +607,7 @@ def gdtot(url):
             return drive_link[0]
         else:
             raise DirectDownloadLinkException(
-                'ERROR: Drive Link not found, Try in your broswer')
+                'ERROR: Link Drive tidak ditemukan!')
     token_url = token_url[0]
     try:
         token_page = cget('GET', token_url)
@@ -574,7 +616,7 @@ def gdtot(url):
             f'ERROR: {e.__class__.__name__} with {token_url}')
     path = findall('\("(.*?)"\)', token_page.text)
     if not path:
-        raise DirectDownloadLinkException('ERROR: Cannot bypass this')
+        raise DirectDownloadLinkException('ERROR: Tidak bisa membypass link!')
     path = path[0]
     raw = urlparse(token_url)
     final_url = f'{raw.scheme}://{raw.hostname}{path}'
@@ -593,11 +635,11 @@ def sharer_scraper(url):
         raise DirectDownloadLinkException(f'ERROR: {e.__class__.__name__}')
     key = findall('"key",\s+"(.*?)"', res.text)
     if not key:
-        raise DirectDownloadLinkException("ERROR: Key not found!")
+        raise DirectDownloadLinkException("ERROR: Kunci tidak ditemukan!")
     key = key[0]
     if not etree.HTML(res.content).xpath("//button[@id='drc']"):
         raise DirectDownloadLinkException(
-            "ERROR: This link don't have direct download button")
+            "ERROR: Link File tidak ditemukan!")
     boundary = uuid4()
     headers = {
         'Content-Type': f'multipart/form-data; boundary=----WebKitFormBoundary{boundary}',
@@ -616,7 +658,7 @@ def sharer_scraper(url):
         raise DirectDownloadLinkException(f'ERROR: {e.__class__.__name__}')
     if "url" not in res:
         raise DirectDownloadLinkException(
-            'ERROR: Drive Link not found, Try in your broswer')
+            'ERROR: Link Drive tidak ditemukan!')
     if "drive.google.com" in res["url"]:
         return res["url"]
     try:
@@ -627,7 +669,7 @@ def sharer_scraper(url):
         return drive_link[0]
     else:
         raise DirectDownloadLinkException(
-            'ERROR: Drive Link not found, Try in your broswer')
+            'ERROR: Link Drive tidak ditemukan!')
 
 
 def wetransfer(url):
@@ -649,7 +691,7 @@ def wetransfer(url):
     elif "error" in res:
         raise DirectDownloadLinkException(f"ERROR: {res['error']}")
     else:
-        raise DirectDownloadLinkException("ERROR: cannot find direct link")
+        raise DirectDownloadLinkException("ERROR: Link File tidak ditemukan!")
 
 
 def akmfiles(url):
@@ -666,7 +708,7 @@ def akmfiles(url):
     if (direct_link := etree.HTML(res.content).xpath("//a[contains(@class,'btn btn-dow')]/@href")):
         return direct_link[0]
     else:
-        raise DirectDownloadLinkException('ERROR: Direct link not found')
+        raise DirectDownloadLinkException('ERROR: Link File tidak ditemukan!')
 
 
 def shrdsk(url):
@@ -683,7 +725,7 @@ def shrdsk(url):
     res = res.json()
     if ("type" in res and res["type"].lower() == "upload" and "video_url" in res):
         return res["video_url"]
-    raise DirectDownloadLinkException("ERROR: cannot find direct link")
+    raise DirectDownloadLinkException("ERROR: Link File tidak ditemukan!")
 
 
 def linkbox(url):
@@ -695,18 +737,249 @@ def linkbox(url):
     except Exception as e:
         raise DirectDownloadLinkException(f'ERROR: {e.__class__.__name__}')
     if 'data' not in res:
-        raise DirectDownloadLinkException('ERROR: Data not found!!')
+        raise DirectDownloadLinkException('ERROR: Data tidak ditemukan!')
     data = res['data']
     if not data:
-        raise DirectDownloadLinkException('ERROR: Data is None!!')
+        raise DirectDownloadLinkException('ERROR: Data tidak ditemukan!')
     if 'itemInfo' not in data:
-        raise DirectDownloadLinkException('ERROR: itemInfo not found!!')
+        raise DirectDownloadLinkException('ERROR: Iteminfo tidak ditemukan!')
     itemInfo = data['itemInfo']
     if 'url' not in itemInfo:
-        raise DirectDownloadLinkException('ERROR: url not found in itemInfo!!')
+        raise DirectDownloadLinkException('ERROR: Link File tidak ditemukan!')
     if "name" not in itemInfo:
         raise DirectDownloadLinkException(
-            'ERROR: Name not found in itemInfo!!')
+            'ERROR: Nama File tidak ditemukan!')
     name = quote(itemInfo["name"])
     raw = itemInfo['url'].split("/", 3)[-1]
     return f'https://wdl.nuplink.net/{raw}&filename={name}'
+
+# TODO: Add more direct link generators
+
+def mp4upload(url: str) -> str:
+    import urllib3
+    url = url.replace("embed-", "")
+    session = requests.Session()
+    headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/116.0", "Referer": "https://www.mp4upload.com/"}
+    req = session.get(url)
+    soup = BeautifulSoup(req.text, "lxml")
+    inputs = soup.find_all("input")
+    data = {input.get("name"): input.get("value") for input in inputs}
+    if not data:
+        raise DirectDownloadLinkException("ERROR: Link File tidak ditemukan!")
+    post = session.post(url, data=data, headers=headers)
+    soup = BeautifulSoup(post.text, "lxml")
+    inputs = soup.find_all("form", {"name": "F1"})[0].find_all("input")
+    data = {input.get("name"): input.get("value").replace(" ", "") for input in inputs}
+    if not data:
+        raise DirectDownloadLinkException("ERROR: Link File tidak ditemukan!")
+    data["referer"] = url
+    urllib3.disable_warnings()
+    link = session.post(url, data=data, verify=False).url
+    return link
+    
+
+def androiddatahost(url: str) -> str:
+    try:
+        ases = create_scraper()
+        link = findall(r"\bhttps?://androiddatahost\.com\S+", url)[0]
+        url3 = BeautifulSoup(ases.get(link).content, "html.parser")
+        fin = url3.find("div", {"download2"})
+        return fin.find("a")["href"]
+    except Exception as e:
+        raise DirectDownloadLinkException(f"ERROR: {e.__class__.__name__}")
+    
+
+def apkadmin(url: str) -> str:
+    try:
+        scraper = create_scraper()
+        r = scraper.get(url)
+        soup = BeautifulSoup(r.text, "lxml")
+        op = soup.find("input", {"name": "op"})["value"]
+        ids = soup.find("input", {"name": "id"})["value"]
+
+        data = {
+            "op": op,
+            "id": ids,
+            "rand": " ",
+            "referer": " ",
+            "method_free": " ",
+            "method_premium": " ",
+        }
+        dlnk = scraper.post(url, data=data)
+        dbsop = BeautifulSoup(dlnk.text, "lxml")
+        dl = dbsop.find("div", {"class": "text text-center"})
+        return dl.find("a")["href"]
+    except Exception as e:
+        raise DirectDownloadLinkException(f"ERROR: {e.__class__.__name__}")
+    
+
+def sourceforge(url: str) -> str:
+    if "master.dl.sourceforge.net" in url:
+        return f"{url}?viasf=1"
+    if url.endswith("/download"):
+        url = url.split("/download")[0]
+    try:
+        link = findall(r"\bhttps?://sourceforge\.net\S+", url)[0]
+    except IndexError:
+        raise DirectDownloadLinkException("ERROR: Link SourceForge tidak ditemukan!")
+    file_path = findall(r"files(.*)", link)[0]
+    project = findall(r"projects?/(.*?)/files", link)[0]
+    mirrors = f"https://sourceforge.net/settings/mirror_choices?projectname={project}&filename={file_path}"
+    page = BeautifulSoup(requests.get(mirrors).content, "html.parser")
+    info = page.find("ul", {"id": "mirrorList"}).findAll("li")
+    try:
+        for mirror in info[1:]:
+            dl_url = f'https://{mirror["id"]}.dl.sourceforge.net/project/{project}/{file_path}?viasf=1'
+        return dl_url
+    except Exception as e:
+        raise DirectDownloadLinkException(f"ERROR: {e.__class__.__name__}")
+
+
+def androidfilehost(url: str) -> str:
+    try:
+        link = findall(r"\bhttps?://.*androidfilehost.*fid.*\S+", url)[0]
+    except IndexError:
+        raise DirectDownloadLinkException("ERROR: Link AndroidFileHost tidak ditemukan!")
+    fid = findall(r"\?fid=(.*)", link)[0]
+    res = requests.get(link)
+    headers = {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/116.0",
+        "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
+        "Referer": f"https://androidfilehost.com/?fid={fid}",
+        "X-MOD-SBB-CTYPE": "xhr",
+        "X-Requested-With": "XMLHttpRequest",
+    }
+    data = {"submit": "submit", "action": "getdownloadmirrors", "fid": fid}
+    mirrors = None
+    error = "ERROR: Can't find AFH Mirrors for the link!"
+    try:
+        req = requests.post("https://androidfilehost.com/libs/otf/mirrors.otf.php", headers=headers, data=data, cookies=res.cookies)
+        mirrors = req.json()["MIRRORS"]
+    except (json.decoder.JSONDecodeError, TypeError):
+        raise DirectDownloadLinkException(error)
+    if mirrors is None:
+        raise DirectDownloadLinkException(error)
+    for i in mirrors:
+        link = i["url"]
+        if link:
+            break
+    return link
+
+
+def tusfiles(url: str) -> str:
+    try:
+        ses = create_scraper()
+        res = ses.get(url)
+        burl = "https://tusfiles.com/"
+        headers = {
+        'content-type': 'application/x-www-form-urlencoded',
+        'user-agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/105.0.0.0 Safari/537.36'
+        }
+        client = BeautifulSoup(res.text, "lxml")
+        inputs = client.find_all("input")
+        file_id = inputs[1]["value"]
+        # file_name = findall("URL=(.*?) - ", res.text)[0].split("]")[1]
+        parse = {"op": "download2", "id": file_id, "referer": url}
+        resp2 = ses.post(burl, data=parse, headers=headers, allow_redirects=False)
+        if jcok:= resp2.headers["location"]:
+            return jcok
+    except Exception as e:
+        raise DirectDownloadLinkException(f'ERROR: {e.__class__.__name__}')
+    
+
+def pandafiles(url: str) -> str:
+    try:
+        scraper = create_scraper()
+        headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/116.0", "Referer": url, "X-Requested-With": "XMLHttpRequest"}
+        media_id = search(r"(?://|\.)(pandafiles\.com)/([0-9a-zA-Z]+)", url)[2]
+        data = {"op": "download2", "usr_login": "", "id": media_id, "referer": url, "method_free": "Free Download"}
+        req = scraper.post(url, headers=headers, data=data)
+        return BeautifulSoup(req.content, "lxml").find("div", {"id": "direct_link"}).find("a")["href"]
+    except Exception as e:
+        raise DirectDownloadLinkException(f'ERROR: {e.__class__.__name__}')
+    
+
+def uploadhaven(link: str) -> str:
+    headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/116.0"}
+    test = BeautifulSoup(requests.get(link, headers=headers).text, "lxml")
+    d = test.find("div", {"class": "alert alert-danger col-md-12"})
+    if d is not None:
+        hot1 = test.find("div", {"class": "alert alert-danger col-md-12"})
+        hot_text = hot1.text.strip()
+        raise DirectDownloadLinkException(f"ERROR: {str(hot_text)}")
+    else:
+        data = {
+            "_token": test.find("input", {"name": "_token"})["value"],
+            "key": test.find("input", {"name": "key"})["value"],
+            "time": test.find("input", {"name": "time"})["value"],
+            "hash": test.find("input", {"name": "hash"})["value"],
+            "type": "free",
+        }
+        for _ in range(6, 0, -1):
+            sleep(1)
+        reurl = BeautifulSoup(requests.post(link, headers=headers, data=data).text, "lxml")
+        return reurl.find("div", class_="alert alert-success mb-0").find("a")["href"]
+    
+
+def uploadrar(url: str) -> str:
+    try:
+        url1 = url.strip("/ ")
+        file_id = url1.split("/")[-1]
+        headers = {"Referer": url}
+        data = {
+            "op": "download2",
+            "id": file_id,
+            "rand": "",
+            "method_free": "Free Download",
+            "method_premium": "",
+        }
+        req = requests.post(url, data=data, headers=headers)
+        bs = BeautifulSoup(req.text, "lxml")
+        return bs.find("span", {"id": "direct_link"}).find("a").get("href")
+    except Exception as e:
+        raise DirectDownloadLinkException(f'ERROR: {e.__class__.__name__}')
+    
+
+def romsget(url: str) -> str:
+    try:
+        req = requests.get(url)
+        bs1 = BeautifulSoup(req.text, "html.parser")
+
+        upos = bs1.find("form", {"id": "download-form"}).get("action")
+        meid = bs1.find("input", {"id": "mediaId"}).get("name")
+        try:
+            dlid = bs1.find("button", {"data-callback": "onDLSubmit"}).get("dlid")
+        except:
+            dlid = bs1.find("div", {"data-callback": "onDLSubmit"}).get("dlid")
+
+        pos = requests.post("https://www.romsget.io" + upos, data={meid: dlid})
+        bs2 = BeautifulSoup(pos.text, "html.parser")
+        udl = bs2.find("form", {"name": "redirected"}).get("action")
+        prm = bs2.find("input", {"name": "attach"}).get("value")
+        return f"{udl}?attach={prm}"
+    except Exception as e:
+        raise DirectDownloadLinkException(f'ERROR: {e.__class__.__name__}')
+
+
+def hexupload(url) -> str:
+    head = {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/116.0",
+        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+        "Accept-Language": "en-us,en;q=0.6",
+        "Sec-Fetch-Mode": "navigate",
+    }
+    payload = {
+        "op": "download2",
+        "id": url.split("/")[-1],
+        "rand": "",
+        "referer": url,
+        "method_free": "Free Download",
+    }
+    try:
+        html = requests.post(url, data=payload, headers=head)
+        url = search(r"ldl.ld\('([^']+)", html.text)
+        if url:
+            url = b64decode(url.group(1)).decode("utf-8").replace(" ", "%20")
+            return url
+    except Exception as e:
+        raise DirectDownloadLinkException(f'ERROR: {e.__class__.__name__}')
