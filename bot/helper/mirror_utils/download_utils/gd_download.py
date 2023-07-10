@@ -50,9 +50,9 @@ async def add_gd_download(link, path, listener, newname):
         non_queued_dl.add(listener.uid)
 
     if from_queue:
-        LOGGER.info(f'Start Queued Download from GDrive: {name}')
+        LOGGER.info(f'Start Queued Download from Google Drive: {name}')
     else:
-        LOGGER.info(f"Download from GDrive: {name}")
+        LOGGER.info(f"Download from Google Drive: {name}")
         await listener.onDownloadStart()
         await sendStatusMessage(listener.message)
 
