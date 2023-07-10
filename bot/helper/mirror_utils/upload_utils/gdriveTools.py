@@ -113,7 +113,7 @@ class GoogleDriveHelper:
             regex = r"https:\/\/drive\.google\.com\/(?:drive(.*?)\/folders\/|file(.*?)?\/d\/)([-\w]+)"
             res = re_search(regex, link)
             if res is None:
-                raise IndexError("ID GDrive tidak ditemukan!")
+                raise IndexError("ID Google Drive tidak ditemukan!")
             return res.group(3)
         parsed = urlparse(link)
         return parse_qs(parsed.query)['id'][0]
@@ -164,7 +164,7 @@ class GoogleDriveHelper:
         try:
             file_id = self.__getIdFromUrl(link)
         except (KeyError, IndexError):
-            return "ID GDrive tidak ditemukan!"
+            return "ID Google Drive tidak ditemukan!"
         msg = ''
         try:
             self.__service.files().delete(fileId=file_id, supportsAllDrives=True).execute()
@@ -284,7 +284,7 @@ class GoogleDriveHelper:
         # File body description
         file_metadata = {
             'name': file_name,
-            'description': "Uploaded by KQRM",
+            'description': "Uploaded by Pea Masamba",
             'mimeType': mime_type,
         }
         if dest_id is not None:
@@ -367,7 +367,7 @@ class GoogleDriveHelper:
         try:
             file_id = self.__getIdFromUrl(link)
         except (KeyError, IndexError):
-            return "ID GDrive tidak ditemukan!"
+            return "ID Google Drive tidak ditemukan!"
         msg = ""
         LOGGER.info(f"File ID: {file_id}")
         try:
