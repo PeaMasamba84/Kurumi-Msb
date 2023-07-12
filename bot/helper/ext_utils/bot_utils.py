@@ -31,14 +31,14 @@ class MirrorStatus:
     STATUS_UPLOADING = "Unggah..."
     STATUS_DOWNLOADING = "Unduh..."
     STATUS_CLONING = "Kloning..."
-    STATUS_QUEUEDL = "Menunggu Antri Unduh..."
-    STATUS_QUEUEUP = "Menunggu Antri Unggah..."
+    STATUS_QUEUEDL = "Nunggu Antri Unduh..."
+    STATUS_QUEUEUP = "Nunggu Antri Unggah..."
     STATUS_PAUSED = "Dihentikan."
     STATUS_ARCHIVING = "Arsip..."
     STATUS_EXTRACTING = "Ekstrak..."
     STATUS_SPLITTING = "Membagi..."
-    STATUS_CHECKING = "Mengecek..."
-    STATUS_SEEDING = "Mengeseed..."
+    STATUS_CHECKING = "Ngecek..."
+    STATUS_SEEDING = "Ngeseed..."
 
 
 class setInterval:
@@ -125,9 +125,9 @@ def get_readable_message():
         if download.status() not in [MirrorStatus.STATUS_SPLITTING, MirrorStatus.STATUS_SEEDING]:
             msg += f"\n<b>┌┤{get_progress_bar_string(download.progress())} <code>{download.progress()}</code>├┐</b>"
             if download.message.chat.type.name in ['SUPERGROUP', 'CHANNEL']:
-                msg += f"\n<b>├ Sts :</b> <a href='{download.message.link}'>{download.status()}</a>"
+                msg += f"\n<b>├ Stat :</b> <a href='{download.message.link}'>{download.status()}</a>"
             else:
-                msg += f"\n<b>├ Sts :</b> <code>{download.status()}</code>"
+                msg += f"\n<b>├ Stat :</b> <code>{download.status()}</code>"
             msg += f"\n<b>├ Pros :</b> <code>{download.processed_bytes()}</code> dari <code>{download.size()}</code>"
             msg += f"\n<b>├ Kec :</b> <code>{download.speed()}</code> | <b>ETA :</b> <code>{download.eta()}</code>"
             if hasattr(download, 'seeders_num'):
@@ -137,21 +137,21 @@ def get_readable_message():
                     pass
         elif download.status() == MirrorStatus.STATUS_SEEDING:
             if download.message.chat.type.name in ['SUPERGROUP', 'CHANNEL']:
-                msg += f"\n<b>┌ Sts :</b> <a href='{download.message.link}'>{download.status()}</a>"
+                msg += f"\n<b>┌ Stat :</b> <a href='{download.message.link}'>{download.status()}</a>"
             else:
-                msg += f"\n<b>┌ Sts :</b> <code>{download.status()}</code>"
-            msg += f"\n<b>├ Ukuran :</b> <code>{download.size()}</code>"
+                msg += f"\n<b>┌ Stat :</b> <code>{download.status()}</code>"
+            msg += f"\n<b>├ Uk :</b> <code>{download.size()}</code>"
             msg += f"\n<b>├ Kec :</b> <code>{download.upload_speed()}</code> | <b>Diupload :</b> <code>{download.uploaded_bytes()}</code>"
             msg += f"\n<b>├ Ratio :</b> <code>{download.ratio()}</code> | <b>Waktu :</b> <code>{download.seeding_time()}</code>"
         else:
             if download.message.chat.type.name in ['SUPERGROUP', 'CHANNEL']:
-                msg += f"\n<b>┌ Sts :</b> <a href='{download.message.link}'>{download.status()}</a>"
+                msg += f"\n<b>┌ Stat :</b> <a href='{download.message.link}'>{download.status()}</a>"
             else:
-                msg += f"\n<b>┌ Sts :</b> <code>{download.status()}</code>"
-            msg += f"\n<b>├ Ukrn :</b> <code>{download.size()}</code>"
+                msg += f"\n<b>┌ Stat :</b> <code>{download.status()}</code>"
+            msg += f"\n<b>├ Uk :</b> <code>{download.size()}</code>"
         # <a href='tg://user?id={download.message.from_user.id}'>{download.message.from_user.first_name}</a>
-        msg += f"\n<b>├ Pgn :</b> <code>{download.message.from_user.first_name}</code> | <b>ID :</b> <code>{download.message.from_user.id}</code>"
-        msg += f"\n<b>└ Stop :</b> <code>/{BotCommands.CancelMirror[0]} {download.gid()}</code>\n\n"
+        msg += f"\n<b>├ User :</b> <code>{download.message.from_user.first_name}</code> | <b>ID :</b> <code>{download.message.from_user.id}</code>"
+        msg += f"\n<b>└</b> <code>/{BotCommands.CancelMirror[0]} {download.gid()}</code>\n\n"
     if len(msg) == 0:
         return None, None
     dl_speed = 0
@@ -177,7 +177,7 @@ def get_readable_message():
             elif 'M' in spd:
                 up_speed += float(spd.split('M')[0]) * 1048576
     if tasks > STATUS_LIMIT:
-        msg += f"<b>Halaman :</b> <code>{PAGE_NO}/{PAGES}</code> | <b>Total Tugas :</b> <code>{tasks}</code>\n"
+        msg += f"<b>Hal :</b> <code>{PAGE_NO}/{PAGES}</code> | <b>Ttl Tugas :</b> <code>{tasks}</code>\n"
         buttons = ButtonMaker()
         buttons.ibutton("⫷", "status pre")
         buttons.ibutton("🪫", "status ref")
@@ -240,7 +240,7 @@ def is_telegram_link(url):
 
 
 def is_share_link(url):
-    return bool(re_match(r'https?:\/\/.+\.gdtot\.\S+|https?:\/\/(filepress|filebee|appdrive|gdflix)\.\S+', url))
+    return bool(re_match(r'https?:\/\/.+\.gdtot\.\S+|https?:\/\/(filepress|filebee|appdrive|gdflix|sharer)\.\S+', url))
 
 
 def is_mega_link(url):
