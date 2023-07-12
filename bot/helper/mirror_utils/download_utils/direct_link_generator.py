@@ -122,7 +122,9 @@ def direct_link_generator(link: str):
     elif "romsget.io" in domain:
         return link if domain == "static.romsget.io" else romsget(link)
     elif "hexupload.net" in domain:
-        return hexupload(link)    
+        return hexupload(link)
+    elif any(x in domain for x in ['dooood.com', 'dood.yt']):
+        return doodstream(link)
     else:
         raise DirectDownloadLinkException(
             f'Tidak ada fungsi direct link untuk {link}')
@@ -171,7 +173,7 @@ def uptobox(url: str) -> str:
         sleep(res["data"]["waiting"])
     elif res['statusCode'] == 39:
         raise DirectDownloadLinkException(
-            f"ERROR: Uptobox sedang limit. Silahkan tunggu {get_readable_time(res['data']['waiting'])} lagi!")
+            f"ERROR: Uptobox sedang limit! Silahkan tunggu {get_readable_time(res['data']['waiting'])} lagi!")
     else:
         raise DirectDownloadLinkException(f"ERROR: {res['message']}")
     try:
@@ -427,7 +429,7 @@ def fichier(link: str) -> str:
         if "you must wait" in str(str_2).lower():
             if numbers := [int(word) for word in str(str_2).split() if word.isdigit()]:
                 raise DirectDownloadLinkException(
-                    f"ERROR: 1Fichier sedang limit. Silahkan tunggu {numbers[0]} menit lagi!")
+                    f"ERROR: 1Fichier sedang limit! Silahkan tunggu {numbers[0]} menit lagi!")
             else:
                 raise DirectDownloadLinkException(
                     "ERROR: 1Fichier sedang limit!")
@@ -443,7 +445,7 @@ def fichier(link: str) -> str:
         if "you must wait" in str(str_1).lower():
             if numbers := [int(word) for word in str(str_1).split() if word.isdigit()]:
                 raise DirectDownloadLinkException(
-                    f"ERROR: 1Fichier sedang limit. Silahkan tunggu {numbers[0]} menit lagi!")
+                    f"ERROR: 1Fichier sedang limit! Silahkan tunggu {numbers[0]} menit lagi!")
             else:
                 raise DirectDownloadLinkException(
                     "ERROR: 1Fichier sedang limit!")
@@ -505,7 +507,7 @@ def krakenfiles(page_link: str) -> str:
         "hash": dl_hash,
     }
     dl_link_resp = cget(
-        'post', f"https://krakenfiles.com/download/{hash}", data=payload, headers=headers)
+        'post', f"https://krakenfiles.com/download/{dl_hash}", data=payload, headers=headers)
     dl_link_json = dl_link_resp.json()
     if "url" in dl_link_json:
         return dl_link_json["url"]
@@ -981,5 +983,63 @@ def hexupload(url) -> str:
         if url:
             url = b64decode(url.group(1)).decode("utf-8").replace(" ", "%20")
             return url
+    except Exception as e:
+        raise DirectDownloadLinkException(f'ERROR: {e.__class__.__name__}')
+
+
+def doodstream(url: str) -> str:
+    """ DoodStream direct link generator
+    Scrapped by https://github.com/arakurumi
+    """
+    # NOTE: Working on my machine, IDK work or not on vps/heroku (Untested)
+    # TODO: Rescrape with better method (This method sometimes got Cloudflare version 2 Captcha challenge)
+
+    base_url = "https://dooood.com"
+    cget = create_scraper(
+        browser={
+        'browser': 'firefox',
+        'platform': 'windows',
+        'mobile': False
+    }).request
+    if "dood.yt" in url:
+        url = url.replace("dood.yt", "dooood.com")
+    if "/e/" in url:
+        url = url.replace("/e/", "/d/")
+    if "/f/" in url:
+        url = url.replace("/f/", "/d/")
+    page_resp = cget('GET', url)
+    # Force get url when not 200 response
+    while "200" not in str(page_resp):
+        try:
+            page_resp = cget('GET', url)
+        except:
+            pass
+    soup = BeautifulSoup(page_resp.text, "lxml")
+    try:
+        dl_link = soup.find_all("a", {"class": "btn btn-primary d-flex align-items-center justify-content-between"})
+        for link in dl_link:
+            dl_link = link['href']
+        if len(dl_link) == 0:
+            raise DirectDownloadLinkException(f"ERROR: Link ini tidak memliki tombol unduh!")
+    except:
+        raise DirectDownloadLinkException(f"ERROR: Link ini tidak memliki tombol unduh!")
+    dl_page_resp = cget('GET', base_url + dl_link)
+    soup = BeautifulSoup(dl_page_resp.text, "lxml")
+    # Force get url when security error
+    while "Security error" in str(soup):
+        try:
+            dl_page_resp = cget('GET', base_url + dl_link)
+            soup = BeautifulSoup(dl_page_resp.text, "lxml")
+        except:
+            pass
+    try:
+        ddl_link = soup.find_all("a", {"class": "btn btn-primary d-flex align-items-center justify-content-between"})
+        for link in ddl_link:
+            ddl_link = link["onclick"]
+        ddl_link = ddl_link.split("'")[1].split("'")[-1]
+        if "http" not in ddl_link:
+            return base_url + ddl_link
+        else:
+            return ddl_link
     except Exception as e:
         raise DirectDownloadLinkException(f'ERROR: {e.__class__.__name__}')
