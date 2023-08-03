@@ -85,16 +85,18 @@ async def get_user_settings(from_user):
 
     buttons.ibutton("Close", f"userset {user_id} close")
     text = f"""<b>Pengaturan untuk user</b> {name}
-<b>Leech to :</b> <code>{leech_dest}</code>
-<b>Leech Type :</b> <code>{ltype}</code>
-<b>Custom Thumbnail :</b> <code>{thumbmsg}</code>
-<b>Rclone Config :</b> <code>{rccmsg}</code>
+<pre languange="bash">
+<b>Leech to         :</b> <code>{leech_dest}</code>
+<b>Leech Type       :</b> <code>{ltype}</code>
+<b>Leech Prefix     :</b> <code>{escape(lprefix)}</code>  
 <b>Leech Split Size :</b> <code>{split_size}</code>
-<b>Equal Splits :</b> <code>{equal_splits}</code>
-<b>Media Group :</b> <code>{media_group}</code>
-<b>Leech Prefix :</b> <code>{escape(lprefix)}</code>
-<b>Media Group is </b> <code>{media_group}</code>    
-<b>YT-DLP Quality :</b> <code>{escape(ytopt)}</code></b>"""
+<b>Equal Split      :</b> <code>{equal_splits}</code>
+<b>Media Group      :</b> <code>{media_group}</code>
+<b>YT-DLP Quality   :</b> <code>{escape(ytopt)}</code></b>
+<b>Rclone Config    :</b> <code>{rccmsg}</code>
+<b>Custom Thumbnail :</b> <code>{thumbmsg}</code>
+</pre>
+"""
     return text, buttons.build_menu(1)
 
 
