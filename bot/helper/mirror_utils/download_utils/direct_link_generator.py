@@ -34,6 +34,7 @@ anonfilesBaseSites = ['anonfiles.com', 'hotfile.io', 'bayfiles.com', 'megaupload
                       'filechan.org', 'myfile.is', 'vshare.is', 'rapidshare.nu', 'lolabits.se',
                       'openload.cc', 'share-online.is', 'upvid.cc', 'zippysha.re']
 
+nurlresolver_sites = ['gofile.io', 'send.cm']
 
 def direct_link_generator(link: str):
     """ direct links generator """
@@ -125,6 +126,8 @@ def direct_link_generator(link: str):
         return hexupload(link)
     elif any(x in domain for x in ['dooood.com', 'dood.yt']):
         return doodstream(link)
+    elif any(x in domain for x in nurlresolver_sites):
+        return nurlresolver(link)
     else:
         raise DirectDownloadLinkException(
             f'Tidak ada fungsi direct link untuk {link}')
@@ -988,11 +991,12 @@ def hexupload(url) -> str:
 
 
 def doodstream(url: str) -> str:
-    """ DoodStream direct link generator
+    """ 
+    DoodStream direct link generator
     Scrapped by https://github.com/arakurumi
+    NOTE: Working on my machine, not work in vps (digitalocean) and heroku
+    TODO: Rescrape with better method (This method sometimes got Cloudflare version 2 Captcha challenge)
     """
-    # NOTE: Working on my machine, IDK work or not on vps/heroku (Untested)
-    # TODO: Rescrape with better method (This method sometimes got Cloudflare version 2 Captcha challenge)
 
     base_url = "https://dooood.com"
     cget = create_scraper(
@@ -1043,3 +1047,24 @@ def doodstream(url: str) -> str:
             return ddl_link
     except Exception as e:
         raise DirectDownloadLinkException(f'ERROR: {e.__class__.__name__}')
+
+
+def nurlresolver(url: str) -> str:
+    """
+    NOTE:
+    There're many sites supported by this api, 
+    but I've only added two because I've only had chance to test 2 of them
+    You can check supported sites here :
+    https://github.com/mnsrulz/nurlresolver/tree/master/src/libs
+    """
+    req = requests.get(f"https://nurlresolver.netlify.app/.netlify/functions/server/resolve?q={url}&m=&r=false").json()
+    if len(req) == 0:
+        raise DirectDownloadLinkException(f'ERROR: Gagal mendapatkan direct link!')
+    for link in req:
+        headers = link.get("headers")
+        direct_link = link.get("link")
+    # Parse headers for aria2c
+    for header, value in (headers or {}).items():
+        headers = f"{header}: {value}"
+    return direct_link, headers
+        
