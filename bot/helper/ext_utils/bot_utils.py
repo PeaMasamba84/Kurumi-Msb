@@ -40,7 +40,6 @@ class MirrorStatus:
     STATUS_CHECKING = "Ngecek..."
     STATUS_SEEDING = "Ngeseed..."
 
-
 class setInterval:
     def __init__(self, interval, action):
         self.interval = interval
@@ -98,7 +97,7 @@ async def get_telegraph_list(telegraph_content):
     if len(path) > 1:
         await telegraph.edit_telegraph(path, telegraph_content)
     buttons = ButtonMaker()
-    buttons.ubutton("👁‍🗨 VIEW", f"https://telegra.ph/{path[0]}")
+    buttons.ubutton("🔦 VIEW", f"https://telegra.ph/{path[0]}")
     return buttons.build_menu(1)
 
 
@@ -106,13 +105,13 @@ def get_progress_bar_string(pct):
     pct = float(pct.strip('%'))
     p = min(max(pct, 0), 100)
     cFull = int(p // 8)
-    p_str = '●' * cFull
-    p_str += '○' * (12 - cFull)
+    p_str = '■' * cFull
+    p_str += '□' * (12 - cFull)
     return f"[{p_str}]"
 
 
 def get_readable_message():
-    msg = "<b><a href='https://subscene.com/u/1271292'>🄿🅴🄰 🅼🄰🅂🄰🅼🄱🄰</a> </b>\n\n"
+    msg = ""
     button = None
     STATUS_LIMIT = config_dict['STATUS_LIMIT']
     tasks = len(download_dict)
@@ -125,10 +124,10 @@ def get_readable_message():
         if download.status() not in [MirrorStatus.STATUS_SPLITTING, MirrorStatus.STATUS_SEEDING]:
             msg += f"\n<b>┌┤{get_progress_bar_string(download.progress())} <code>{download.progress()}</code>├┐</b>"
             if download.message.chat.type.name in ['SUPERGROUP', 'CHANNEL']:
-                msg += f"\n<b>├ Stat :</b> <a href='{download.message.link}'>{download.status()}</a>"
+                msg += f"\n<b>├ Status :</b> <a href='{download.message.link}'>{download.status()}</a>"
             else:
-                msg += f"\n<b>├ Stat :</b> <code>{download.status()}</code>"
-            msg += f"\n<b>├ Pros :</b> <code>{download.processed_bytes()}</code> dari <code>{download.size()}</code>"
+                msg += f"\n<b>├ Status :</b> <code>{download.status()}</code>"
+            msg += f"\n<b>├ Proses :</b> <code>{download.processed_bytes()}</code> dari <code>{download.size()}</code>"
             msg += f"\n<b>├ Kec :</b> <code>{download.speed()}</code> | <b>ETA :</b> <code>{download.eta()}</code>"
             if hasattr(download, 'seeders_num'):
                 try:
@@ -137,18 +136,18 @@ def get_readable_message():
                     pass
         elif download.status() == MirrorStatus.STATUS_SEEDING:
             if download.message.chat.type.name in ['SUPERGROUP', 'CHANNEL']:
-                msg += f"\n<b>┌ Stat :</b> <a href='{download.message.link}'>{download.status()}</a>"
+                msg += f"\n<b>┌ Status :</b> <a href='{download.message.link}'>{download.status()}</a>"
             else:
-                msg += f"\n<b>┌ Stat :</b> <code>{download.status()}</code>"
-            msg += f"\n<b>├ Uk :</b> <code>{download.size()}</code>"
+                msg += f"\n<b>┌ Status :</b> <code>{download.status()}</code>"
+            msg += f"\n<b>├ Ukuran :</b> <code>{download.size()}</code>"
             msg += f"\n<b>├ Kec :</b> <code>{download.upload_speed()}</code> | <b>Diupload :</b> <code>{download.uploaded_bytes()}</code>"
             msg += f"\n<b>├ Ratio :</b> <code>{download.ratio()}</code> | <b>Waktu :</b> <code>{download.seeding_time()}</code>"
         else:
             if download.message.chat.type.name in ['SUPERGROUP', 'CHANNEL']:
-                msg += f"\n<b>┌ Stat :</b> <a href='{download.message.link}'>{download.status()}</a>"
+                msg += f"\n<b>┌ Status :</b> <a href='{download.message.link}'>{download.status()}</a>"
             else:
-                msg += f"\n<b>┌ Stat :</b> <code>{download.status()}</code>"
-            msg += f"\n<b>├ Uk :</b> <code>{download.size()}</code>"
+                msg += f"\n<b>┌ Status :</b> <code>{download.status()}</code>"
+            msg += f"\n<b>├ Ukuran :</b> <code>{download.size()}</code>"
         # <a href='tg://user?id={download.message.from_user.id}'>{download.message.from_user.first_name}</a>
         msg += f"\n<b>├ User :</b> <code>{download.message.from_user.first_name}</code> | <b>ID :</b> <code>{download.message.from_user.id}</code>"
         msg += f"\n<b>└</b> <code>/{BotCommands.CancelMirror[0]} {download.gid()}</code>\n\n"
@@ -177,7 +176,7 @@ def get_readable_message():
             elif 'M' in spd:
                 up_speed += float(spd.split('M')[0]) * 1048576
     if tasks > STATUS_LIMIT:
-        msg += f"<b>Hal :</b> <code>{PAGE_NO}/{PAGES}</code> | <b>Ttl Tugas :</b> <code>{tasks}</code>\n"
+        msg += f"<b>Halaman :</b> <code>{PAGE_NO}/{PAGES}</code> | <b>Total Tugas :</b> <code>{tasks}</code>\n"
         buttons = ButtonMaker()
         buttons.ibutton("⫷", "status pre")
         buttons.ibutton("🪫", "status ref")
@@ -248,7 +247,11 @@ def is_mega_link(url):
 
 
 def is_rclone_path(path):
-    return bool(re_match(r'^(mrcc:)?(?!magnet:)(?![- ])[a-zA-Z0-9_\. -]+(?<! ):(?!.*\/\/).*$|^rcl$', path))
+    return bool(re_match(r'^(mrcc:)?(?!magnet:)(?!mtp:)(?![- ])[a-zA-Z0-9_\. -]+(?<! ):(?!.*\/\/).*$|^rcl$', path))
+
+
+def is_gdrive_id(id_):
+    return bool(re_match(r'^(mtp:)?(?:[a-zA-Z0-9-_]{33}|[a-zA-Z0-9_-]{19})$|^gdl$|^root$', id_))
 
 
 def get_mega_link_type(url):
