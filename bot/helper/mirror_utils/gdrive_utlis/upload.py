@@ -110,7 +110,7 @@ class gdUpload(GoogleDriveHelper):
         # File body description
         file_metadata = {
             'name': file_name,
-            'description': 'Uploaded by KQRM',
+            'description': 'Uploaded by Pea Masamba',
             'mimeType': mime_type,
         }
         if dest_id is not None:
@@ -156,7 +156,7 @@ class gdUpload(GoogleDriveHelper):
                     if self.use_sa:
                         if self.sa_count >= self.sa_number:
                             LOGGER.info(
-                                f"Reached maximum number of service accounts switching, which is {self.__sa_count}")
+                                f"Reached maximum number of service accounts switching, which is {self.sa_count}")
                             raise err
                         else:
                             if self.is_cancelled:
