@@ -856,14 +856,13 @@ def androidfilehost(url: str) -> str:
     }
     data = {"submit": "submit", "action": "getdownloadmirrors", "fid": fid}
     mirrors = None
-    error = "ERROR: Can't find AFH Mirrors for the link!"
     try:
         req = requests.post("https://androidfilehost.com/libs/otf/mirrors.otf.php", headers=headers, data=data, cookies=res.cookies)
         mirrors = req.json()["MIRRORS"]
     except (json.decoder.JSONDecodeError, TypeError):
-        raise DirectDownloadLinkException(error)
+        raise DirectDownloadLinkException("ERROR: Link AndroidFileHost tidak ditemukan!")
     if mirrors is None:
-        raise DirectDownloadLinkException(error)
+        raise DirectDownloadLinkException("ERROR: Link AndroidFileHost tidak ditemukan!")
     for i in mirrors:
         link = i["url"]
         if link:
@@ -889,7 +888,7 @@ def tusfiles(url: str) -> str:
         if jcok:= resp2.headers["location"]:
             return jcok
     except Exception as e:
-        raise DirectDownloadLinkException(f'ERROR: {e.__class__.__name__}')
+        raise DirectDownloadLinkException(f"ERROR: {e.__class__.__name__}")
     
 
 def pandafiles(url: str) -> str:
@@ -901,7 +900,7 @@ def pandafiles(url: str) -> str:
         req = scraper.post(url, headers=headers, data=data)
         return BeautifulSoup(req.content, "lxml").find("div", {"id": "direct_link"}).find("a")["href"]
     except Exception as e:
-        raise DirectDownloadLinkException(f'ERROR: {e.__class__.__name__}')
+        raise DirectDownloadLinkException(f"ERROR: {e.__class__.__name__}")
     
 
 def uploadhaven(link: str) -> str:
@@ -913,18 +912,21 @@ def uploadhaven(link: str) -> str:
         hot_text = hot1.text.strip()
         raise DirectDownloadLinkException(f"ERROR: {str(hot_text)}")
     else:
-        data = {
-            "_token": test.find("input", {"name": "_token"})["value"],
-            "key": test.find("input", {"name": "key"})["value"],
-            "time": test.find("input", {"name": "time"})["value"],
-            "hash": test.find("input", {"name": "hash"})["value"],
-            "type": "free",
-        }
-        for _ in range(6, 0, -1):
-            sleep(1)
-        reurl = BeautifulSoup(requests.post(link, headers=headers, data=data).text, "lxml")
-        return reurl.find("div", class_="alert alert-success mb-0").find("a")["href"]
-    
+        try:
+            data = {
+                "_token": test.find("input", {"name": "_token"})["value"],
+                "key": test.find("input", {"name": "key"})["value"],
+                "time": test.find("input", {"name": "time"})["value"],
+                "hash": test.find("input", {"name": "hash"})["value"],
+                "type": "free",
+            }
+            for _ in range(6, 0, -1):
+                sleep(1)
+            reurl = BeautifulSoup(requests.post(link, headers=headers, data=data).text, "lxml")
+            return reurl.find("div", class_="alert alert-success mb-0").find("a")["href"]
+        except Exception as e:
+            raise DirectDownloadLinkException(f"ERROR: {e.__class__.__name__}")
+
 
 def uploadrar(url: str) -> str:
     try:
@@ -942,7 +944,7 @@ def uploadrar(url: str) -> str:
         bs = BeautifulSoup(req.text, "lxml")
         return bs.find("span", {"id": "direct_link"}).find("a").get("href")
     except Exception as e:
-        raise DirectDownloadLinkException(f'ERROR: {e.__class__.__name__}')
+        raise DirectDownloadLinkException(f"ERROR: {e.__class__.__name__}")
     
 
 def romsget(url: str) -> str:
@@ -963,7 +965,7 @@ def romsget(url: str) -> str:
         prm = bs2.find("input", {"name": "attach"}).get("value")
         return f"{udl}?attach={prm}"
     except Exception as e:
-        raise DirectDownloadLinkException(f'ERROR: {e.__class__.__name__}')
+        raise DirectDownloadLinkException(f"ERROR: {e.__class__.__name__}")
 
 
 def hexupload(url) -> str:
@@ -987,7 +989,7 @@ def hexupload(url) -> str:
             url = b64decode(url.group(1)).decode("utf-8").replace(" ", "%20")
             return url
     except Exception as e:
-        raise DirectDownloadLinkException(f'ERROR: {e.__class__.__name__}')
+        raise DirectDownloadLinkException(f"ERROR: {e.__class__.__name__}")
 
 
 def doodstream(url: str) -> str:
