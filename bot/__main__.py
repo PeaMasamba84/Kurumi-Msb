@@ -23,7 +23,7 @@ from .helper.telegram_helper.message_utils import sendMessage, editMessage, send
 from .helper.telegram_helper.filters import CustomFilters
 from .helper.telegram_helper.button_build import ButtonMaker
 from bot.helper.listeners.aria2_listener import start_aria2_listener
-from .modules import authorize, clone, gd_count, gd_delete, gd_list, cancel_mirror, mirror_leech, status, torrent_search, torrent_select, ytdlp, rss, shell, eval, users_settings, bot_settings
+from .modules import authorize, clone, gd_count, gd_delete, cancel_mirror, gd_search, mirror_leech, status, torrent_search, torrent_select, ytdlp, rss, shell, eval, users_settings, bot_settings
 
 def get_quotes():
     try:
@@ -113,7 +113,7 @@ async def stats(_, message):
     # Neofetch
     neofetch = check_output(
         ["neofetch --shell_version off --stdout"], shell=True).decode()
-    stats = f'<b>System</b>\n' \
+    stats = f'<b>System Bot Pea Masamba</b>\n' \
             f'<code>{neofetch}</code>' \
             f'<b>CPU</b>\n' \
             f'<b>Cores :</b> <code>{p_core}</code>\n' \
@@ -145,7 +145,7 @@ async def stats(_, message):
 async def start(client, message):
     buttons = ButtonMaker()
     buttons.ubutton(
-        "Owner", "https://subscene.com/u/1271292")
+        "Subtitle Kami", "https://subscene.com/u/1271292")
     buttons.ubutton("Group", "https://t.me/CollectionMovie_Subtitles")
     reply_markup = buttons.build_menu(2)
     if await CustomFilters.authorized(client, message):
