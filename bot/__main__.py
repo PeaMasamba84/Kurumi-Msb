@@ -113,7 +113,7 @@ async def stats(_, message):
     # Neofetch
     neofetch = check_output(
         ["neofetch --shell_version off --stdout"], shell=True).decode()
-    stats = f'<b>System</b>\n' \
+    stats = f'<b>System Bot Pea Masamba</b>\n' \
             f'<code>{neofetch}</code>' \
             f'<b>CPU</b>\n' \
             f'<b>Cores :</b> <code>{p_core}</code>\n' \
@@ -145,8 +145,8 @@ async def stats(_, message):
 async def start(client, message):
     buttons = ButtonMaker()
     buttons.ubutton(
-        "Owner", "https://t.me/save_usdt")
-    buttons.ubutton("Group", "https://t.me/arakurumi")
+        "Subtitle Kami", "https://subscene.com/u/1271292")
+    buttons.ubutton("Group", "https://t.me/CollectionMovie_Subtitles")
     reply_markup = buttons.build_menu(2)
     if await CustomFilters.authorized(client, message):
         start_string = f'''
