@@ -3,7 +3,7 @@ from logging import getLogger, ERROR
 from time import time
 from asyncio import Lock
 
-from bot import LOGGER, download_dict, download_dict_lock, non_queued_dl, queue_dict_lock, bot, user, IS_PREMIUM_USER
+from bot import LOGGER, download_dict, download_dict_lock, non_queued_dl, queue_dict_lock, bot, user, IS_PREMIUM_USER, config_dict
 from bot.helper.mirror_utils.status_utils.telegram_status import TelegramStatus
 from bot.helper.mirror_utils.status_utils.queue_status import QueueStatus
 from bot.helper.telegram_helper.message_utils import sendStatusMessage, sendMessage
@@ -90,16 +90,19 @@ class TelegramDownloadHelper:
             await self.__onDownloadError('Ada yang salah!')
 
     async def add_download(self, message, path, filename, session):
+        if IS_PREMIUM_USER and not session and (self.__listener.user_dict.get('user_leech', False) or 'user_leech' not in self.__listener.user_dict and config_dict['USER_LEECH']):
+            session = 'user'
+        elif not session:
+            session = 'bot'
         if IS_PREMIUM_USER and session != 'bot' or session == 'user':
             try:
                 message = await user.get_messages(chat_id=message.chat.id, message_ids=message.id)
             except:
                 pass
-                # await sendMessage(message, "Gunakan SuperGroup untuk mengunduh dengan USER_SESSION!")
-                # return
 
         media = message.document or message.photo or message.video or message.audio or \
             message.voice or message.video_note or message.sticker or message.animation or None
+        
         if media is not None:
 
             async with global_lock:
