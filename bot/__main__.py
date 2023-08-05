@@ -113,7 +113,7 @@ async def stats(_, message):
     # Neofetch
     neofetch = check_output(
         ["neofetch --shell_version off --stdout"], shell=True).decode()
-    stats = f'<b>System</b>\n' \
+    stats = f'<b>𝚂𝚢𝚜𝚝𝚎𝚖 𝙱𝚘𝚝 𝙲𝙼𝚃</b>\n' \
             f'<code>{neofetch}</code>' \
             f'<b>CPU</b>\n' \
             f'<b>Cores :</b> <code>{p_core}</code>\n' \
@@ -145,12 +145,12 @@ async def stats(_, message):
 async def start(client, message):
     buttons = ButtonMaker()
     buttons.ubutton(
-        "Owner", "https://t.me/save_usdt")
-    buttons.ubutton("Group", "https://t.me/arakurumi")
+        "Website", "https://www.comelmuewa84.eu.org/")
+    buttons.ubutton("Group", "https://t.me/CollectionMovie_Subtitles")
     reply_markup = buttons.build_menu(2)
     if await CustomFilters.authorized(client, message):
         start_string = f'''
-<b>Mirror Tautan Lambat menjadi Tautan Cepat!</b>
+<b>Mirror Tautan Lambat menjadi Kencang!</b>
 
 <b>Note :</b>
 Selalu backup File setelah Mirror untuk menghindari Team Drive terhapus!
