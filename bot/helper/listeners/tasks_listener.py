@@ -338,6 +338,7 @@ class MirrorLeechListener:
         msg = f"<b>Nama :</b> <code>{escape(name)}</code>"
         msg += f"\n\n<b>Ukuran :</b> <code>{get_readable_file_size(size)}</code>"
         msg += f"\n\n</b>Hasil mirror sudah kami pindahkan<a href='https://t.me/peamasambamirror'> 𝑫𝒊𝒔𝒊𝒏𝒊</a> </b>\n\n"
+        msg += f"\n\n</b>Join Group Google Drive CMT<a href='https://groups.google.com/g/jagoanmasamba'> 𝑫𝒊𝒔𝒊𝒏𝒊</a> </b>\n"
         msg += f'\n\n<b>𝐏𝐄𝐀 𝐌𝐀𝐒𝐀𝐌𝐁𝐀\n\n'
         LOGGER.info(f'Task Done: {name}')
         if self.isLeech:
