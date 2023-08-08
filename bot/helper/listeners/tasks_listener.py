@@ -336,9 +336,9 @@ class MirrorLeechListener:
         if self.isSuperGroup and config_dict['INCOMPLETE_TASK_NOTIFIER'] and DATABASE_URL:
             await DbManger().rm_complete_task(self.message.link)
         msg = f"<b>Nama :</b> <code>{escape(name)}</code>"
-        msg += f"\n\n<b>Ukuran :</b> <code>{get_readable_file_size(size)}</code>"
-        msg += f"\n\n</b>Hasil mirror sudah kami pindahkan<a href='https://t.me/peamasambamirror'> 𝑫𝒊𝒔𝒊𝒏𝒊</a> </b>\n\n"
-        msg += f"\n\n</b>Join Group Google Drive CMT<a href='https://groups.google.com/g/jagoanmasamba'> 𝑫𝒊𝒔𝒊𝒏𝒊</a> </b>\n"
+        msg += f"\n\n<b>Ukuran :</b> <code>{get_readable_file_size(size)}</code>\n\n"
+        msg += f"\n\n</b>Hasil mirror sudah kami pindahkan<a href='https://t.me/peamasambamirror'> 𝑫𝒊𝒔𝒊𝒏𝒊</a> </b>"
+        msg += f"\n\n</b>Join Group Google Drive CMT<a href='https://groups.google.com/g/jagoanmasamba'> 𝑫𝒊𝒔𝒊𝒏𝒊</a> </b>"
         msg += f'\n\n<b>𝐏𝐄𝐀 𝐌𝐀𝐒𝐀𝐌𝐁𝐀\n\n'
         LOGGER.info(f'Task Done: {name}')
         if self.isLeech:
@@ -395,7 +395,7 @@ class MirrorLeechListener:
                         share_url = f'{INDEX_URL}findpath?id={dir_id}'
                         buttons.ubutton("⚡ Index Link", share_url)
                         if mime_type.startswith(('image', 'video', 'audio')):
-                            share_urls = f'{INDEX_URL}findpath?id={dir_id}&?a=view'
+                            share_urls = f'{INDEX_URL}findpath?id={dir_id}&view=true'
                             buttons.ubutton("🌐 View Link", share_urls)
                 button = buttons.build_menu(2)
             else:
