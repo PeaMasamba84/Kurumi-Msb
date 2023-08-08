@@ -703,7 +703,7 @@ async def load_config():
         RSS_CHAT_ID = int(RSS_CHAT_ID)
 
     RSS_DELAY = environ.get('RSS_DELAY', '')
-    RSS_DELAY = 900 if len(RSS_DELAY) == 0 else int(RSS_DELAY)
+    RSS_DELAY = 600 if len(RSS_DELAY) == 0 else int(RSS_DELAY)
 
     CMD_SUFFIX = environ.get('CMD_SUFFIX', '')
 
