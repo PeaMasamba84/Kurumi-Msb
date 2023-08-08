@@ -34,6 +34,8 @@ anonfilesBaseSites = ['anonfiles.com', 'hotfile.io', 'bayfiles.com', 'megaupload
                       'filechan.org', 'myfile.is', 'vshare.is', 'rapidshare.nu', 'lolabits.se',
                       'openload.cc', 'share-online.is', 'upvid.cc', 'zippysha.re']
 
+dood_sites = ['dooood.com', 'doods.pro', 'dood.yt']
+
 nurlresolver_sites = ['gofile.io', 'send.cm']
 
 def direct_link_generator(link: str):
@@ -124,7 +126,7 @@ def direct_link_generator(link: str):
         return link if domain == "static.romsget.io" else romsget(link)
     elif "hexupload.net" in domain:
         return hexupload(link)
-    elif any(x in domain for x in ['dooood.com', 'dood.yt']):
+    elif any(x in domain for x in dood_sites):
         return doodstream(link)
     elif any(x in domain for x in nurlresolver_sites):
         return nurlresolver(link)
@@ -1000,15 +1002,16 @@ def doodstream(url: str) -> str:
     TODO: Rescrape with better method (This method sometimes got Cloudflare version 2 Captcha challenge)
     """
 
-    base_url = "https://dooood.com"
+    base_url = "https://dood.yt"
+    headers = "Referer: https://dood.yt/"
     cget = create_scraper(
         browser={
         'browser': 'firefox',
         'platform': 'windows',
         'mobile': False
     }).request
-    if "dood.yt" in url:
-        url = url.replace("dood.yt", "dooood.com")
+    for domain in dood_sites:
+        url = url.replace(domain, "dood.yt")
     if "/e/" in url:
         url = url.replace("/e/", "/d/")
     if "/f/" in url:
@@ -1044,9 +1047,9 @@ def doodstream(url: str) -> str:
             ddl_link = link["onclick"]
         ddl_link = ddl_link.split("'")[1].split("'")[-1]
         if "http" not in ddl_link:
-            return base_url + ddl_link
+            return base_url + ddl_link, headers
         else:
-            return ddl_link
+            return ddl_link, headers
     except Exception as e:
         raise DirectDownloadLinkException(f'ERROR: {e.__class__.__name__}')
 
