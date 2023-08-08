@@ -61,6 +61,7 @@ class DbManger:
                         await makedirs('tokens')
                     async with aiopen(token_path, 'wb+') as f:
                         await f.write(row['token_pickle'])
+                    row['token_pickle'] = token_path
                 user_data[uid] = row
             LOGGER.info("Users data has been imported from Database")
         # Rss Data
@@ -122,6 +123,8 @@ class DbManger:
             del data['thumb']
         if data.get('rclone'):
             del data['rclone']
+        if data.get('token_pickle'):
+            del data['token_pickle']
         await self.__db.users.replace_one({'_id': user_id}, data, upsert=True)
         self.__conn.close
 
