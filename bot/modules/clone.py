@@ -244,7 +244,7 @@ async def clone(client, message):
         if not config_dict['RCLONE_PATH'] and not listener.user_dict.get('rclone_path') and not dst_path:
             await sendMessage(message, 'Tujuan upload tidak ditemukan!')
             return
-        await rcloneNode(client, message, link, dst_path, rcf, tag, listener)
+        await rcloneNode(client, message, link, dst_path, rcf, listener)
     else:
         if not await aiopath.exists('token.pickle') and not await aiopath.exists(f'tokens/{message.from_user.id}.pickle'):
             await sendMessage(message, 'Token.pickle tidak ditemukan!')
