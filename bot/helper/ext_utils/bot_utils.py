@@ -123,7 +123,7 @@ def get_readable_message():
     for download in list(download_dict.values())[STATUS_START:STATUS_LIMIT+STATUS_START]:
         msg += f"<code>{escape(f'{download.name()}')}</code>"
         if download.status() not in [MirrorStatus.STATUS_SPLITTING, MirrorStatus.STATUS_SEEDING]:
-            msg += f"\n<b>┌┤{get_progress_bar_string(download.progress())} <code>{download.progress()}</code>├┐</b>"
+            msg += f"\n<b>┌┤{get_progress_bar_string(download.progress())} <code>{download.progress()}</code></b>"
             if download.message.chat.type.name in ['SUPERGROUP', 'CHANNEL']:
                 msg += f"\n<b>├ Status :</b> <a href='{download.message.link}'>{download.status()}</a>"
             else:
