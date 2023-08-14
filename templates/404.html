@@ -1,50 +1,35 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<meta charset="utf-8" />
-		<meta
-			name="viewport"
-			content="width=device-width, initial-scale=1, maximum-scale=5"
-		/>
-
-		<link rel="icon" href="https://telegra.ph/file/9213ca143c5c63548c0b4.jpg" />
-		<link
-			rel="shortcut icon"
-			type="image/x-icon"
-			href="https://t.me/CollectionMovie_Subtitles"
-		/>
-		<link rel="preconnect" href="https://fonts.googleapis.com" />
-		<link rel="preconnect" href="https://fonts.googleapis.com" />
-		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-		<link
-			href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&display=swap"
-			rel="stylesheet"
-		/>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		<link
 			rel="stylesheet"
-			href="https://gist.githubusercontent.com/arakurumi/147fb374d34604934e24c9776a61ac7d/raw/style.css"
+			href="{{ url_for('static',filename='style.css') }}"
 		/>
-		<title>404 page | @CollectionMovie_Subtitles</title>
+		<title>Situs tidak ditemukan!</title>
 	</head>
-
 	<body>
-		<h1>404 not found</h1>
 		<main>
-			<img
-				src="https://telegra.ph/file/9213ca143c5c63548c0b4.jpg"
-				alt="Uwoooh"
-			/>
-			<article>
-				<h2>Tabibito-san👿</h2>
-				<p>Where are you going dear?</p>
-				<a href="https://t.me/CollectionMovie_Subtitles">Telegram Group</a>
-			</article>
+			<div class="container">
+				<h3 class="page-title"></h3>
+				<div class="main-content row py-3">
+					<img
+						class="scarecrow-img"
+						src="https://i.kek.sh/VKkocfyDNM5.png"
+						alt="Image"
+					/>
+					<div class="main-content-text">
+						<h1>Situs tidak ditemukan!</h1>
+						<p>Masuk Telegram Group untuk menggunakan bot 😁</p>
+						<a class="btn" href="https://t.me/arakurumi">Telegram Group</a>
+					</div>
+				</div>
+			</div>
 		</main>
 
-		<footer>
-			<a href="https://t.me/CollectionMovie_Subtitles" target="_blank"
-				><span>@CollectionMovie_Subtitles</span></a
-			>
+		<footer class="py-1">
+			<p>With 💖 by KQRM</p>
 		</footer>
 	</body>
 </html>
