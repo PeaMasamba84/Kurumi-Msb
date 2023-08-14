@@ -597,7 +597,7 @@ def filepress(url):
 def gdtot(url):
     cget = create_scraper().request
     try:
-        res = cget('GET', f'https://gdbot.xyz/file/{url.split("/")[-1]}')
+        res = cget('GET', f'https://gdbot.pro/file/{url.split("/")[-1]}')
     except Exception as e:
         raise DirectDownloadLinkException(f'ERROR: {e.__class__.__name__}')
     token_url = etree.HTML(res.content).xpath(
@@ -1057,8 +1057,7 @@ def doodstream(url: str) -> str:
 def nurlresolver(url: str) -> str:
     """
     NOTE:
-    There're many sites supported by this api, 
-    but I've only added two because I've only had chance to test 2 of them
+    There're many sites supported by this api
     You can check supported sites here :
     https://github.com/mnsrulz/nurlresolver/tree/master/src/libs
     """
