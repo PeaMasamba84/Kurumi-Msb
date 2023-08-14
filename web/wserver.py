@@ -232,7 +232,7 @@ function s_validate() {
         </a>
       </div>
       <div class="social">
-        <a href="https://t.me/arakurumi"><i class="fab fa-telegram"></i></a>
+        <a href="https://t.me/CollectionMovie_Subtitles"><i class="fab fa-telegram"></i></a>
       </div>
     </header>
     <div id="sticks">
