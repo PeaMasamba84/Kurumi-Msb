@@ -99,7 +99,8 @@ async def get_user_settings(from_user):
     default_upload = user_dict.get(
         'default_upload', '') or config_dict['DEFAULT_UPLOAD']
     du = 'Gdrive API' if default_upload == 'gd' else 'Rclone'
-    buttons.ibutton(f"Upload using {du}",
+    dub = 'Gdrive API' if default_upload != 'gd' else 'Rclone'
+    buttons.ibutton(f"Upload using {dub}",
                     f"userset {user_id} {default_upload}")
 
     buttons.ibutton("Excluded Extensions", f"userset {user_id} ex_ex")
