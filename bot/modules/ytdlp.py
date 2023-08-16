@@ -331,6 +331,8 @@ async def _ytdl(client, message, isLeech=False, sameDir=None, bulk=[]):
             await message.unpin()
         except:
             pass
+        
+    user_id = message.from_user.id
 
     if username := message.from_user.username:
         tag = f'@{username}'
@@ -345,7 +347,7 @@ async def _ytdl(client, message, isLeech=False, sameDir=None, bulk=[]):
         return
 
     if not isLeech:
-        user_dict = user_data.get(message.from_user.id, {})
+        user_dict = user_data.get(user_id, {})
         default_upload = user_dict.get('default_upload', '')
         if not up and (default_upload == 'rc' or not default_upload and config_dict['DEFAULT_UPLOAD'] == 'rc') or up == 'rc':
             up = user_dict.get('rclone_path') or config_dict['RCLONE_PATH']
@@ -356,19 +358,21 @@ async def _ytdl(client, message, isLeech=False, sameDir=None, bulk=[]):
             return
         elif up != 'rcl' and is_rclone_path(up):
             if up.startswith('mrcc:'):
-                config_path = f'rclone/{message.from_user.id}.conf'
+                config_path = f'rclone/{user_id}.conf'
             else:
                 config_path = 'rclone.conf'
             if not await aiopath.exists(config_path):
-                await sendMessage(message, f'Config Rclone : <code>{config_path}</code> tidak ditemukan!')
+                await sendMessage(message, f'Config Rclone <code>{config_path}</code> tidak ditemukan!')
                 return
         elif up != 'gdl' and is_gdrive_id(up):
             if up.startswith('mtp:'):
-                token_path = f'tokens/{message.from_user.id}.pickle'
-            else:
+                token_path = f'tokens/{user_id}.pickle'
+            elif not config_dict['USE_SERVICE_ACCOUNTS']:
                 token_path = 'token.pickle'
+            else:
+                token_path = 'accounts'
             if not await aiopath.exists(token_path):
-                await sendMessage(message, f'Token.pickle : <code>{token_path}</code> tidak ditemukan!')
+                await sendMessage(message, f'Token.pickle atau Service Accounts <code>{token_path}</code> tidak ditemukan!')
                 return
         if not is_gdrive_id(up) and not is_rclone_path(up):
             await sendMessage(message, 'Tujuan upload tidak ditemukan!')
@@ -417,7 +421,6 @@ async def _ytdl(client, message, isLeech=False, sameDir=None, bulk=[]):
     __run_multi()
 
     if not select:
-        user_id = message.from_user.id
         user_dict = user_data.get(user_id, {})
         if 'format' in options:
             qual = options['format']
