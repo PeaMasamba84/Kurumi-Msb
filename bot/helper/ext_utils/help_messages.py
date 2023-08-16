@@ -443,10 +443,10 @@ Send Gdrive|Gdot|Filepress|Filebee|Appdrive|Gdflix link or rclone path along wit
 <code>/{BotCommands.CloneCommand[0]}</code> -i 10(number of links/pathies)
 
 <b>Gdrive:</b>
-<code>/{BotCommands.CloneCommand[0]}</code> gdrivelink
+<code>/{BotCommands.CloneCommand[0]}</code> gdrivelink/gdl/gdrive_id -up gdl/gdrive_id/gd
 
 <b>Rclone:</b>
-<code>/{BotCommands.CloneCommand[0]}</code> (rcl or rclone_path) -up (rcl or rclone_path) -rcf flagkey:flagvalue|flagkey|flagkey:flagvalue
+<code>/{BotCommands.CloneCommand[0]}</code> rcl/rclone_path -up rcl/rclone_path/rc -rcf flagkey:flagvalue|flagkey|flagkey:flagvalue
 
 Note: If -up not specified then rclone destination will be the RCLONE_PATH from config.env
 """
