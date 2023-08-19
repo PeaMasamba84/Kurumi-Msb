@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
 from tzlocal import get_localzone
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
-from pyrogram import Client as tgClient, enums
+from pyrogram import Client as tgClient, enums, __version__ as prv
 from pymongo import MongoClient
 from asyncio import Lock
 from dotenv import load_dotenv, dotenv_values
 from threading import Thread
 from time import sleep, time
-from subprocess import Popen, run as srun
+from subprocess import Popen, run as srun, check_output
 from os import remove as osremove, path as ospath, environ, getcwd
 from aria2p import API as ariaAPI, Client as ariaClient
 from qbittorrentapi import Client as qbClient
@@ -23,7 +23,7 @@ setdefaulttimeout(600)
 
 botStartTime = time()
 
-basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+basicConfig(format='%(asctime)s - %(name)s [%(module)s:%(lineno)d] - %(levelname)s - %(message)s',
             handlers=[FileHandler('log.txt'), StreamHandler()],
             level=INFO)
 
@@ -45,6 +45,20 @@ queued_dl = {}
 queued_up = {}
 non_queued_dl = set()
 non_queued_up = set()
+
+try:
+    arv = check_output(["chrome --v"], shell=True).decode().split("\n")[0].split(" ")[2] 
+    ffv = check_output(['opera -version | grep "ffmpeg version" | sed -e "s/ffmpeg version //" -e "s/[^0-9.].*//"'], shell=True).decode().replace("\n", "")
+    gav = check_output(["pip show google-api-python-client | grep Version"], shell=True).decode().split(" ", 1)[1].replace("\n", "")
+    msv = check_output(["pip show megasdk | grep Version"], shell=True).decode().split(" ", 1)[1].replace("\n", "")
+    p7v = check_output(["7z | grep Version"], shell=True).decode().split(" ")[2]
+    prv = prv
+    rcv = check_output(["edge --version"], shell=True).decode().split("\n")[0].split(" ")[1]
+    qbv = check_output(["firefox --version"], shell=True).decode().split(" ", 1)[1].replace("\n", "")
+    ytv = check_output(["yt-dlp --version"], shell=True).decode().split("\n")[0]
+except Exception as e:
+    LOGGER.warning(f"Failed when get apps version! => {e}")
+    arv, ffv, gav, msv, p7v, prv, rcv, qbv, ytv = "", "", "", "", "", "", "", "", ""
 
 try:
     if bool(environ.get('_____REMOVE_THIS_LINE_____')):
@@ -179,11 +193,19 @@ if len(USER_SESSION_STRING) != 0:
     if len(TELEGRAM_API_PREMIUM) != 0:
         log_info("Using another Telegram Api & Telegram Hash for User Session...")
         TELEGRAM_API_PREMIUM = int(TELEGRAM_API_PREMIUM)
-        user = tgClient('user', TELEGRAM_API_PREMIUM, TELEGRAM_HASH_PREMIUM, session_string=USER_SESSION_STRING,
+        try:
+            user = tgClient('user', TELEGRAM_API_PREMIUM, TELEGRAM_HASH_PREMIUM, session_string=USER_SESSION_STRING,
                         parse_mode=enums.ParseMode.HTML, no_updates=True, max_concurrent_transmissions=1000).start()
+        except:
+            user = tgClient('user', TELEGRAM_API_PREMIUM, TELEGRAM_HASH_PREMIUM, session_string=USER_SESSION_STRING,
+                        parse_mode=enums.ParseMode.HTML, no_updates=True).start()
     else:
-        user = tgClient('user', TELEGRAM_API, TELEGRAM_HASH, session_string=USER_SESSION_STRING,
+        try:
+            user = tgClient('user', TELEGRAM_API_PREMIUM, TELEGRAM_HASH_PREMIUM, session_string=USER_SESSION_STRING,
                         parse_mode=enums.ParseMode.HTML, no_updates=True, max_concurrent_transmissions=1000).start()
+        except:
+            user = tgClient('user', TELEGRAM_API_PREMIUM, TELEGRAM_HASH_PREMIUM, session_string=USER_SESSION_STRING,
+                        parse_mode=enums.ParseMode.HTML, no_updates=True).start()
     IS_PREMIUM_USER = user.me.is_premium
 else:
     IS_PREMIUM_USER = False
@@ -501,8 +523,12 @@ else:
     qb_client.app_set_preferences(qb_opt)
 
 log_info("Creating client from BOT_TOKEN")
-bot = tgClient('bot', TELEGRAM_API, TELEGRAM_HASH,
-               bot_token=BOT_TOKEN, workers=1000, parse_mode=enums.ParseMode.HTML, max_concurrent_transmissions=1000).start()
+try:
+    bot = tgClient('bot', TELEGRAM_API, TELEGRAM_HASH,
+            bot_token=BOT_TOKEN, workers=1000, parse_mode=enums.ParseMode.HTML, max_concurrent_transmissions=1000).start()
+except:
+    bot = tgClient('bot', TELEGRAM_API, TELEGRAM_HASH,
+            bot_token=BOT_TOKEN, workers=1000, parse_mode=enums.ParseMode.HTML).start()
 bot_loop = bot.loop
 
 scheduler = AsyncIOScheduler(timezone=str(
