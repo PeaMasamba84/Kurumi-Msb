@@ -2,7 +2,7 @@
 from pyrogram.handlers import MessageHandler
 from pyrogram.filters import command
 
-from bot import bot
+from bot import bot, LOGGER
 from bot.helper.mirror_utils.gdrive_utlis.count import gdCount
 from bot.helper.telegram_helper.message_utils import deleteMessage, sendMessage
 from bot.helper.telegram_helper.filters import CustomFilters
@@ -20,8 +20,13 @@ async def countNode(_, message):
 
     link = args[1] if len(args) > 1 else ''
     if len(link) == 0 and (reply_to := message.reply_to_message):
-        link = reply_to.text.split(maxsplit=1)[0].strip()
-
+        if reply_to.text:
+            link = reply_to.text.split(maxsplit=1)[0].strip()
+            if not is_gdrive_link(link) and reply_to.reply_markup:
+                try:
+                    link = reply_to.reply_markup.inline_keyboard[0][0].url
+                except:
+                    link = reply_to.reply_markup.inline_keyboard[0].url
     if is_gdrive_link(link):
         msg = await sendMessage(message, f"<b>Menghitung :</b>\n<code>{link}</code>")
         name, mime_type, size, files, folders = await sync_to_async(gdCount().count, link, message.from_user.id)
