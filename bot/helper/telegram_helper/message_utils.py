@@ -45,6 +45,18 @@ async def sendFile(message, file, caption=None):
         return str(e)
 
 
+async def sendPhoto(message, photo, caption=None):
+    try:
+        return await message.reply_photo(photo=photo, quote=True, caption=caption, disable_notification=True)
+    except FloodWait as f:
+        LOGGER.warning(str(f))
+        await sleep(f.value * 1.2)
+        return await sendFile(message, photo, caption)
+    except Exception as e:
+        LOGGER.error(str(e))
+        return str(e)
+
+
 async def sendRss(text):
     try:
         if user:
