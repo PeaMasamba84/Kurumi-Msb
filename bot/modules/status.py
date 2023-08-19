@@ -4,7 +4,7 @@ from pyrogram.filters import command, regex
 from psutil import cpu_percent, virtual_memory, disk_usage, net_io_counters
 from time import time
 
-from bot import status_reply_dict_lock, download_dict, download_dict_lock, botStartTime, DOWNLOAD_DIR, Interval, config_dict, bot
+from bot import bot, status_reply_dict_lock, download_dict, download_dict_lock, botStartTime, DOWNLOAD_DIR, Interval, config_dict
 from bot.helper.telegram_helper.filters import CustomFilters
 from bot.helper.telegram_helper.bot_commands import BotCommands
 from bot.helper.telegram_helper.message_utils import sendMessage, deleteMessage, auto_delete_message, sendStatusMessage, update_all_messages
@@ -27,9 +27,9 @@ async def mirror_status(_, message):
         except:
             recv = 'n/a'
         msg = '<code>Tidak ada Tugas Aktif!</code>\n___________________________'
-        msg += f"\n<b>T.DL :</b> <code>{sent}</code> | <b>T.UP :</b> <code>{recv}</code>" \
-            f"\n<b>CPU :</b> <code>{cpu_percent()}%</code> | <b>FREE :</b> <code>{free}</code>" \
-            f"\n<b>RAM :</b> <code>{virtual_memory().percent}%</code> | <b>UPTIME :</b> <code>{currentTime}</code>"
+        msg += f"\n<b>CPU :</b> <code>{cpu_percent()}%</code> | <b>FREE :</b> <code>{free}</code>" \
+            f"\n<b>RAM :</b> <code>{virtual_memory().percent}%</code> | <b>UPTIME :</b> <code>{currentTime}</code>" \
+            f"\n<b>Total Unduh :</b> <code>{sent}</code> | <b>Total Unggah :</b> <code>{recv}</code>" 
         reply_message = await sendMessage(message, msg)
         await auto_delete_message(message, reply_message)
     else:
