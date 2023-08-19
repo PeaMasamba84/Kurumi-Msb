@@ -4,15 +4,15 @@ from bot import CMD_SUFFIX
 class _BotCommands:
     def __init__(self):
         self.StartCommand = f'start{CMD_SUFFIX}'
-        self.MirrorCommand = [f'pea{CMD_SUFFIX}', f'm{CMD_SUFFIX}']
-        self.QbMirrorCommand = [f'peaqb{CMD_SUFFIX}', f'qb{CMD_SUFFIX}']
+        self.MirrorCommand = [f'pea{CMD_SUFFIX}', f'p{CMD_SUFFIX}']
+        self.QbMirrorCommand = [f'peaqb{CMD_SUFFIX}', f'pqb{CMD_SUFFIX}']
         self.YtdlCommand = [
-            f'peaytdl{CMD_SUFFIX}', f'y{CMD_SUFFIX}', f'watch{CMD_SUFFIX}', f'w{CMD_SUFFIX}']
-        self.LeechCommand = [f'pealeech{CMD_SUFFIX}', f'l{CMD_SUFFIX}']
-        self.QbLeechCommand = [f'peaqbleech{CMD_SUFFIX}', f'qbl{CMD_SUFFIX}']
+            f'ytdl{CMD_SUFFIX}', f'peay{CMD_SUFFIX}', f'pwatch{CMD_SUFFIX}', f'pw{CMD_SUFFIX}']
+        self.LeechCommand = [f'pealeech{CMD_SUFFIX}', f'pl{CMD_SUFFIX}']
+        self.QbLeechCommand = [f'peaqbl{CMD_SUFFIX}', f'pqbl{CMD_SUFFIX}']
         self.YtdlLeechCommand = [
-            f'peaytdlleech{CMD_SUFFIX}', f'yl{CMD_SUFFIX}', f'watchleech{CMD_SUFFIX}', f'wl{CMD_SUFFIX}']
-        self.CloneCommand = [f'peaclone{CMD_SUFFIX}', f'cl{CMD_SUFFIX}']
+            f'ytdlleech{CMD_SUFFIX}', f'peayl{CMD_SUFFIX}', f'peawatchleech{CMD_SUFFIX}', f'pwl{CMD_SUFFIX}']
+        self.CloneCommand = [f'peaclone{CMD_SUFFIX}', f'pcl{CMD_SUFFIX}']
         self.CountCommand = [f'peacount{CMD_SUFFIX}', f'co{CMD_SUFFIX}']
         self.DeleteCommand = [f'peadelete{CMD_SUFFIX}', f'del{CMD_SUFFIX}']
         self.CancelMirror = [f'peacancel{CMD_SUFFIX}', f'c{CMD_SUFFIX}']
@@ -23,7 +23,7 @@ class _BotCommands:
         self.UsersCommand = [f'peausers{CMD_SUFFIX}', f'us{CMD_SUFFIX}']
         self.AuthorizeCommand = [f'peaauthorize{CMD_SUFFIX}', f'au{CMD_SUFFIX}']
         self.UnAuthorizeCommand = [
-            f'peaunauthorize{CMD_SUFFIX}', f'ua{CMD_SUFFIX}']
+            f'unauthorize{CMD_SUFFIX}', f'peaua{CMD_SUFFIX}']
         self.AddSudoCommand = [f'peaaddsudo{CMD_SUFFIX}', f'as{CMD_SUFFIX}']
         self.RmSudoCommand = [f'pearmsudo{CMD_SUFFIX}', f'rs{CMD_SUFFIX}']
         self.PingCommand = [f'peaping{CMD_SUFFIX}', f'p{CMD_SUFFIX}']
@@ -32,6 +32,7 @@ class _BotCommands:
         self.HelpCommand = [f'peahelp{CMD_SUFFIX}', f'h{CMD_SUFFIX}']
         self.LogCommand = [f'pealog{CMD_SUFFIX}', f'lo{CMD_SUFFIX}']
         self.ShellCommand = [f'peashell{CMD_SUFFIX}', f'sh{CMD_SUFFIX}']
+        self.SpeedCommand = [f'peaspeedtest{CMD_SUFFIX}', f'sp{CMD_SUFFIX}']
         self.EvalCommand = [f'peaeval{CMD_SUFFIX}', f'ev{CMD_SUFFIX}']
         self.ExecCommand = [f'peaexec{CMD_SUFFIX}', f'ex{CMD_SUFFIX}']
         self.ClearLocalsCommand = [f'peaclearlocals{CMD_SUFFIX}', f'clo{CMD_SUFFIX}']
