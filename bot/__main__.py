@@ -272,16 +272,20 @@ async def restart_notification():
             LOGGER.error(e)
 
     now = datetime.now(timezone(f'Asia/Makassar'))
-    date = now.strftime('%d/%m/%y')
-    time = now.strftime('%I:%M:%S %p')
+    day = now.strftime('%A')
+    date = now.strftime('%d %B %Y')
+    time = now.strftime('%H:%M:%S WIB')
     if INCOMPLETE_TASK_NOTIFIER and DATABASE_URL:
         if notifier_dict := await DbManger().get_incomplete_tasks():
             for cid, data in notifier_dict.items():
                 msg = 'Bot berhasil dimulai ulang!' if cid == chat_id else 'Bot dimulai ulang!'
-                msg += f"\n<b>Waktu :</b> <code>{time}</code>"
-                msg += f"\n<b>Tanggal :</b> <code>{date}</code>"
-                msg += f"\n<b>Quotes Today :</b>"
+                msg += f'<pre languange="bash">'
+                msg += f"\n<b>Hari      :</b> <code>{day}</code>"
+                msg += f"\n<b>Tanggal   :</b> <code>{date}</code>"
+                msg += f"\n<b>Waktu     :</b> <code>{time}</code>"
+                msg += f"\n<b>Quotes    :</b>"
                 msg += f"\n<code>{get_quotes()}</code>"
+                msg += f"</pre>"
                 if data.items():
                     msg += f"\n\n<b>Tugas yang belum selesai :</b>"
                 for tag, links in data.items():
