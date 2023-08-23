@@ -183,7 +183,7 @@ def get_readable_message():
         buttons.ibutton("🪫", "status ref")
         buttons.ibutton("⫸", "status nex")
         button = buttons.build_menu(3)
-    msg += "════❰ 𝑪𝑴𝑻 𝑴𝒂𝒔𝒂𝒎𝒃𝒂 ❱════"
+    msg += "══❰ 𝑩𝒐𝒕 𝑴𝒊𝒓𝒓𝒐𝒓 𝑪𝑴𝑻 ❱══"
     msg += f"\n<b>🅲🄿🆄 :</b> <code>{cpu_percent()}%</code> | <b>🆁🄰🅼 :</b> <code>{virtual_memory().percent}%</code>"    
     msg += f"\n<b>🆃🄳🅻 :</b> <code>{get_readable_file_size(net_io_counters().bytes_recv)}</code> | <b>🆃🅄🅻 :</b> <code>{get_readable_file_size(net_io_counters().bytes_sent)}</code>"
     msg += f"\n<b>🄳🅸🆂🄺 :</b> <code>{get_readable_file_size(disk_usage(config_dict['DOWNLOAD_DIR']).free)}</code> | <b>🅃🅸🅼🄴 :</b> <code>{get_readable_time(time() - botStartTime)}</code>"
