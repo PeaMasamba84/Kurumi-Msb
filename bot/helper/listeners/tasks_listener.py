@@ -125,6 +125,20 @@ class MirrorLeechListener:
         if self.join and await aiopath.isdir(dl_path):
             await join_files(dl_path)
 
+        if self.isLeech:
+            LEECH_SPLIT_SIZE = self.user_dict.get('split_size') or config_dict['LEECH_SPLIT_SIZE']
+            if self.upDest.startswith('b:') and LEECH_SPLIT_SIZE > 2097152000:
+                LEECH_SPLIT_SIZE = 2097152000
+                user_leech = False
+            elif self.upDest.startswith('u:') and IS_PREMIUM_USER and LEECH_SPLIT_SIZE > 4194304000:
+                LEECH_SPLIT_SIZE = 4194304000
+                user_leech = True
+            else:
+                user_leech = (self.user_dict.get('user_leech') or config_dict['USER_LEECH'] and 'user_leech' not in self.user_dict) and IS_PREMIUM_USER
+
+            MAX_SIZE = MAX_SPLIT_SIZE if user_leech else 2097152000
+            LEECH_SPLIT_SIZE = min(LEECH_SPLIT_SIZE, MAX_SIZE)
+
         if self.extract:
             pswd = self.extract if isinstance(self.extract, str) else ''
             try:
@@ -210,8 +224,6 @@ class MirrorLeechListener:
                 up_path = f"{dl_path}.zip"
             async with download_dict_lock:
                 download_dict[self.uid] = ZipStatus(name, size, gid, self)
-            LEECH_SPLIT_SIZE = self.user_dict.get(
-                'split_size', False) or config_dict['LEECH_SPLIT_SIZE']
             cmd = ["7z", f"-v{LEECH_SPLIT_SIZE}b", "a",
                    "-mx=0", f"-p{pswd}", up_path, dl_path]
             for ext in GLOBAL_EXTENSION_FILTER:
@@ -246,8 +258,6 @@ class MirrorLeechListener:
             o_files = []
             if not self.compress:
                 checked = False
-                LEECH_SPLIT_SIZE = self.user_dict.get(
-                    'split_size', False) or config_dict['LEECH_SPLIT_SIZE']
                 for dirpath, _, files in await sync_to_async(walk, up_dir, topdown=False):
                     for file_ in files:
                         f_path = ospath.join(dirpath, file_)
@@ -259,11 +269,11 @@ class MirrorLeechListener:
                                     download_dict[self.uid] = SplitStatus(
                                         up_name, size, gid, self)
                                 LOGGER.info(f"Splitting: {up_name}")
-                            res = await split_file(f_path, f_size, file_, dirpath, LEECH_SPLIT_SIZE, self)
+                            res = await split_file(f_path, f_size, file_, dirpath, LEECH_SPLIT_SIZE, LEECH_SPLIT_SIZE, MAX_SIZE, self)
                             if not res:
                                 return
                             if res == "errored":
-                                if f_size <= MAX_SPLIT_SIZE:
+                                if f_size <= MAX_SIZE:
                                     continue
                                 try:
                                     await aioremove(f_path)
@@ -337,16 +347,12 @@ class MirrorLeechListener:
             await DbManger().rm_complete_task(self.message.link)
         msg = f"<b>Nama :</b> <code>{escape(name)}</code>"
         msg += f"\n\n<b>Ukuran :</b> <code>{get_readable_file_size(size)}</code>"
-        msg += f"\n\n</b>Hasil mirror sudah kami pindahkan<a href='https://t.me/peamasambamirror'> 𝑫𝒊𝒔𝒊𝒏𝒊</a> </b>"
-        msg += f"\n\n</b>Join Group Google Drive CMT<a href='https://groups.google.com/g/jagoan-masamba1984'> 𝑫𝒊𝒔𝒊𝒏𝒊</a> </b>"
-        msg += f'\n\n<b>𝐏𝐄𝐀 𝐌𝐀𝐒𝐀𝐌𝐁𝐀\n\n'
         LOGGER.info(f'Task Done: {name}')
         if self.isLeech:
             msg += f'\n\n<b>Jumlah File :</b> <code>{folders}</code>'
             if mime_type != 0:
                 msg += f'\n\n<b>File Rusak :</b> <code>{mime_type}</code>'
             msg += f'\n\n<b>Oleh :</b> {self.tag}\n\n'
-            msg += f'\n\n<b>𝐏𝐄𝐀 𝐌𝐀𝐒𝐀𝐌𝐁𝐀\n\n'
             if not files:
                 await sendMessage(self.message, msg)
             else:
