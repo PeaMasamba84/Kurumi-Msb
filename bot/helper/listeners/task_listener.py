@@ -125,7 +125,7 @@ class MirrorLeechListener:
         if self.join and await aiopath.isdir(dl_path):
             await join_files(dl_path)
 
-        if self.isLeech:
+        if self.isLeech or self.compress:
             LEECH_SPLIT_SIZE = self.user_dict.get('split_size') or config_dict['LEECH_SPLIT_SIZE']
             if self.upDest.startswith('b:') and LEECH_SPLIT_SIZE > 2097152000:
                 LEECH_SPLIT_SIZE = 2097152000
