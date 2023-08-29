@@ -272,22 +272,20 @@ async def restart_notification():
             LOGGER.error(e)
 
     now = datetime.now(timezone(f'Asia/Makassar'))
-    day = now.strftime('%A')
-    date = now.strftime('%d %B %Y')
-    time = now.strftime('%H:%M:%S WIB')
     if INCOMPLETE_TASK_NOTIFIER and DATABASE_URL:
         if notifier_dict := await DbManger().get_incomplete_tasks():
             for cid, data in notifier_dict.items():
-                msg = 'Bot berhasil dimulai ulang!' if cid == chat_id else 'Bot dimulai ulang!'
-                msg += f'<pre languange="bash">'
-                msg += f"\n<b>Hari      :</b> <code>{day}</code>"
-                msg += f"\n<b>Tanggal   :</b> <code>{date}</code>"
-                msg += f"\n<b>Waktu     :</b> <code>{time}</code>"
-                msg += f"\n<b>Quotes    :</b>"
-                msg += f"\n<code>{get_quotes()}</code>"
-                msg += f"</pre>"
+                msg = f"""{'Bot berhasil dimulai ulang!' if cid == chat_id else 'Bot dimulai ulang!'}
+<pre languange="bash">
+<b>Hari      :</b> <code>{now.strftime('%A')}</code>
+<b>Tanggal   :</b> <code>{now.strftime('%d %B %Y')}</code>
+<b>Waktu     :</b> <code>{now.strftime('%H:%M:%S WIB')}</code>
+<b>Quotes    :</b>
+<code>{get_quotes()}</code>
+</pre>           
+"""
                 if data.items():
-                    msg += f"\n\n<b>Tugas yang belum selesai :</b>"
+                    msg += f"\n<b>Tugas yang belum selesai :</b>"
                 for tag, links in data.items():
                     msg += f"\n{tag} :"
                     for index, link in enumerate(links, start=1):
@@ -300,7 +298,16 @@ async def restart_notification():
 
     if await aiopath.isfile(".restartmsg"):
         try:
-            await bot.edit_message_text(chat_id=chat_id, message_id=msg_id, text='Bot berhasil dimulai ulang!')
+            msg = f"""Bot berhasil dimulai ulang!
+<pre languange="bash">
+<b>Hari      :</b> <code>{now.strftime('%A')}</code>
+<b>Tanggal   :</b> <code>{now.strftime('%d %B %Y')}</code>
+<b>Waktu     :</b> <code>{now.strftime('%H:%M:%S WIB')}</code>
+<b>Quotes    :</b>
+<code>{get_quotes()}</code>
+</pre>           
+"""
+            await bot.edit_message_text(chat_id=chat_id, message_id=msg_id, text=msg)
         except:
             pass
         await aioremove(".restartmsg")
