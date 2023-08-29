@@ -10,6 +10,7 @@ for original authorship. """
 import json
 import requests
 from base64 import b64decode
+from hashlib import sha256
 from http.cookiejar import MozillaCookieJar
 from json import loads
 from os import path
@@ -27,6 +28,8 @@ from bot import config_dict
 from bot.helper.ext_utils.bot_utils import get_readable_time, is_share_link
 from bot.helper.ext_utils.exceptions import DirectDownloadLinkException
 
+_caches = {}
+
 fmed_list = ['fembed.net', 'fembed.com', 'femax20.com', 'fcdn.stream', 'feurl.com', 'layarkacaxxi.icu',
              'naniplay.nanime.in', 'naniplay.nanime.biz', 'naniplay.com', 'mm9842.com']
 
@@ -36,7 +39,7 @@ anonfilesBaseSites = ['anonfiles.com', 'hotfile.io', 'bayfiles.com', 'megaupload
 
 dood_sites = ['dooood.com', 'doods.pro', 'dood.yt']
 
-nurlresolver_sites = ['gofile.io', 'send.cm']
+nurlresolver_sites = ['send.cm']
 
 def direct_link_generator(link: str):
     """ direct links generator """
@@ -64,8 +67,6 @@ def direct_link_generator(link: str):
         return pixeldrain(link)
     elif 'antfiles.com' in domain:
         return antfiles(link)
-    elif 'streamtape.com' in domain:
-        return streamtape(link)
     elif 'racaty' in domain:
         return racaty(link)
     elif '1fichier.com' in domain:
@@ -84,11 +85,15 @@ def direct_link_generator(link: str):
         return shrdsk(link)
     elif 'letsupload.io' in domain:
         return letsupload(link)
+    elif 'gofile.io' in domain:
+        return gofile(link)
+    elif any(x in domain for x in ['streamtape.com', 'streamtape.co', 'streamtape.cc', 'streamtape.to', 'streamtape.net', 'streamta.pe', 'streamtape.xyz']):
+        return streamtape(link)
     elif any(x in domain for x in ['wetransfer.com', 'we.tl']):
         return wetransfer(link)
     elif any(x in domain for x in anonfilesBaseSites):
         return anonfilesBased(link)
-    elif any(x in domain for x in ['terabox', 'nephobox', '4funbox', 'mirrobox', 'momerybox', 'teraboxapp', '1024tera']):
+    elif any(x in domain for x in ['terabox.com', 'nephobox.com', '4funbox.com', 'mirrobox.com', 'momerybox.com', 'teraboxapp.com', '1024tera.com']):
         return terabox(link)
     elif any(x in domain for x in fmed_list):
         return fembed(link)
@@ -369,12 +374,14 @@ def streamtape(url: str) -> str:
     Based on https://github.com/zevtyardt/lk21
     """
     try:
-        link = Bypass().bypass_streamtape(url)
+        with requests.Session() as session:
+            res = session.get(url)
     except Exception as e:
         raise DirectDownloadLinkException(f"ERROR: {e.__class__.__name__}")
-    if not link:
+    if link := findall(r"document.*((?=id\=)[^\"']+)", res.text):
+        return f"https://streamtape.com/get_video?{link[-1]}"
+    else:
         raise DirectDownloadLinkException("ERROR: Link File tidak ditemukan!")
-    return link
 
 
 def racaty(url: str) -> str:
@@ -536,46 +543,86 @@ def uploadee(url: str) -> str:
 
 def terabox(url) -> str:
     if not path.isfile('terabox.txt'):
-        raise DirectDownloadLinkException("ERROR: Cookies tidak ditemukan!")
+        raise DirectDownloadLinkException("ERROR: Cookies (terabox.txt) tidak ditemukan!")
     try:
         jar = MozillaCookieJar('terabox.txt')
         jar.load()
-        cookie_string = ''
-        cookie_dict = {}
-        for cookie in jar:
-            cookie_string += f'{cookie.name}={cookie.value}; '
-            cookie_dict[cookie.name] = cookie.value
-        session = requests.Session()
-        session.cookies.update(cookie_dict)
-        res = session.request('GET', url)
-        surl = res.url.split('?surl=')[-1]
-        soup = BeautifulSoup(res.content, 'lxml')
-        jsToken = None
-        for fs in soup.find_all('script'):
-            fstring = fs.string
-            if fstring and fstring.startswith('try {eval(decodeURIComponent'):
-                jsToken = fstring.split('%22')[1]
-        headers = {"Cookie": cookie_string}
-        res = session.request(
-            'GET', f'https://www.terabox.com/share/list?app_id=250528&jsToken={jsToken}&shorturl={surl}&root=1', headers=headers)
-        result = res.json()
     except Exception as e:
         raise DirectDownloadLinkException(f"ERROR: {e.__class__.__name__}")
-    if result['errno'] != 0: raise DirectDownloadLinkException(f"ERROR: '{result}'. Cek Cookies!")
-    result = result['list']
-    if len(result) > 1:
-        raise DirectDownloadLinkException(
-            "ERROR: Tidak dapat mengunduh multi file!")
-    result = result[0]
+    cookies = {}
+    for cookie in jar:
+        cookies[cookie.name] = cookie.value
+    session = requests.Session()
+    try:
+        _res = session.get(url, cookies=cookies)
+    except Exception as e:
+        session.close()
+        raise DirectDownloadLinkException(f'ERROR: {e.__class__.__name__}')
 
-    if result['isdir'] != '0':
-        raise DirectDownloadLinkException("ERROR: Tidak dapat mengunduh folder!")
+    if jsToken := findall(r'window\.jsToken.*%22(.*)%22', _res.text):
+        jsToken = jsToken[0]
+    else:
+        session.close()
+        raise DirectDownloadLinkException('ERROR: jsToken tidak ditemukan!')
+    shortUrl = _res.url.split('?surl=')[-1]
+
+    details = {'contents':[], 'title': '', 'total_size': 0}
+    details["header"] = ' '.join(f'{key}: {value}' for key, value in cookies.items())
+
+    def __fetch_links(folderPath=''):
+        params = {
+            'app_id': '250528',
+            'jsToken': jsToken,
+            'shorturl': shortUrl
+            }
+        if folderPath:
+            params['dir'] = folderPath
+        else:
+            params['root'] = '1'
+        try:
+            _json = session.get("https://www.1024tera.com/share/list", params=params, cookies=cookies).json()
+        except Exception as e:
+            raise DirectDownloadLinkException(f'ERROR: {e.__class__.__name__}')
+        if _json['errno'] not in [0, '0']:
+            if 'errmsg' in _json:
+                raise DirectDownloadLinkException(f"ERROR: {_json['errmsg']}")
+            else:
+                raise DirectDownloadLinkException('ERROR: Terjadi kesalahan!')
+
+        if not details['title']:
+            if "title" in _json:
+                title = _json["title"].split("/")
+                title = title[-1]
+            else:
+                title = shortUrl
+            details['title'] = title
+        if "list" not in _json:
+            return
+        contents = _json["list"]
+        for content in contents:
+            if content['isdir'] in ['1', 1]:
+                __fetch_links(content['path'])
+            else:
+                filepaths = content["path"].split('/')
+                item = {
+                    'url': content['dlink'],
+                    'filename': content['server_filename'],
+                    'path' : path.join(*filepaths).rsplit("/", 1)[0],
+                }
+                if 'size' in content:
+                    size = content["size"]
+                    if isinstance(size, str) and size.isdigit():
+                        size = float(size)
+                    details['total_size'] += size
+                details['contents'].append(item)
 
     try:
-        dlink = result['dlink']
+        __fetch_links()
     except Exception as e:
-        raise DirectDownloadLinkException(f"ERROR: {e.__class__.__name__}. Cek Cookies!")
-    return dlink
+        session.close()
+        raise DirectDownloadLinkException(e)
+    session.close()
+    return details
 
 
 def filepress(url):
@@ -752,7 +799,7 @@ def linkbox(url):
     if not data:
         raise DirectDownloadLinkException('ERROR: Data tidak ditemukan!')
     if 'itemInfo' not in data:
-        raise DirectDownloadLinkException('ERROR: Iteminfo tidak ditemukan!')
+        raise DirectDownloadLinkException('ERROR: Item info tidak ditemukan!')
     itemInfo = data['itemInfo']
     if 'url' not in itemInfo:
         raise DirectDownloadLinkException('ERROR: Link File tidak ditemukan!')
@@ -763,7 +810,107 @@ def linkbox(url):
     raw = itemInfo['url'].split("/", 3)[-1]
     return f'https://wdl.nuplink.net/{raw}&filename={name}'
 
-# TODO: Add more direct link generators
+
+def gofile(url):
+    try:
+        if "::" in url:
+            _password = url.split("::")[-1]
+            _password = sha256(_password.encode("utf-8")).hexdigest()
+            url = url.split("::")[-2]
+        else:
+            _password = ''
+        _id = url.split("/")[-1]
+    except Exception as e:
+        raise DirectDownloadLinkException(f"ERROR: {e.__class__.__name__}")
+
+    session = requests.Session()
+
+    def __get_token():
+        if 'gofile_token' in _caches:
+            __url = f"https://api.gofile.io/getAccountDetails?token={_caches['gofile_token']}"
+        else:
+            __url = 'https://api.gofile.io/createAccount'
+        try:
+            __res = session.get(__url, verify=False).json()
+            if __res["status"] != 'ok':
+                if 'gofile_token' in _caches:
+                    del _caches['gofile_token']
+                return __get_token()
+            _caches['gofile_token'] = __res["data"]["token"]
+            return _caches['gofile_token']
+        except Exception as e:
+            raise DirectDownloadLinkException(f"ERROR: {e.__class__.__name__}")
+
+    try:
+        token = __get_token()
+    except Exception as e:
+        session.close()
+        raise DirectDownloadLinkException(e)
+    
+    details = {'contents':[], 'title': '', 'total_size': 0, 'root_path': ''}
+    headers = {"Cookie": f"accountToken={token}"}
+    details["header"] = ' '.join(f'{key}: {value}' for key, value in headers.items())
+
+    def __fetch_links(_id, folderPath=''):
+        _url = f"https://api.gofile.io/getContent?contentId={_id}&token={token}&websiteToken=7fd94ds12fds4&cache=true"
+        if _password:
+            _url += f"&password={_password}"
+        try:
+            _json = session.get(_url, verify=False).json()
+        except Exception as e:
+            raise DirectDownloadLinkException(f"ERROR: {e.__class__.__name__}")
+        if _json['status'] in 'error-passwordRequired':
+            raise DirectDownloadLinkException(f'ERROR: Link File ini memerlukan password!\nTambahkan dengan <b>::</b> setelah link dan masukan password setelah tanda tanpa spasi!\n\nContoh :\n{url}::ini password')
+        if _json['status'] in 'error-passwordWrong':
+            raise DirectDownloadLinkException('ERROR: Password salah!')
+        if _json['status'] in 'error-notFound':
+            raise DirectDownloadLinkException("ERROR: Link File tidak ditemukan!")
+        if _json['status'] in 'error-notPublic':
+            raise DirectDownloadLinkException("ERROR: Folder tidak dapat diunduh!")
+
+        data = _json["data"]
+
+        if not details['title']:
+            details['title'] = data['name'] if data['type'] == "folder" else _id
+
+        if not details['root_path']:
+            details['root_path'] = path.join(details['title'])
+
+        contents = data["contents"]
+        for content in contents.values():
+            if content["type"] == "folder":
+                if not content['public']:
+                    continue
+                if not folderPath:
+                    newFolderPath = path.join(details['root_path'], content["name"])
+                else:
+                    newFolderPath = path.join(folderPath, content["name"])
+                __fetch_links(content["id"], newFolderPath)
+            else:
+                if not folderPath:
+                    folderPath = details['root_path']
+                item = {
+                    "path": path.join(folderPath),
+                    "filename": content["name"],
+                    "url": content["link"],
+                }
+                if 'size' in content:
+                    size = content["size"]
+                    if isinstance(size, str) and size.isdigit():
+                        size = float(size)
+                    details['total_size'] += size
+                details['contents'].append(item)
+
+    try:
+        __fetch_links(_id)
+    except Exception as e:
+        session.close()
+        raise DirectDownloadLinkException(e)
+    session.close()
+    return details
+
+
+# NOTE: added from other repositories
 
 def mp4upload(url: str) -> str:
     import urllib3
