@@ -29,7 +29,7 @@ async def mirror_status(_, message):
         msg = '<code>Tidak ada Tugas Aktif!</code>\n___________________________'
         msg += f"\n<b>CPU :</b> <code>{cpu_percent()}%</code> | <b>FREE :</b> <code>{free}</code>" \
             f"\n<b>RAM :</b> <code>{virtual_memory().percent}%</code> | <b>UPTIME :</b> <code>{currentTime}</code>" \
-            f"\n<b>Total Unduh :</b> <code>{sent}</code> | <b>Total Unggah :</b> <code>{recv}</code>" 
+            f"\n<b>T.Unduh :</b> <code>{sent}</code> | <b>T.Unggah :</b> <code>{recv}</code>" 
         reply_message = await sendMessage(message, msg)
         await auto_delete_message(message, reply_message)
     else:
