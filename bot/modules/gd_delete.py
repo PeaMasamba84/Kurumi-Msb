@@ -27,7 +27,7 @@ async def deletefile(_, message):
         link = ''
     if is_gdrive_link(link):
         LOGGER.info(link)
-        msg = await sync_to_async(gdDelete().deletefile, link, message.from_user)
+        msg = await sync_to_async(gdDelete().deletefile, link, message.from_user.id)
     else:
         msg = '<b>Kirim perintah dengan Link Google Drive atau balas Link Google Drive dengan perintah!</b>'
     reply_message = await sendMessage(message, msg)
