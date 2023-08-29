@@ -190,7 +190,7 @@ TELEGRAM_HASH_PREMIUM = environ.get('TELEGRAM_HASH_PREMIUM', '')
 if len(USER_SESSION_STRING) != 0:
     log_info("Creating client from USER_SESSION_STRING")
     # If Using Other Account
-    if len(TELEGRAM_API_PREMIUM) != 0:
+    if len(TELEGRAM_API_PREMIUM) != 0 and len(TELEGRAM_HASH_PREMIUM) != 0:
         log_info("Using another Telegram Api & Telegram Hash for User Session...")
         TELEGRAM_API_PREMIUM = int(TELEGRAM_API_PREMIUM)
         try:
@@ -201,10 +201,10 @@ if len(USER_SESSION_STRING) != 0:
                         parse_mode=enums.ParseMode.HTML, no_updates=True).start()
     else:
         try:
-            user = tgClient('user', TELEGRAM_API_PREMIUM, TELEGRAM_HASH_PREMIUM, session_string=USER_SESSION_STRING,
+            user = tgClient('user', TELEGRAM_API, TELEGRAM_HASH, session_string=USER_SESSION_STRING,
                         parse_mode=enums.ParseMode.HTML, no_updates=True, max_concurrent_transmissions=1000).start()
         except:
-            user = tgClient('user', TELEGRAM_API_PREMIUM, TELEGRAM_HASH_PREMIUM, session_string=USER_SESSION_STRING,
+            user = tgClient('user', TELEGRAM_API, TELEGRAM_HASH, session_string=USER_SESSION_STRING,
                         parse_mode=enums.ParseMode.HTML, no_updates=True).start()
     IS_PREMIUM_USER = user.me.is_premium
 else:
