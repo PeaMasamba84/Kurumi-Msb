@@ -14,7 +14,7 @@ from bot.helper.telegram_helper.bot_commands import BotCommands
 async def shell(_, message):
     cmd = message.text.split(maxsplit=1)
     if len(cmd) == 1:
-        await sendMessage(message, '<b>Tidak ada perintah untuk dieksekusi!</b>')
+        await sendMessage(message, 'Tidak ada perintah untuk dieksekusi!')
         return
     cmd = cmd[1]
     stdout, stderr, _ = await cmd_exec(cmd, shell=True)
@@ -32,7 +32,7 @@ async def shell(_, message):
     elif len(reply) != 0:
         await sendMessage(message, reply)
     else:
-        await sendMessage(message, '<b>Tidak ada balasan!</b>')
+        await sendMessage(message, 'Tidak ada balasan!')
 
 
 bot.add_handler(MessageHandler(shell, filters=command(
