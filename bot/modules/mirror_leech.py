@@ -90,7 +90,7 @@ async def _mirror_leech(client, message, isQbit=False, isLeech=False, sameDir=No
         try:
             bulk = await extract_bulk_links(message, bulk_start, bulk_end)
         except:
-            await sendMessage(message, 'Reply to text file or tg message that have links seperated by new line!')
+            await sendMessage(message, '<b>Balas file txt atau balas pesan Telegram yang memiliki banyak link dan dipisahkan menggunakan line baru!</b>')
             return
         b_msg = input_list[:1]
         b_msg.append(f'{bulk[0]} -i {len(bulk)}')
@@ -233,7 +233,7 @@ async def _mirror_leech(client, message, isQbit=False, isLeech=False, sameDir=No
         if not up and (default_upload == 'gd' or not default_upload and config_dict['DEFAULT_UPLOAD'] == 'gd') or up == 'gd':
             up = user_dict.get('gdrive_id') or config_dict['GDRIVE_ID']
         if not up:
-            await sendMessage(message, 'Tujuan upload tidak ditemukan!')
+            await sendMessage(message, '<b>Tujuan upload tidak ditemukan!</b>')
             return
         elif up != 'rcl' and is_rclone_path(up):
             if up.startswith('mrcc:'):
@@ -241,7 +241,7 @@ async def _mirror_leech(client, message, isQbit=False, isLeech=False, sameDir=No
             else:
                 config_path = 'rclone.conf'
             if not await aiopath.exists(config_path):
-                await sendMessage(message, f"Config Rclone <code>{config_path}</code> tidak ditemukan!")
+                await sendMessage(message, f"<b>Config Rclone</b> <code>{config_path}</code> <b>tidak ditemukan!</b>")
                 return
         elif up != 'gdl' and is_gdrive_id(up):
             if up.startswith('mtp:'):
@@ -251,10 +251,10 @@ async def _mirror_leech(client, message, isQbit=False, isLeech=False, sameDir=No
             else:
                 token_path = 'accounts'
             if not await aiopath.exists(token_path):
-                await sendMessage(message, f"token.pickle atau Service Accounts <code>{token_path}</code> tidak ditemukan!")
+                await sendMessage(message, f"<b>Token.pickle atau Service Accounts</b> <code>{token_path}</code> <b>tidak ditemukan!</b>")
                 return
         if not is_gdrive_id(up) and not is_rclone_path(up):
-            await sendMessage(message, 'Tujuan upload tidak ditemukan!')
+            await sendMessage(message, '<b>Tujuan upload tidak ditemukan!</b>')
             return
 
     if link == 'rcl':
@@ -295,7 +295,7 @@ async def _mirror_leech(client, message, isQbit=False, isLeech=False, sameDir=No
         else:
             config_path = 'rclone.conf'
         if not await aiopath.exists(config_path):
-            await sendMessage(message, f"Rclone Config: {config_path} not Exists!")
+            await sendMessage(message, f"<b>Rclone Config</b> <code>{config_path}</code> <b>tidak ditemukan!</b>")
             return
         await add_rclone_download(link, config_path, f'{path}/', name, listener)
     elif is_gdrive_link(link) or is_gdrive_id(link):
