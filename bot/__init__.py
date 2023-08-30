@@ -168,7 +168,11 @@ AUTHORIZED_CHATS = environ.get('AUTHORIZED_CHATS', '')
 if len(AUTHORIZED_CHATS) != 0:
     aid = AUTHORIZED_CHATS.split()
     for id_ in aid:
-        user_data[int(id_.strip())] = {'is_auth': True}
+        if ":" in id_:
+            user_data[int(id_.split(":")[0].strip())] = {
+                'thread_id': int(id_.split(":")[1].strip()), 'is_auth': True}
+        else:
+            user_data[int(id_.strip())] = {'is_auth': True}
 
 SUDO_USERS = environ.get('SUDO_USERS', '')
 if len(SUDO_USERS) != 0:
@@ -193,19 +197,11 @@ if len(USER_SESSION_STRING) != 0:
     if len(TELEGRAM_API_PREMIUM) != 0 and len(TELEGRAM_HASH_PREMIUM) != 0:
         log_info("Using another Telegram Api & Telegram Hash for User Session...")
         TELEGRAM_API_PREMIUM = int(TELEGRAM_API_PREMIUM)
-        try:
-            user = tgClient('user', TELEGRAM_API_PREMIUM, TELEGRAM_HASH_PREMIUM, session_string=USER_SESSION_STRING,
-                        parse_mode=enums.ParseMode.HTML, no_updates=True, max_concurrent_transmissions=1000).start()
-        except:
-            user = tgClient('user', TELEGRAM_API_PREMIUM, TELEGRAM_HASH_PREMIUM, session_string=USER_SESSION_STRING,
-                        parse_mode=enums.ParseMode.HTML, no_updates=True).start()
+        user = tgClient('user', TELEGRAM_API_PREMIUM, TELEGRAM_HASH_PREMIUM, session_string=USER_SESSION_STRING,
+                        workers=1000, parse_mode=enums.ParseMode.HTML, no_updates=True).start()
     else:
-        try:
-            user = tgClient('user', TELEGRAM_API, TELEGRAM_HASH, session_string=USER_SESSION_STRING,
-                        parse_mode=enums.ParseMode.HTML, no_updates=True, max_concurrent_transmissions=1000).start()
-        except:
-            user = tgClient('user', TELEGRAM_API, TELEGRAM_HASH, session_string=USER_SESSION_STRING,
-                        parse_mode=enums.ParseMode.HTML, no_updates=True).start()
+        user = tgClient('user', TELEGRAM_API, TELEGRAM_HASH, session_string=USER_SESSION_STRING,
+                        workers=1000, parse_mode=enums.ParseMode.HTML, no_updates=True).start()
     IS_PREMIUM_USER = user.me.is_premium
 else:
     IS_PREMIUM_USER = False
@@ -523,12 +519,8 @@ else:
     qb_client.app_set_preferences(qb_opt)
 
 log_info("Creating client from BOT_TOKEN")
-try:
-    bot = tgClient('bot', TELEGRAM_API, TELEGRAM_HASH,
-            bot_token=BOT_TOKEN, workers=1000, parse_mode=enums.ParseMode.HTML, max_concurrent_transmissions=1000).start()
-except:
-    bot = tgClient('bot', TELEGRAM_API, TELEGRAM_HASH,
-            bot_token=BOT_TOKEN, workers=1000, parse_mode=enums.ParseMode.HTML).start()
+bot = tgClient('bot', TELEGRAM_API, TELEGRAM_HASH,
+        bot_token=BOT_TOKEN, workers=1000, parse_mode=enums.ParseMode.HTML).start()
 bot_loop = bot.loop
 
 scheduler = AsyncIOScheduler(timezone=str(
