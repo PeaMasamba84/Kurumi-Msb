@@ -14,16 +14,17 @@ from bot.helper.telegram_helper.message_utils import (sendMessage,
 
 async def add_direct_download(details, path, listener, foldername):
     if not (contents:= details.get('contents')):
-        await sendMessage(listener.message, 'Tidak ada file untuk diunduh!')
+        await sendMessage(listener.message, '<b>Tidak ada file untuk diunduh!</b>')
         return
     size = details['total_size']
-    if foldername:
-        path = f'{path}/{foldername}'
     if len(contents) == 1:
         if foldername:
             contents[0]['filename'] = foldername
         foldername = contents[0]['filename']
         contents[0]['path'] = ''
+    elif foldername:
+        path = f'{path}/{foldername}'
+
     if not foldername:
         foldername = details['title']
     msg, button = await stop_duplicate_check(foldername, listener)
@@ -47,7 +48,7 @@ async def add_direct_download(details, path, listener, foldername):
         from_queue = True
     else:
         from_queue = False
-    
+
     a2c_opt = {**aria2_options}
     [a2c_opt.pop(k) for k in aria2c_global if k in aria2_options]
     if header:= details.get('header'):
