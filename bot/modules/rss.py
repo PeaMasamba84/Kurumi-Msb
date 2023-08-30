@@ -73,15 +73,15 @@ async def rssSub(client, message, pre_event):
     for index, item in enumerate(items, start=1):
         args = item.split()
         if len(args) < 2:
-            await sendMessage(message, f'{item}. Wrong Input format. Read help message before adding new subcription!')
+            await sendMessage(message, f'<code>{item}</code> <b>Format Salah! Baca pesan bantuan sebelum menambahkan langganan RSS baru!</b>')
             continue
         title = args[0].strip()
         if (user_feeds := rss_dict.get(user_id, False)) and title in user_feeds:
-            await sendMessage(message, f"This title {title} already subscribed! Choose another title!")
+            await sendMessage(message, f"<b>RSS dengan Judul</b> <code>{title}</code> <b>telah ditambahkan!</b>")
             continue
         feed_link = args[1].strip()
         if feed_link.startswith(('-inf', '-exf', '-c')):
-            await sendMessage(message, f'Wrong input in line {index}! Re-add only the mentioned line correctly! Read the example!')
+            await sendMessage(message, f'<b>Terdapat kesalahan pada line<b> <code>{index}</code>! <b>Tambahkan ulang sesuai dengan contoh!</b>')
             continue
         inf_lists = []
         exf_lists = []
@@ -115,17 +115,17 @@ async def rssSub(client, message, pre_event):
                     html = await res.text()
             rss_d = feedparse(html)
             last_title = rss_d.entries[0]['title']
-            msg += "<b>Subscribed!</b>"
-            msg += f"\n<b>Title: </b><code>{title}</code>\n<b>Feed Url: </b>{feed_link}"
-            msg += f"\n<b>latest record for </b>{rss_d.feed.title}:"
-            msg += f"\nName: <code>{last_title.replace('>', '').replace('<', '')}</code>"
+            msg += "<b>Berlangganan!</b>"
+            msg += f"\n<b>Judul :</b> <code>{title}</code>\n<b>URL Feed :</b> <code>{feed_link}</code>"
+            msg += f"\n<b>Item Terakhir untuk judul</b> <code>{rss_d.feed.title}</code>:"
+            msg += f"\n<b>Nama :</b> <code>{last_title.replace('>', '').replace('<', '')}</code>"
             try:
                 last_link = rss_d.entries[0]['links'][1]['href']
             except IndexError:
                 last_link = rss_d.entries[0]['link']
-            msg += f"\nLink: <code>{last_link}</code>"
-            msg += f"\n<b>Command: </b><code>{cmd}</code>"
-            msg += f"\n<b>Filters:-</b>\ninf: <code>{inf}</code>\nexf: <code>{exf}<code/>"
+            msg += f"\n<b>Link :</b> <code>{last_link}</code>"
+            msg += f"\n<b>Perintah :</b> <code>{cmd}</code>"
+            msg += f"\n<b>Filter:</b>\n<b>Inf :</b> <code>{inf}</code>\n<b>Exf :</b> <code>{exf}<code/>"
             async with rss_dict_lock:
                 if rss_dict.get(user_id, False):
                     rss_dict[user_id][title] = {'link': feed_link, 'last_feed': last_link, 'last_title': last_title,
@@ -136,7 +136,7 @@ async def rssSub(client, message, pre_event):
             LOGGER.info(
                 f"Rss Feed Added: id: {user_id} - title: {title} - link: {feed_link} - c: {cmd} - inf: {inf} - exf: {exf}")
         except (IndexError, AttributeError) as e:
-            emsg = f"The link: {feed_link} doesn't seem to be a RSS feed or it's region-blocked!"
+            emsg = f"<b>Link</b> <code>{feed_link}</code> <b>sepertinya bukan RSS Feed atau Bot diblokir oleh Link!</b>"
             await sendMessage(message, emsg + '\nError: ' + str(e))
         except Exception as e:
             await sendMessage(message, str(e))
@@ -201,7 +201,7 @@ async def rssUpdate(client, message, pre_event, state):
                 if not rss_dict:
                     await DbManger().trunc_table('rss')
     LOGGER.info(f"Rss link with Title(s): {updated} has been {state}d!")
-    await sendMessage(message, f"Rss links with Title(s): <code>{updated}</code> has been {state}d!")
+    await sendMessage(message, f"<b>RSS dengan judul</b> <code>{updated}</code> <b>telah</b> <code>di{state}d</code>!")
     if DATABASE_URL and rss_dict.get(user_id):
         await DbManger().rss_update(user_id)
     await updateRssMenu(pre_event)
@@ -254,7 +254,7 @@ async def rssGet(client, message, pre_event):
     handler_dict[user_id] = False
     args = message.text.split()
     if len(args) < 2:
-        await sendMessage(message, f'{args}. Wrong Input format. You should add number of the items you want to get. Read help message before adding new subcription!')
+        await sendMessage(message, f'<code>{args}</code> <b>Format Salah! Baca pesan bantuan!</b>')
         await updateRssMenu(pre_event)
         return
     try:
@@ -286,13 +286,13 @@ async def rssGet(client, message, pre_event):
                     await editMessage(msg, item_info)
             except IndexError as e:
                 LOGGER.error(str(e))
-                await editMessage(msg, "Parse depth exceeded. Try again with a lower value.")
+                await editMessage(msg, "<b>Limit terlampaui, coba lagi menggunakan nilai yang lebih rendah!</b>")
             except Exception as e:
                 LOGGER.error(str(e))
                 await editMessage(msg, str(e))
     except Exception as e:
         LOGGER.error(str(e))
-        await sendMessage(message, f"Enter a valid value!. {e}")
+        await sendMessage(message, f"<b>Tambahkan nilai valid!</b>\n<code>{e}</code>")
     await updateRssMenu(pre_event)
 
 
@@ -304,10 +304,10 @@ async def rssEdit(client, message, pre_event):
         args = item.split()
         title = args[0].strip()
         if len(args) < 2:
-            await sendMessage(message, f'{item}. Wrong Input format. Read help message before editing!')
+            await sendMessage(message, f'<code>{item}</code> <b>Format Salah! Baca pesan bantuan!</b>')
             continue
         elif not rss_dict[user_id].get(title, False):
-            await sendMessage(message, "Enter a valid title. Title not found!")
+            await sendMessage(message, "<b>Judul tidak ditemukan!</b>")
             continue
         inf_lists = []
         exf_lists = []
