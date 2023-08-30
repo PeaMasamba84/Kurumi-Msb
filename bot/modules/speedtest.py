@@ -12,7 +12,7 @@ from bot.helper.ext_utils.bot_utils import get_readable_file_size, new_task
 
 @new_task
 async def speedtest(_, message):
-    msg = await sendMessage(message, "<code>Mengetes kecepatan Unduh & Unggah...</code>")
+    msg = await sendMessage(message, "<b>Mengetes kecepatan Unduh & Unggah...</b>")
     test = Speedtest()
     test.get_best_server()
     test.download()
