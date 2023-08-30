@@ -65,7 +65,7 @@ async def add_aria2c_download(link, path, listener, filename, auth, header, rati
             await sync_to_async(aria2.client.force_pause, gid)
         await sync_to_async(aria2.client.force_pause, gid)
         SBUTTONS = bt_selection_buttons(gid)
-        msg = "Unduhan dihentikan...\nPilih file lalu tekan tombol selesai untuk melanjutkan!"
+        msg = "<b>Unduhan dihentikan...</b>\n<b>Pilih file yang mau diunduh lalu tekan tombol selesai untuk melanjutkan!</b>"
         await sendMessage(listener.message, msg, SBUTTONS)
 
     if added_to_queue:
