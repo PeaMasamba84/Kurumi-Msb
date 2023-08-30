@@ -102,7 +102,7 @@ class MirrorLeechListener:
         LOGGER.info(f"Download completed: {name}")
 
         if multi_links:
-            await self.onUploadError('Menunggu tugas lain selesai diunduh...')
+            await self.onUploadError('Selesai, Menunggu tugas lain selesai diunduh...')
             return
         
         if name == "None" or self.isQbit or not await aiopath.exists(f"{self.dir}/{name}"):
@@ -422,7 +422,7 @@ class MirrorLeechListener:
                                            disable_notification=True,
                                            reply_markup=buttons.build_menu(2))
             except Exception as e:
-                LOGGER.error(f"Failed forward message | {e}")
+                LOGGER.error(f"Failed when forward message => {e}")
             if self.seed:
                 if self.newDir:
                     await clean_target(self.newDir)
