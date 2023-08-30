@@ -42,7 +42,7 @@ async def select_format(_, query, obj):
     elif data[1] == 'back':
         await obj.back_to_main()
     elif data[1] == 'cancel':
-        await editMessage(message, 'Tugas dibatalkan oleh User!')
+        await editMessage(message, '<b>Tugas dibatalkan oleh User!</b>')
         obj.qual = None
         obj.is_cancelled = True
         obj.event.set()
@@ -80,7 +80,7 @@ class YtSelection:
         try:
             await wait_for(self.event.wait(), timeout=self.__timeout)
         except:
-            await editMessage(self.__reply_to, 'Waktu habis, Tugas dibatalkan!')
+            await editMessage(self.__reply_to, '<b>Waktu habis, Tugas dibatalkan!</b>')
             self.qual = None
             self.is_cancelled = True
             self.event.set()
@@ -285,7 +285,7 @@ async def _ytdl(client, message, isLeech=False, sameDir=None, bulk=[]):
             if len(bulk) == 0:
                 raise ValueError('Bulk Empty!')
         except:
-            await sendMessage(message, 'Reply to text file or tg message that have links seperated by new line!')
+            await sendMessage(message, '<b>Balas file txt atau balas pesan Telegram yang memiliki banyak link dan dipisahkan menggunakan line baru!</b>')
             return
         b_msg = input_list[:1]
         b_msg.append(f'{bulk[0]} -i {len(bulk)}')
@@ -354,7 +354,7 @@ async def _ytdl(client, message, isLeech=False, sameDir=None, bulk=[]):
         if not up and (default_upload == 'gd' or not default_upload and config_dict['DEFAULT_UPLOAD'] == 'gd') or up == 'gd':
             up = user_dict.get('gdrive_id') or config_dict['GDRIVE_ID']
         if not up:
-            await sendMessage(message, 'Tujuan upload tidak ditemukan!')
+            await sendMessage(message, '<b>Tujuan upload tidak ditemukan!</b>')
             return
         elif up != 'rcl' and is_rclone_path(up):
             if up.startswith('mrcc:'):
@@ -362,7 +362,7 @@ async def _ytdl(client, message, isLeech=False, sameDir=None, bulk=[]):
             else:
                 config_path = 'rclone.conf'
             if not await aiopath.exists(config_path):
-                await sendMessage(message, f'Config Rclone <code>{config_path}</code> tidak ditemukan!')
+                await sendMessage(message, f'<b>Config Rclone</b> <code>{config_path}</code> <b>tidak ditemukan!</b>')
                 return
         elif up != 'gdl' and is_gdrive_id(up):
             if up.startswith('mtp:'):
@@ -372,10 +372,10 @@ async def _ytdl(client, message, isLeech=False, sameDir=None, bulk=[]):
             else:
                 token_path = 'accounts'
             if not await aiopath.exists(token_path):
-                await sendMessage(message, f'Token.pickle atau Service Accounts <code>{token_path}</code> tidak ditemukan!')
+                await sendMessage(message, f'<b>Token.pickle atau Service Accounts</b> <code>{token_path}</code> <b>tidak ditemukan!</b>')
                 return
         if not is_gdrive_id(up) and not is_rclone_path(up):
-            await sendMessage(message, 'Tujuan upload tidak ditemukan!')
+            await sendMessage(message, '<b>Tujuan upload tidak ditemukan!</b>')
             return
 
     if up == 'rcl' and not isLeech:
