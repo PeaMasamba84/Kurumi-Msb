@@ -41,7 +41,7 @@ async def rcloneNode(client, link, dst_path, rcf, listener):
         private = False
 
     if not await aiopath.exists(config_path):
-        await sendMessage(listener.message, f"Config Rclone {config_path} tidak ditemukan!")
+        await sendMessage(listener.message, f"<b>Config Rclone</b> <code>{config_path}</code> <b>tidak ditemukan!</b>")
         return
 
     if dst_path == 'rcl' or config_dict['RCLONE_PATH'] == 'rcl' or listener.user_dict.get('rclone_path') == 'rcl':
@@ -53,15 +53,15 @@ async def rcloneNode(client, link, dst_path, rcf, listener):
     dst_path = (dst_path or listener.user_dict.get('rclone_path', '')
                 or config_dict['RCLONE_PATH']).strip('/')
     if not is_rclone_path(dst_path):
-        await sendMessage(listener.message, 'Tujuan path Rclone tidak ditemukan!')
+        await sendMessage(listener.message, '<b>Tujuan path Rclone tidak ditemukan!</b>')
         return
     if dst_path.startswith('mrcc:'):
         if config_path != f'rclone/{listener.user_id}.conf':
-            await sendMessage(listener.message, 'Kamu harus menggunakan Config Rclone yang sama!')
+            await sendMessage(listener.message, '<b>Kamu harus menggunakan Config Rclone yang sama!</b>')
             return
         dst_path = dst_path.lstrip('mrcc:')
     elif config_path != 'rclone.conf':
-        await sendMessage(listener.message, 'Kamu harus menggunakan Config Rclone yang sama!')
+        await sendMessage(listener.message, '<b>Kamu harus menggunakan Config Rclone yang sama!</b>')
         return
 
     remote, src_path = link.split(':', 1)
@@ -158,7 +158,7 @@ async def gdcloneNode(client, link, dest_id, listener):
         dest_id = dest_id or listener.user_dict.get(
             'gdrive_id', '') or config_dict['GDRIVE_ID']
         if not is_gdrive_id(dest_id):
-            await sendMessage(listener.message, 'Google Drive ID salah!')
+            await sendMessage(listener.message, '<b>Google Drive ID salah!</b>')
             return
         gdc = gdCount()
         if sa:
@@ -175,7 +175,7 @@ async def gdcloneNode(client, link, dest_id, listener):
                 gds.use_sa = True
             telegraph_content, contents_no = await sync_to_async(gds.drive_list, name, dest_id, listener.user_id)
             if telegraph_content:
-                msg = f"File/Folder ini sudah ada di Google Drive!\n{contents_no} Hasil pencarian :"
+                msg = f"<b>File/Folder ini sudah ada di Google Drive!</b>\n<code>{contents_no}</code> <b>Hasil pencarian :</b>"
                 button = await get_telegraph_list(telegraph_content)
                 await sendMessage(listener.message, msg, button)
                 return
@@ -255,19 +255,19 @@ async def clone(client, message):
 
     if is_rclone_path(link):
         if not await aiopath.exists('rclone.conf') and not await aiopath.exists(f'rclone/{message.from_user.id}.conf'):
-            await sendMessage(message, 'Config Rclone tidak ditemukan!')
+            await sendMessage(message, '<b>Config Rclone tidak ditemukan!</b>')
             return
         if not config_dict['RCLONE_PATH'] and not listener.user_dict.get('rclone_path') and not dst_path:
-            await sendMessage(message, 'Tujuan upload tidak ditemukan!')
+            await sendMessage(message, '<b>Tujuan upload tidak ditemukan!</b>')
             return
         await rcloneNode(client, link, dst_path, rcf, listener)
     else:
         if not await aiopath.exists('token.pickle') and not await aiopath.exists(f'tokens/{message.from_user.id}.pickle') \
             and not await aiopath.exists('accounts'):
-            await sendMessage(message, 'Token.pickle dan Service Accounts tidak ditemukan!')
+            await sendMessage(message, '<b>Token.pickle dan Service Accounts tidak ditemukan!</b>')
             return
         if not config_dict['GDRIVE_ID'] and not listener.user_dict.get('gdrive_id') and not dst_path:
-            await sendMessage(message, 'Google Drive ID tidak ditemukan!')
+            await sendMessage(message, '<b>Google Drive ID tidak ditemukan!</b>')
             return
         await gdcloneNode(client, link, dst_path, listener)
 
