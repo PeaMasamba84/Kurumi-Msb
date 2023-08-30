@@ -17,30 +17,30 @@ async def select(client, message):
         gid = msg[1]
         dl = await getDownloadByGid(gid)
         if dl is None:
-            await sendMessage(message, f"Tugas dengan ID Google Drive <code>{gid}</code> tidak ditemukan!")
+            await sendMessage(message, f"<b>Tugas dengan ID</b> <code>{gid}</code> <b>tidak ditemukan!</b>")
             return
     elif reply_to_id := message.reply_to_message_id:
         async with download_dict_lock:
             dl = download_dict.get(reply_to_id, None)
         if dl is None:
-            await sendMessage(message, "Bukan tugas aktif!")
+            await sendMessage(message, "<b>Bukan Tugas Aktif!</b>")
             return
     elif len(msg) == 1:
-        msg = ("Reply to an active /cmd which was used to start the qb-download or add gid along with cmd\n\n"
-               + "This command mainly for selection incase you decided to select files from already added torrent. "
-               + "But you can always use /cmd with arg `s` to select files before download start.")
+        msg = ("<b>Balas ke Tugas Aktif dengan perintah atau tambahkan ID Tugas setelah perintah!</b>\n\n"
+               + "<b>Perintah ini hanya untuk memilih file yang ingin diunduh dan hanya bisa digunakan untuk Torrent!</b>"
+               + "<b>Kamu juga dapat menambahkan args -s sebelum memulai mengunduh!</b>")
         await sendMessage(message, msg)
         return
 
     if OWNER_ID != user_id and dl.message.from_user.id != user_id and \
        (user_id not in user_data or not user_data[user_id].get('is_sudo')):
-        await sendMessage(message, "Bukan tugas darimu!")
+        await sendMessage(message, "<b>Bukan tugas darimu!</b>")
         return
     if dl.status() not in [MirrorStatus.STATUS_DOWNLOADING, MirrorStatus.STATUS_PAUSED, MirrorStatus.STATUS_QUEUEDL]:
-        await sendMessage(message, 'Tugas ini baru diunduh, dihentikan atau menunggu antrian!')
+        await sendMessage(message, '<b>Tugas ini baru diunduh, dihentikan atau menunggu antrian!</b>')
         return
     if dl.name().startswith('[METADATA]'):
-        await sendMessage(message, 'Coba lagi setelah metadata selesai diunduh!')
+        await sendMessage(message, '<b>Coba lagi setelah metadata selesai diunduh!</b>')
         return
 
     try:
@@ -60,11 +60,11 @@ async def select(client, message):
                         f"{e} Error in pause, this mostly happens after abuse aria2")
         listener.select = True
     except:
-        await sendMessage(message, "Bukan tugas bittorrent!")
+        await sendMessage(message, "<b>Bukan tugas bittorrent!</b>")
         return
 
     SBUTTONS = bt_selection_buttons(id_)
-    msg = "Download dihentikan...\nPilih file lalu tekan tombol selesai untuk melanjutkan!"
+    msg = "<b>Download dihentikan...</b>\n<b>Pilih file yang mau diunduh lalu tekan tombol selesai untuk melanjutkan!</b>"
     await sendMessage(message, msg, SBUTTONS)
 
 
