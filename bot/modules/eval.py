@@ -108,7 +108,7 @@ async def clear(client, message):
     global namespaces
     if message.chat.id in namespaces:
         del namespaces[message.chat.id]
-    await send("Locals Cleared.", message)
+    await send("<b>Penyimpanan Locals berhasil dihapus!</b>", message)
 
 
 bot.add_handler(MessageHandler(evaluate, filters=command(
