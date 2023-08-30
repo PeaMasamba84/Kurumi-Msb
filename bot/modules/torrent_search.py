@@ -250,11 +250,11 @@ async def torrentSearchUpdate(_, query):
     elif data[2].startswith('api'):
         await query.answer()
         button = __api_buttons(user_id, data[2])
-        await editMessage(message, 'Pilih situs:', button)
+        await editMessage(message, '<b>Pilih situs :</b>', button)
     elif data[2] == 'plugin':
         await query.answer()
         button = await __plugin_buttons(user_id)
-        await editMessage(message, 'Pilih situs:', button)
+        await editMessage(message, '<b>Pilih situs :</b>', button)
     elif data[2] != "cancel":
         await query.answer()
         site = data[2]
