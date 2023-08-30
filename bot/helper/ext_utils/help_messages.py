@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 from bot.helper.telegram_helper.bot_commands import BotCommands
 
-# TODO : Change to efisien help message, Not much variable in help_message.py
+# TODO : More Translate to Indonesian & Change to efisien help message, No much variable in help_message.py
 
 YT_HELP_MESSAGE = f"""
 <b>Send link along with command line</b>:
