@@ -57,7 +57,7 @@ async def select_type(_, query):
         await query.answer()
         isRecursive = not bool(eval(data[3]))
         buttons = await list_buttons(user_id, isRecursive, eval(data[4]))
-        return await editMessage(message, 'Choose list options:', buttons)
+        return await editMessage(message, '<b>Pilih opsi :</b>', buttons)
     elif data[2] == 'ut':
         await query.answer()
         user_token = not bool(eval(data[4]))
@@ -70,7 +70,7 @@ async def select_type(_, query):
     item_type = data[2]
     isRecursive = eval(data[3])
     user_token = eval(data[4])
-    await editMessage(message, f"Mencari file dengan kata kunci <code>{key}</code>...")
+    await editMessage(message, f"<b>Mencari file dengan kata kunci</b> <code>{key}</code>...")
     await _list_drive(key, message, item_type, isRecursive, user_token, user_id)
 
 
