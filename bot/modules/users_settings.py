@@ -123,8 +123,7 @@ async def get_user_settings(from_user):
 
     text = f"""
 <b>Pengaturan untuk user</b> <code>{name}</code>
-<pre languange="bash">
-<b>Leech By         :</b> <code>{leech_method} Session</code>
+<pre languange="bash"><b>Leech By         :</b> <code>{leech_method} Session</code>
 <b>Leech To         :</b> <code>{leech_dest}</code>
 <b>Leech Type       :</b> <code>{ltype}</code>
 <b>Leech Prefix     :</b> <code>{escape(lprefix)}</code>
@@ -364,8 +363,7 @@ async def edit_user_settings(client, query):
         buttons.ibutton("Close", f"userset {user_id} close")
         text = f"""
 <b>Pengaturan Leech untuk user</b> <code>{name}</code>
-<pre languange="bash">
-<b>Leech By         :</b> <code>{leech_method} Session</code>
+<pre languange="bash"><b>Leech By         :</b> <code>{leech_method} Session</code>
 <b>Leech To         :</b> <code>{leech_dest}</code>
 <b>Leech Type       :</b> <code>{ltype}</code>
 <b>Leech Split Size :</b> <code>{split_size}</code>
@@ -392,8 +390,7 @@ async def edit_user_settings(client, query):
             rccpath = 'None'
         text = f"""
 <b>Pengaturan Rclone untuk user</b> <code>{name}</code>
-<pre languange="bash">
-<b>Rclone Config    :</b> <code>{rccmsg}</code>
+<pre languange="bash"><b>Rclone Config    :</b> <code>{rccmsg}</code>
 <b>Rclone Path      :</b> <code>{rccpath}</code>
 </pre>
 """
@@ -422,8 +419,7 @@ async def edit_user_settings(client, query):
         index = user_dict['index_url'] if user_dict.get('index_url', False) else 'None'
         text = f"""
 <b>Pengaturan Gdrive untuk user</b> <code>{name}</code>
-<pre languange="bash">
-<b>Gdrive Token     :</b> <code>{tokenmsg}</code>
+<pre languange="bash"><b>Gdrive Token     :</b> <code>{tokenmsg}</code>
 <b>Gdrive ID        :</b> <code>{gdrive_id}</code>
 <b>Index URL        :</b> <code>{index}</code>
 <b>Stop Duplicate   :</b> <code>{sd_msg}</code>
