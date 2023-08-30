@@ -26,7 +26,7 @@ async def mirror_status(_, message):
             recv = get_readable_file_size(net_io_counters().bytes_recv)
         except:
             recv = 'n/a'
-        msg = '<code>Tidak ada Tugas Aktif!</code>\n___________________________'
+        msg = '<b>Tidak ada Tugas Aktif!</b>\n___________________________'
         msg += f"\n<b>CPU :</b> <code>{cpu_percent()}%</code> | <b>FREE :</b> <code>{free}</code>" \
             f"\n<b>RAM :</b> <code>{virtual_memory().percent}%</code> | <b>UPTIME :</b> <code>{currentTime}</code>" \
             f"\n<b>T.Unduh :</b> <code>{sent}</code> | <b>T.Unggah :</b> <code>{recv}</code>" 
