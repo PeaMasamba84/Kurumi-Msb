@@ -606,7 +606,11 @@ async def load_config():
     if len(AUTHORIZED_CHATS) != 0:
         aid = AUTHORIZED_CHATS.split()
         for id_ in aid:
-            user_data[int(id_.strip())] = {'is_auth': True}
+            if ":" in id_:
+                user_data[int(id_.split(":")[0].strip())] = {
+                    'thread_id': int(id_.split(":")[1].strip()), 'is_auth': True}
+            else:
+                user_data[int(id_.strip())] = {'is_auth': True}
 
     SUDO_USERS = environ.get('SUDO_USERS', '')
     if len(SUDO_USERS) != 0:
