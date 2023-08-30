@@ -6,7 +6,7 @@ from requests import get as rget
 LOGGER = getLogger(__name__)
 
 headers = {
-    "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_5) AppleWebKit/600.1.17 (KHTML, like Gecko) Version/7.1 Safari/537.85.10"}
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/117.0"}
 
 try:
     HEROKU_APP_NAME = environ.get("HEROKU_APP_NAME", "")
