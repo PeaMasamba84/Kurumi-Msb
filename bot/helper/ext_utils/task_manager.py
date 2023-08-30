@@ -26,7 +26,7 @@ async def stop_duplicate_check(name, listener):
     if name is not None:
         telegraph_content, contents_no = await sync_to_async(gdSearch(stopDup=True).drive_list, name, listener.upDest, listener.user_id)
         if telegraph_content:
-            msg = f"File/Folder ini sudah ada di Google Drive!\n{contents_no} hasil pencarian :"
+            msg = f"<b>File/Folder ini sudah ada di Google Drive!</b>\n<code>{contents_no}</code> <b>hasil pencarian :</b>"
             button = await get_telegraph_list(telegraph_content)
             return msg, button
     return False, None
