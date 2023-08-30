@@ -18,7 +18,7 @@ async def cancel_mirror(_, message):
         gid = msg[1]
         dl = await getDownloadByGid(gid)
         if dl is None:
-            await sendMessage(message, f"<b>Tugas dengan ID Google Drive</b> <code>{gid}</code> <b>tidak ditemukan!</b>")
+            await sendMessage(message, f"<b>Tugas dengan ID</b> <code>{gid}</code> <b>tidak ditemukan!</b>")
             return
     elif reply_to_id := message.reply_to_message_id:
         async with download_dict_lock:
@@ -27,8 +27,8 @@ async def cancel_mirror(_, message):
             await sendMessage(message, "<b>Bukan Tugas Aktif!</b>")
             return
     elif len(msg) == 1:
-        msg = "Balas ke pesan perintah saat digunakan untuk memulai Tugas" \
-              f" atau kirim <code>/{BotCommands.CancelMirror[0]} atau /{BotCommands.CancelMirror[1]} GID</code> untuk membatalkan Tugas!"
+        msg = "<b>Balas ke pesan perintah saat digunakan untuk memulai Tugas</b>" \
+              f" <b>atau kirim</b> <code>/{BotCommands.CancelMirror[0]} atau /{BotCommands.CancelMirror[1]} GID</code> <b>untuk membatalkan Tugas!</b>"
         await sendMessage(message, msg)
         return
 
