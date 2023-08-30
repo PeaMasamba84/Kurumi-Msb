@@ -10,7 +10,7 @@ from bot.helper.ext_utils.db_handler import DbManger
 from bot.helper.ext_utils.bot_utils import update_user_ldata
 
 
-async def authorize(client, message):
+async def authorize(_, message):
     msg = message.text.split()
     if len(msg) > 1:
         id_ = int(msg[1].strip())
@@ -19,16 +19,16 @@ async def authorize(client, message):
     else:
         id_ = message.chat.id
     if id_ in user_data and user_data[id_].get('is_auth'):
-        msg = '🙃 Sudah diautorisasi!'
+        msg = '🙃 <b>Sudah diautorisasi!</b>'
     else:
         update_user_ldata(id_, 'is_auth', True)
         if DATABASE_URL:
             await DbManger().update_user_data(id_)
-        msg = '😉 Berhasil diautorisasi!'
+        msg = '😉 <b>Berhasil diautorisasi!</b>'
     await sendMessage(message, msg)
 
 
-async def unauthorize(client, message):
+async def unauthorize(_, message):
     msg = message.text.split()
     if len(msg) > 1:
         id_ = int(msg[1].strip())
@@ -40,13 +40,13 @@ async def unauthorize(client, message):
         update_user_ldata(id_, 'is_auth', False)
         if DATABASE_URL:
             await DbManger().update_user_data(id_)
-        msg = '😉 Berhasil diunautorisasi!'
+        msg = '😉 <b>Berhasil diunautorisasi!</b>'
     else:
-        msg = '🙃 Sudah diunautorisasi!'
+        msg = '🙃 <b>Sudah diunautorisasi!</b>'
     await sendMessage(message, msg)
 
 
-async def addSudo(client, message):
+async def addSudo(_, message):
     id_ = ""
     msg = message.text.split()
     if len(msg) > 1:
@@ -55,18 +55,18 @@ async def addSudo(client, message):
         id_ = reply_to.from_user.id
     if id_:
         if id_ in user_data and user_data[id_].get('is_sudo'):
-            msg = '🙃 Sudah menjadi sudo user!'
+            msg = '🙃 <b>Sudah menjadi sudo user!</b>'
         else:
             update_user_ldata(id_, 'is_sudo', True)
             if DATABASE_URL:
                 await DbManger().update_user_data(id_)
-            msg = '😉 Berhasil dinaikan menjadi sudo user!'
+            msg = '😉 <b>Berhasil dinaikan menjadi sudo user!</b>'
     else:
-        msg = "Berikan ID atau balas pesan dari user yang ingin dinaikan menjadi sudo user!"
+        msg = "<b>Berikan ID atau balas pesan dari User yang ingin dinaikan menjadi Sudo User!</b>"
     await sendMessage(message, msg)
 
 
-async def removeSudo(client, message):
+async def removeSudo(_, message):
     id_ = ""
     msg = message.text.split()
     if len(msg) > 1:
@@ -77,9 +77,9 @@ async def removeSudo(client, message):
         update_user_ldata(id_, 'is_sudo', False)
         if DATABASE_URL:
             await DbManger().update_user_data(id_)
-        msg = '😉 Berhasil diturunkan dari sudo user!'
+        msg = '😉 <b>Berhasil diturunkan dari Sudo User!</b>'
     else:
-        msg = "Berikan ID atau balas pesan dari user yang ingin diturunkan dari sudo user!"
+        msg = "<b>Berikan ID atau balas pesan dari User yang ingin diturunkan dari Sudo User!</b>"
     await sendMessage(message, msg)
 
 bot.add_handler(MessageHandler(authorize, filters=command(
