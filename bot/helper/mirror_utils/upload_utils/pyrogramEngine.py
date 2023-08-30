@@ -47,6 +47,7 @@ class TgUploader:
         self.__upload_dest = ''
         self.__up_size = 0
         self.__user_leech = False
+        self.__thread_id = None
         
 
     async def __upload_progress(self, current, total):
@@ -75,6 +76,7 @@ class TgUploader:
             self.__user_leech = True
         self.__upload_dest = self.__listener.upDest or self.__listener.user_dict.get(
             'leech_dest') or self.__listener.message.chat.id
+        self.__thread_id = int(self.__listener.message.message_thread_id) if self.__listener.message.chat.is_forum else None
         if not isinstance(self.__upload_dest, int):
             if self.__upload_dest.startswith('b:'):
                 self.__upload_dest = self.__upload_dest.lstrip('b:')
@@ -84,13 +86,6 @@ class TgUploader:
                 self.__user_leech = IS_PREMIUM_USER
             if self.__upload_dest.isdigit() or self.__upload_dest.startswith('-'):
                 self.__upload_dest = int(self.__upload_dest)
-
-        # if str(self.__upload_dest).startswith('b:'):
-        #     self.__upload_dest = int(str(self.__upload_dest).lstrip('b:'))
-        # elif str(self.__upload_dest).startswith('u:'):
-        #     self.__upload_dest = int(str(self.__upload_dest).lstrip('u:'))
-        # if str(self.__upload_dest).isdigit() or str(self.__upload_dest).startswith('-'):
-        #     self.__upload_dest = int(self.__upload_dest)
 
     async def __msg_to_reply(self):
         if self.__upload_dest:
@@ -420,13 +415,17 @@ class TgUploader:
             if self.__thumb is None and thumb is not None and await aiopath.exists(thumb):
                 await aioremove(thumb)
             if not self.__is_cancelled:
-                # Forward to PM 
+                # Forward
                 if DUMP_CHAT_ID := config_dict['DUMP_CHAT_ID']:
                     try:
-                        await bot.copy_message(
-                            chat_id=self.__upload_dest, from_chat_id=self.__sent_msg.chat.id, message_id=self.__sent_msg.id)
+                        if self.__thread_id:
+                            await bot.copy_message(
+                                chat_id=self.__upload_dest, from_chat_id=self.__sent_msg.chat.id, message_id=self.__sent_msg.id, message_thread_id=self.__thread_id)
+                        else:
+                            await bot.copy_message(
+                                chat_id=self.__upload_dest, from_chat_id=self.__sent_msg.chat.id, message_id=self.__sent_msg.id)
                     except Exception as e:
-                        LOGGER.error(f"Failed forward message | {e}")              
+                        LOGGER.error(f"Failed when forward message => {e}")              
         except FloodWait as f:
             LOGGER.warning(str(f))
             await sleep(f.value)
