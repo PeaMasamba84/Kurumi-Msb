@@ -31,7 +31,7 @@ def get_quotes():
         quotez = str(Quote.print_series_quote())
         quote = quotez.split(": ")[1]
         oleh = quotez.split(":")[0]
-        quotes = f"{quote}\n~{oleh}"
+        quotes = f"{quote}\n=> {oleh}"
     except:
         quotes = "Ngga ada Quote bijak buatmu wahai Tuan yang bijaksana :D"
     return quotes
@@ -116,8 +116,7 @@ async def stats(_, message):
         ["neofetch --shell_version off --stdout"], shell=True).decode()
     # Versi
     stats = f'''
-<pre languange="bash">
-<code>{neofetch}</code>
+<pre languange="bash"><code>{neofetch}</code>
 <b>CPU</b>
 <b>Cores        :</b> <code>{p_core}</code>
 <b>Logical      :</b> <code>{t_core}</code>
@@ -137,8 +136,8 @@ async def stats(_, message):
 <code>[{progress_bar(disk)}] {disk}%</code>
 
 <b>Jaringan</b>
-<b>Unduhan      :</b> <code>{recv}</code>
-<b>Unggahan     :</b> <code>{sent}</code>
+<b>Total Unduh  :</b> <code>{recv}</code>
+<b>Total Unggah :</b> <code>{sent}</code>
 
 <b>Versi</b>
 <b>Aria2c       :</b> <code>v{arv}</code>
@@ -146,7 +145,7 @@ async def stats(_, message):
 <b>Google Api   :</b> <code>v{gav}</code>
 <b>MegaSDK      :</b> <code>v{msv}</code>
 <b>P7Zip        :</b> <code>v{p7v}</code>
-<b>Pyrogram     :</b> <code>v{prv}</code>
+<b>Pyro         :</b> <code>v{prv}</code>
 <b>Rclone       :</b> <code>{rcv}</code>
 <b>Qbittorrent  :</b> <code>{qbv}</code>
 <b>YT-DLP       :</b> <code>v{ytv}</code>
@@ -183,7 +182,7 @@ Enjoy :D
 '''
         await sendMessage(message, start_string, reply_markup)
     else:
-        await sendMessage(message, 'Tidak ada izin!\nGabung grup untuk menggunakan Bot!', reply_markup)
+        await sendMessage(message, '<b>Tidak ada izin!</b>\n<b>Gabung grup untuk menggunakan Bot!</b>', reply_markup)
 
 
 async def restart(_, message):
@@ -204,7 +203,7 @@ async def restart(_, message):
 
 async def ping(_, message):
     start_time = int(round(time() * 1000))
-    reply = await sendMessage(message, "Mengetest waktu respon bot...")
+    reply = await sendMessage(message, "<b>Mengetest waktu respon bot...</b>")
     end_time = int(round(time() * 1000))
     await editMessage(reply, f'🤖 <b>Respon Bot :</b> <code>{end_time - start_time} ms</code>')
 
@@ -213,39 +212,40 @@ async def log(_, message):
     await sendFile(message, 'log.txt')
 
 help_string = f'''
-/{BotCommands.MirrorCommand[0]} atau /{BotCommands.MirrorCommand[1]} : Mirror ke Google Drive / Cloud.
-/{BotCommands.QbMirrorCommand[0]} atau /{BotCommands.QbMirrorCommand[1]} : Mirror ke Google Drive / Cloud menggunakan qBittorrent.
-/{BotCommands.YtdlCommand[0]} atau /{BotCommands.YtdlCommand[1]} : Mirror link yang disupport YT-DLP.
-/{BotCommands.LeechCommand[0]} atau /{BotCommands.LeechCommand[1]} : Leech ke Telegram.
-/{BotCommands.QbLeechCommand[0]} atau /{BotCommands.QbLeechCommand[1]} : Leech ke Telegram menggunakan qBittorrent.
-/{BotCommands.YtdlLeechCommand[0]} atau /{BotCommands.YtdlLeechCommand[1]} : Leech link yang disupport YT-DLP.
-/{BotCommands.CloneCommand[0]} atau /{BotCommands.CloneCommand[1]} [drive_url] : Menggandakan file/folder Google Drive.
-/{BotCommands.CountCommand[0]} atau /{BotCommands.CountCommand[1]} [drive_url] : Menghitung file/folder Google Drive.
-/{BotCommands.DeleteCommand[0]} atau /{BotCommands.DeleteCommand[1]} [drive_url] : Menghapus file/folder Google Drive (Hanya Owner & Sudo).
-/{BotCommands.UserSetCommand[0]} atau /{BotCommands.UserSetCommand[1]} : Pengaturan User.
-/{BotCommands.BotSetCommand[0]} atau /{BotCommands.BotSetCommand[1]} : Pengaturan Bot (Hanya Owner & Sudo).
-/{BotCommands.BtSelectCommand[0]} atau /{BotCommands.BtSelectCommand[1]} : Memilih file dari torrent.
-/{BotCommands.CancelMirror[0]} atau /{BotCommands.CancelMirror[1]} : Membatalkan tugas.
-/{BotCommands.CancelAllCommand[0]} atau /{BotCommands.CancelAllCommand[1]} : Membatalkan semua tugas.
-/{BotCommands.ListCommand[0]} atau /{BotCommands.ListCommand[1]} [query] : Mencari file/folder di Google Drive.
-/{BotCommands.SearchCommand[0]} atau /{BotCommands.SearchCommand[1]} [query] : Mencari torrent menggunakan API.
-/{BotCommands.StatusCommand[0]} atau /{BotCommands.StatusCommand[1]} : Menampilkan status dari semua tugas yang sedang berjalan.
-/{BotCommands.StatsCommand[0]} atau /{BotCommands.StatsCommand[1]} : Menampilan statistik dari mesin bot.
-/{BotCommands.PingCommand[0]} atau /{BotCommands.PingCommand[1]} : Mengetes respon bot (Hanya Owner & Sudo).
-/{BotCommands.AuthorizeCommand[0]} atau /{BotCommands.AuthorizeCommand[1]} : Memberikan izin chat atau user untuk menggunakan bot (Hanya Owner & Sudo).
-/{BotCommands.UnAuthorizeCommand[0]} atau /{BotCommands.UnAuthorizeCommand[1]} : Menghapus izin chat atau user untuk menggunakan bot (Hanya Owner & Sudo).
-/{BotCommands.UsersCommand[0]} atau /{BotCommands.UsersCommand[1]} : Menampilan pengaturan User (Hanya Owner & Sudo).
-/{BotCommands.AddSudoCommand[0]} atau /{BotCommands.AddSudoCommand[1]} : Menambahkan User Sudo (Hanya Owner).
-/{BotCommands.RmSudoCommand[0]} atau /{BotCommands.RmSudoCommand[1]} : Menghapus User Sudo (Hanya Owner).
-/{BotCommands.RestartCommand[0]} atau /{BotCommands.RestartCommand[1]} : Memulai ulang dan memperbarui bot (Hanya Owner & Sudo).
-/{BotCommands.LogCommand[0]} atau /{BotCommands.LogCommand[1]} : Mengambil log file dari bot (Hanya Owner & Sudo).
-/{BotCommands.ShellCommand[0]} atau /{BotCommands.ShellCommand[1]} : Menjalankan perintah Shell (Hanya Owner).
-/{BotCommands.EvalCommand[0]} atau /{BotCommands.EvalCommand[1]} : Menjalankan perintah Kode Python (Hanya Owner).
-/{BotCommands.ExecCommand[0]} atau /{BotCommands.ExecCommand[1]} : Menjalankan perintah Exec (Hanya Owner).
-/{BotCommands.ClearLocalsCommand[0]} atau /{BotCommands.ClearLocalsCommand[1]} : Menghapus penyimpanan lokal (Hanya Owner)
-/{BotCommands.RssCommand} : Menu RSS.
+<b>Daftar Perintah</b> <code>@{bot.me.username}</code>
+<code>/{BotCommands.MirrorCommand[0]}</code> atau <code>/{BotCommands.MirrorCommand[1]}</code> : Mirror ke Google Drive/Cloud.
+<code>/{BotCommands.QbMirrorCommand[0]}</code> atau <code>/{BotCommands.QbMirrorCommand[1]}</code> : Mirror ke Google Drive/Cloud menggunakan qBittorrent.
+<code>/{BotCommands.YtdlCommand[0]}</code> atau <code>/{BotCommands.YtdlCommand[1]}</code> : Mirror link yang disupport YT-DLP.
+<code>/{BotCommands.LeechCommand[0]}</code> atau <code>/{BotCommands.LeechCommand[1]}</code> : Leech ke Telegram.
+<code>/{BotCommands.QbLeechCommand[0]}</code> atau <code>/{BotCommands.QbLeechCommand[1]}</code> : Leech ke Telegram menggunakan qBittorrent.
+<code>/{BotCommands.YtdlLeechCommand[0]}</code> atau <code>/{BotCommands.YtdlLeechCommand[1]}</code> : Leech link yang disupport YT-DLP.
+<code>/{BotCommands.CloneCommand[0]}</code> atau <code>/{BotCommands.CloneCommand[1]}</code> [drive_url] : Menggandakan file/folder Google Drive.
+<code>/{BotCommands.CountCommand[0]}</code> atau <code>/{BotCommands.CountCommand[1]}</code> [drive_url] : Menghitung file/folder Google Drive.
+<code>/{BotCommands.DeleteCommand[0]}</code> atau <code>/{BotCommands.DeleteCommand[1]}</code> [drive_url] : Menghapus file/folder Google Drive (Hanya Owner & Sudo).
+<code>/{BotCommands.UserSetCommand[0]}</code> atau <code>/{BotCommands.UserSetCommand[1]}</code> : Pengaturan User.
+<code>/{BotCommands.BotSetCommand[0]}</code> atau <code>/{BotCommands.BotSetCommand[1]}</code> : Pengaturan Bot (Hanya Owner & Sudo).
+<code>/{BotCommands.BtSelectCommand[0]}</code> atau <code>/{BotCommands.BtSelectCommand[1]}</code> : Memilih file dari torrent.
+<code>/{BotCommands.CancelMirror[0]}</code> atau <code>/{BotCommands.CancelMirror[1]}</code> : Membatalkan tugas.
+<code>/{BotCommands.CancelAllCommand[0]}</code> atau <code>/{BotCommands.CancelAllCommand[1]}</code> : Membatalkan semua tugas.
+<code>/{BotCommands.ListCommand[0]}</code> atau <code>/{BotCommands.ListCommand[1]}</code> [query] : Mencari file/folder di Google Drive.
+<code>/{BotCommands.SearchCommand[0]}</code> atau <code>/{BotCommands.SearchCommand[1]}</code> [query] : Mencari torrent menggunakan API.
+<code>/{BotCommands.StatusCommand[0]}</code> atau <code>/{BotCommands.StatusCommand[1]}</code> : Menampilkan status dari semua tugas yang sedang berjalan.
+<code>/{BotCommands.StatsCommand[0]}</code> atau <code>/{BotCommands.StatsCommand[1]}</code> : Menampilan statistik dari mesin bot.
+<code>/{BotCommands.PingCommand[0]}</code> atau <code>/{BotCommands.PingCommand[1]}</code> : Mengetes respon bot (Hanya Owner & Sudo).
+<code>/{BotCommands.AuthorizeCommand[0]}</code> atau <code>/{BotCommands.AuthorizeCommand[1]}</code> : Memberikan izin chat atau user untuk menggunakan bot (Hanya Owner & Sudo).
+<code>/{BotCommands.UnAuthorizeCommand[0]}</code> atau <code>/{BotCommands.UnAuthorizeCommand[1]}</code> : Menghapus izin chat atau user untuk menggunakan bot (Hanya Owner & Sudo).
+<code>/{BotCommands.UsersCommand[0]}</code> atau <code>/{BotCommands.UsersCommand[1]}</code> : Menampilan pengaturan User (Hanya Owner & Sudo).
+<code>/{BotCommands.AddSudoCommand[0]}</code> atau <code>/{BotCommands.AddSudoCommand[1]}</code> : Menambahkan User Sudo (Hanya Owner).
+<code>/{BotCommands.RmSudoCommand[0]}</code> atau <code>/{BotCommands.RmSudoCommand[1]}</code> : Menghapus User Sudo (Hanya Owner).
+<code>/{BotCommands.RestartCommand[0]}</code> atau <code>/{BotCommands.RestartCommand[1]}</code> : Memulai ulang dan memperbarui bot (Hanya Owner & Sudo).
+<code>/{BotCommands.LogCommand[0]}</code> atau <code>/{BotCommands.LogCommand[1]}</code> : Mengambil log file dari bot (Hanya Owner & Sudo).
+<code>/{BotCommands.ShellCommand[0]}</code> atau <code>/{BotCommands.ShellCommand[1]}</code> : Menjalankan perintah Shell (Hanya Owner).
+<code>/{BotCommands.EvalCommand[0]}</code> atau <code>/{BotCommands.EvalCommand[1]}</code> : Menjalankan perintah Kode Python (Hanya Owner).
+<code>/{BotCommands.ExecCommand[0]}</code> atau <code>/{BotCommands.ExecCommand[1]}</code> : Menjalankan perintah Exec (Hanya Owner).
+<code>/{BotCommands.ClearLocalsCommand[0]}</code> atau <code>/{BotCommands.ClearLocalsCommand[1]}</code> : Menghapus penyimpanan lokal (Hanya Owner)
+<code>/{BotCommands.RssCommand}</code> : Menu RSS.
 
-NOTE : Kirim perintah tanpa argument untuk melihat perintah secara detail!
+<b>NOTE :</b> Kirim perintah tanpa argument untuk melihat perintah secara detail!
 '''
 
 
@@ -262,7 +262,7 @@ async def restart_notification():
 
     async def send_incompelete_task_message(cid, msg):
         try:
-            if msg.startswith('Bot berhasil dimulai ulang!'):
+            if msg.startswith('<b>Bot berhasil dimulai ulang!</b>'):
                 await bot.edit_message_text(chat_id=chat_id, message_id=msg_id, text=msg)
                 await aioremove(".restartmsg")
             else:
@@ -275,9 +275,9 @@ async def restart_notification():
     if INCOMPLETE_TASK_NOTIFIER and DATABASE_URL:
         if notifier_dict := await DbManger().get_incomplete_tasks():
             for cid, data in notifier_dict.items():
-                msg = f"""{'Bot berhasil dimulai ulang!' if cid == chat_id else 'Bot dimulai ulang!'}
-<pre languange="bash">
-<b>Hari      :</b> <code>{now.strftime('%A')}</code>
+                msg = f"""
+{'<b>Bot berhasil dimulai ulang!</b>' if cid == chat_id else '<b>Bot dimulai ulang!</b>'}
+<pre languange="bash"><b>Hari      :</b> <code>{now.strftime('%A')}</code>
 <b>Tanggal   :</b> <code>{now.strftime('%d %B %Y')}</code>
 <b>Waktu     :</b> <code>{now.strftime('%H:%M:%S WIB')}</code>
 <b>Quotes    :</b>
@@ -285,7 +285,7 @@ async def restart_notification():
 </pre>           
 """
                 if data.items():
-                    msg += f"\n<b>Tugas yang belum selesai :</b>"
+                    msg += f"<b>Tugas yang belum selesai :</b>"
                 for tag, links in data.items():
                     msg += f"\n{tag} :"
                     for index, link in enumerate(links, start=1):
@@ -298,9 +298,9 @@ async def restart_notification():
 
     if await aiopath.isfile(".restartmsg"):
         try:
-            msg = f"""Bot berhasil dimulai ulang!
-<pre languange="bash">
-<b>Hari      :</b> <code>{now.strftime('%A')}</code>
+            msg = f"""
+<b>Bot berhasil dimulai ulang!</b>
+<pre languange="bash"><b>Hari      :</b> <code>{now.strftime('%A')}</code>
 <b>Tanggal   :</b> <code>{now.strftime('%d %B %Y')}</code>
 <b>Waktu     :</b> <code>{now.strftime('%H:%M:%S WIB')}</code>
 <b>Quotes    :</b>
