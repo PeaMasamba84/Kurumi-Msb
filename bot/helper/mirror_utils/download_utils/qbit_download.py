@@ -49,13 +49,13 @@ async def add_qb_torrent(link, path, listener, ratio, seed_time):
                     if len(tor_info) > 0:
                         break
                     elif time() - ADD_TIME >= 120:
-                        msg = "Torrent tidak valid!"
+                        msg = "<b>Torrent tidak valid!</b>"
                         await sendMessage(listener.message, msg)
                         return
             tor_info = tor_info[0]
             ext_hash = tor_info.hash
         else:
-            await sendMessage(listener.message, "Torrent ini sudah ditambahkan atau torrent tidak valid!")
+            await sendMessage(listener.message, "<b>Torrent ini sudah ditambahkan atau torrent tidak valid!</b>")
             return
         async with download_dict_lock:
             download_dict[listener.uid] = QbittorrentStatus(
@@ -74,7 +74,7 @@ async def add_qb_torrent(link, path, listener, ratio, seed_time):
         await listener.onDownloadStart()
         if config_dict['BASE_URL'] and listener.select:
             if link.startswith('magnet:'):
-                metamsg = "Mengunduh Metadata...\nGunakan file torrent untuk melewati proses ini!"
+                metamsg = "<b>Mengunduh Metadata...</b>\n<b>Gunakan file torrent untuk melewati proses ini!</b>"
                 meta = await sendMessage(listener.message, metamsg)
                 while True:
                     tor_info = await sync_to_async(client.torrents_info, tag=f'{listener.uid}')
@@ -93,7 +93,7 @@ async def add_qb_torrent(link, path, listener, ratio, seed_time):
             if not added_to_queue:
                 await sync_to_async(client.torrents_pause, torrent_hashes=ext_hash)
             SBUTTONS = bt_selection_buttons(ext_hash)
-            msg = "Unduhan dihentikan...\nPilih file lalu tekan tombol selesai untuk melanjutkan!"
+            msg = "<b>Unduhan dihentikan...</b>\n<b>Pilih file yang mau diunduh lalu tekan tombol selesai untuk melanjutkan!</b>"
             await sendMessage(listener.message, msg, SBUTTONS)
         else:
             await sendStatusMessage(listener.message)
