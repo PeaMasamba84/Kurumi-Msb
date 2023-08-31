@@ -159,6 +159,8 @@ async def stats(_, message):
 <b>Quotes       :</b> 
 <code>{get_quotes()}</code>
 </pre>
+
+PEA MASAMBA
 '''
     await sendMessage(message, stats)
 
