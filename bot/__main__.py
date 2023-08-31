@@ -264,7 +264,7 @@ async def restart_notification():
 
     async def send_incompelete_task_message(cid, msg):
         try:
-            if msg.startswith('<b>Bot berhasil dimulai ulang!</b>'):
+            if msg.startswith('<b>Bot berhasil di restart ya!</b>'):
                 await bot.edit_message_text(chat_id=chat_id, message_id=msg_id, text=msg)
                 await aioremove(".restartmsg")
             else:
@@ -278,13 +278,15 @@ async def restart_notification():
         if notifier_dict := await DbManger().get_incomplete_tasks():
             for cid, data in notifier_dict.items():
                 msg = f"""
-{'<b>Bot berhasil dimulai ulang!</b>' if cid == chat_id else '<b>Bot dimulai ulang!</b>'}
+{'<b>Bot berhasil di restart ya!</b>' if cid == chat_id else '<b>Bot dimulai ulang!</b>'}
 <pre languange="bash"><b>Hari      :</b> <code>{now.strftime('%A')}</code>
 <b>Tanggal   :</b> <code>{now.strftime('%d %B %Y')}</code>
 <b>Waktu     :</b> <code>{now.strftime('%H:%M:%S WIB')}</code>
 <b>Quotes    :</b>
 <code>{get_quotes()}</code>
-</pre>           
+</pre>     
+
+<b><code>PEA MASAMBA</b></code>
 """
                 if data.items():
                     msg += f"<b>Tugas yang belum selesai :</b>"
@@ -308,6 +310,8 @@ async def restart_notification():
 <b>Quotes    :</b>
 <code>{get_quotes()}</code>
 </pre>           
+
+<b><code>PEA MASAMBA</b></code>
 """
             await bot.edit_message_text(chat_id=chat_id, message_id=msg_id, text=msg)
         except:
