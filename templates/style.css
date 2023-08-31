@@ -1,0 +1,89 @@
+@import url("https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&display=swap");
+
+* {
+	padding: 0;
+	margin: 0;
+	box-sizing: border-box;
+}
+
+body {
+	font-family: "Space Mono", monospace;
+	font-size: 24px;
+	color: #333333;
+}
+
+/* utility */
+.container {
+	width: 95%;
+	max-width: 1200px;
+	margin: 0 auto;
+}
+
+img {
+	max-width: 100%;
+}
+
+.py-1 {
+	padding-top: 1em;
+}
+.py-2 {
+	padding-top: 2em;
+}
+.py-3 {
+	padding-top: 3em;
+}
+
+.btn {
+	display: inline-block;
+	cursor: pointer;
+	background: #333;
+	color: #fff;
+	padding: 1.5em;
+	font-weight: 700;
+	font-size: 14px;
+	text-transform: uppercase;
+	text-decoration: none;
+	width: 15em;
+	text-align: center;
+}
+
+h1 {
+	line-height: 70px;
+}
+
+.main-content-text p {
+	margin: 1em 0;
+	font-size: 1.125rem;
+}
+
+footer {
+	text-align: center;
+	font-size: 14px;
+}
+
+@media (min-width: 800px) {
+	.row {
+		display: flex;
+		justify-content: space-between;
+	}
+
+	.scarecrow-img {
+		width: 539px;
+	}
+
+	.main-content-text {
+		width: 400px;
+		display: flex;
+		flex-direction: column;
+		justify-content: center;
+	}
+
+	footer {
+		position: fixed;
+		left: 0;
+		bottom: 0;
+		width: 100%;
+		padding-bottom: 1em;
+		text-align: center;
+	}
+}
