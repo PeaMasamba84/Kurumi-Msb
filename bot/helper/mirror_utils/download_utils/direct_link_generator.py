@@ -203,7 +203,12 @@ def mediafire(url: str) -> str:
     except Exception as e:
         raise DirectDownloadLinkException(f"ERROR: {e.__class__.__name__}")
     if not (final_link := findall(r"\'(https?:\/\/download\d+\.mediafire\.com\/\S+\/\S+\/\S+)\'", page)):
-        raise DirectDownloadLinkException("ERROR: Link File tidak ditemukan!")
+        try:
+            page = BeautifulSoup(page, 'lxml')
+            final_link = [
+                page.find('a', {'aria-label': 'Download file'}).get('href')]
+        except:
+            raise DirectDownloadLinkException("ERROR: Link File tidak ditemukan!")
     return final_link[0]
 
 
@@ -1285,7 +1290,6 @@ def pake(url: str) -> str:
     - Dood (Slow)
     - Vidstream (Untested)
     """
-    
     base = "https://dd-cdn.pakai.eu.org/download?url="  # For bypass different IP
     req = requests.get(f"https://api.pake.tk/dood?url={url}")
     if req.status_code != 200:
