@@ -37,7 +37,7 @@ anonfilesBaseSites = ['anonfiles.com', 'hotfile.io', 'bayfiles.com', 'megaupload
                       'filechan.org', 'myfile.is', 'vshare.is', 'rapidshare.nu', 'lolabits.se',
                       'openload.cc', 'share-online.is', 'upvid.cc', 'zippysha.re']
 
-dood_sites = ['dooood.com', 'doods.pro', 'dood.yt']
+pake_sites = ['doodstream.com', 'dooood.com', 'doods.pro', 'dood.yt']
 
 nurlresolver_sites = ['send.cm']
 
@@ -130,8 +130,8 @@ def direct_link_generator(link: str):
         return link if domain == "static.romsget.io" else romsget(link)
     elif "hexupload.net" in domain:
         return hexupload(link)
-    elif any(x in domain for x in dood_sites):
-        return doodstream(link)
+    elif any(x in domain for x in pake_sites):
+        return pake(link)
     elif any(x in domain for x in nurlresolver_sites):
         return nurlresolver(link)
     else:
@@ -193,17 +193,102 @@ def uptobox(url: str) -> str:
 
 
 def mediafire(url: str) -> str:
+    if '/folder/' in url:
+        return mediafireFolder(url)
     if final_link := findall(r'https?:\/\/download\d+\.mediafire\.com\/\S+\/\S+\/\S+', url):
         return final_link[0]
-    cget = create_scraper().request
     try:
-        url = cget('get', url).url
-        page = cget('get', url).text
+        with requests.Session() as scraper:
+            page = scraper.get(url).text
     except Exception as e:
         raise DirectDownloadLinkException(f"ERROR: {e.__class__.__name__}")
     if not (final_link := findall(r"\'(https?:\/\/download\d+\.mediafire\.com\/\S+\/\S+\/\S+)\'", page)):
         raise DirectDownloadLinkException("ERROR: Link File tidak ditemukan!")
     return final_link[0]
+
+
+def mediafireFolder(url: str):
+    try:
+        raw = url.split('/', 4)[-1]
+        folderkey = raw.split('/', 1)[0]
+    except:
+        raise DirectDownloadLinkException('ERROR: Link Folder tidak ditemukan!')
+
+    details = {'contents': [], 'title': '', 'total_size': 0, 'header': ''}
+    session = requests.Session()
+
+    try:
+        _json = session.post('https://www.mediafire.com/api/1.4/folder/get_info.php', data={
+            'recursive': 'yes',
+            'folder_key': folderkey,
+            'response_format': 'json'
+        }).json()
+    except Exception as e:
+        session.close()
+        raise DirectDownloadLinkException(f"ERROR: {e.__class__.__name__} ketika mendapatkan Info Folder")
+
+    _res = _json['response']
+    if 'folder_info' not in _res:
+        session.close()
+        if 'message' in _res:
+            raise DirectDownloadLinkException(f"ERROR: {_res['message']}")
+        raise DirectDownloadLinkException("ERROR: Info Folder tidak ditemukan!")
+    details['title'] = _res['folder_info']['name']
+
+    def __scraper(url):
+        try:
+            html = etree.HTML(session.get(url).text)
+        except:
+            return
+        if final_link := html.xpath("//a[@id='downloadButton']/@href"):
+            return final_link[0]
+
+    def __get_content(folderKey, folderPath='', content_type='folders'):
+        params = {
+            'content_type': content_type,
+            'folder_key': folderKey,
+            'response_format': 'json',
+        }
+        try:
+            _json = session.get(
+                'https://www.mediafire.com/api/1.4/folder/get_content.php', params=params).json()
+        except Exception as e:
+            raise DirectDownloadLinkException(f"ERROR: {e.__class__.__name__} ketika mendapatkan File!")
+        _res = _json['response']
+        _folder_content = _res['folder_content']
+        if content_type == 'folders':
+            folders = _folder_content['folders']
+            for folder in folders:
+                if not folderPath:
+                    newFolderPath = path.join(details['title'], folder["name"])
+                else:
+                    newFolderPath = path.join(folderPath, folder["name"])
+                __get_content(folder['folderkey'], newFolderPath)
+            __get_content(folderKey, folderPath, 'files')
+        else:
+            files = _folder_content['files']
+            for file in files:
+                item = {}
+                if not (_url := __scraper(file['links']['normal_download'])):
+                    continue
+                item['filename'] = file["filename"]
+                if not folderPath:
+                    folderPath = details['title']
+                item['path'] = path.join(folderPath)
+                item['url'] = _url
+                if 'size' in file:
+                    size = file["size"]
+                    if isinstance(size, str) and size.isdigit():
+                        size = float(size)
+                    details['total_size'] += size
+                details['contents'].append(item)
+    try:
+        __get_content(folderkey)
+    except Exception as e:
+        session.close()
+        raise DirectDownloadLinkException(e)
+    session.close()
+    return details
 
 
 def osdn(url: str) -> str:
@@ -791,7 +876,7 @@ def linkbox(url):
     if not data:
         raise DirectDownloadLinkException('ERROR: Data tidak ditemukan!')
     if 'itemInfo' not in data:
-        raise DirectDownloadLinkException('ERROR: Item info tidak ditemukan!')
+        raise DirectDownloadLinkException('ERROR: Item Info tidak ditemukan!')
     itemInfo = data['itemInfo']
     if 'url' not in itemInfo:
         raise DirectDownloadLinkException('ERROR: Link File tidak ditemukan!')
@@ -1133,13 +1218,12 @@ def hexupload(url) -> str:
         raise DirectDownloadLinkException(f"ERROR: {e.__class__.__name__}")
 
 
+""" 
 def doodstream(url: str) -> str:
-    """ 
     DoodStream direct link generator
     Scrapped by https://github.com/arakurumi
     NOTE: Working on my machine, not work in vps (digitalocean) and heroku
     TODO: Rescrape with better method (This method sometimes got Cloudflare version 2 Captcha challenge)
-    """
 
     base_url = "https://dood.yt"
     headers = "Referer: https://dood.yt/"
@@ -1191,6 +1275,40 @@ def doodstream(url: str) -> str:
             return ddl_link, headers
     except Exception as e:
         raise DirectDownloadLinkException(f'ERROR: {e.__class__.__name__}')
+"""
+
+
+def pake(url: str) -> str:
+    """
+    URL : https://api.pake.tk
+    Supported Sites :
+    - Dood (Slow)
+    - Vidstream (Untested)
+    """
+    
+    base = "https://dd-cdn.pakai.eu.org/download?url="  # For bypass different IP
+    req = requests.get(f"https://api.pake.tk/dood?url={url}")
+    if req.status_code != 200:
+        raise DirectDownloadLinkException(f'ERROR: Gagal mendapatkan direct link!')
+    else:
+        try:
+            req = req.json()
+
+            details = {'contents':[], 'title': '', 'total_size': 0}
+
+            if not details['title']:
+                details['title'] = f"{req['data']['title']}.mp4"
+
+            item = {
+                "path": path.join(details['title']),
+                "filename": details['title'],
+                "url": f"{base}{req['data']['direct_link']}&title={details['title']}.mp4",
+            }
+       
+            details["contents"].append(item)
+        except ValueError:
+            raise DirectDownloadLinkException(f'ERROR: Gagal mendapatkan direct link!')
+    return details
 
 
 def nurlresolver(url: str) -> str:
@@ -1200,14 +1318,35 @@ def nurlresolver(url: str) -> str:
     You can check supported sites here :
     https://github.com/mnsrulz/nurlresolver/tree/master/src/libs
     """
-    req = requests.get(f"https://nurlresolver.netlify.app/.netlify/functions/server/resolve?q={url}&m=&r=false").json()
-    if len(req) == 0:
+    req = requests.get(f"https://nurlresolver.netlify.app/.netlify/functions/server/resolve?q={url}&m=&r=false")
+    if req.status_code != 200:
         raise DirectDownloadLinkException(f'ERROR: Gagal mendapatkan direct link!')
-    for link in req:
-        headers = link.get("headers")
-        direct_link = link.get("link")
-    # Parse headers for aria2c
-    for header, value in (headers or {}).items():
-        headers = f"{header}: {value}"
-    return direct_link, headers
+    try:
+        req = req.json()
+        if len(req) == 0:
+            raise DirectDownloadLinkException(f'ERROR: Gagal mendapatkan direct link!')
         
+        details = {'contents':[], 'title': '', 'total_size': 0}
+        
+        for file in req:
+            headers = file["headers"]
+            details["header"] = ' '.join(f'{key}: {value}' for key, value in headers.items())
+            
+            if not details['title']:
+                details['title'] = file["title"]
+            
+            item = {
+                "path": path.join(details['title']),
+                "filename": details['title'],
+                "url": file["link"],
+            }
+            
+            size = file["size"]
+            if isinstance(size, str) and size.isdigit():
+                size = float(size)
+            details["total_size"] += size
+
+            details["content"].append(item)
+    except ValueError:
+        raise DirectDownloadLinkException(f'ERROR: Gagal mendapatkan direct link!')
+    return details
