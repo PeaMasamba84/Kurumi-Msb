@@ -166,8 +166,8 @@ async def stats(_, message):
 async def start(client, message):
     buttons = ButtonMaker()
     buttons.ubutton(
-        "Owner", "https://t.me/save_usdt")
-    buttons.ubutton("Group", "https://t.me/arakurumi")
+        "Website", "https://www.comelmuewa84.eu.org/")
+    buttons.ubutton("Group", "https://t.me/CollectionMovie_Subtitles")
     reply_markup = buttons.build_menu(2)
     if await CustomFilters.authorized(client, message):
         start_string = f'''
