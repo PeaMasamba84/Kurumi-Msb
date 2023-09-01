@@ -444,6 +444,8 @@ Filter Notes:
 3. You can add `or` and `|` as much as you want."
 4. Take look on title if it has static special character after or before the qualities or extensions or whatever and use them in filter to avoid wrong match.
 Timeout: 60 sec.
+
+<b>By @peamasamba</b>
 """
 
 CLONE_HELP_MESSAGE = f"""
