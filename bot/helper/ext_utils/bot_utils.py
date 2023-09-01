@@ -28,17 +28,17 @@ PAGE_NO = 1
 
 
 class MirrorStatus:
-    STATUS_UPLOADING = "Unggah..."
-    STATUS_DOWNLOADING = "Unduh..."
-    STATUS_CLONING = "Kloning..."
-    STATUS_QUEUEDL = "Menunggu antrian unduh..."
-    STATUS_QUEUEUP = "Menunggu antrian unggah..."
-    STATUS_PAUSED = "Dihentikan."
-    STATUS_ARCHIVING = "Arsip..."
-    STATUS_EXTRACTING = "Ekstrak..."
-    STATUS_SPLITTING = "Membagi..."
-    STATUS_CHECKING = "Mengecek..."
-    STATUS_SEEDING = "Mengeseed..."
+    STATUS_UPLOADING = "𝑼𝒏𝒈𝒈𝒂𝒉..."
+    STATUS_DOWNLOADING = "𝑼𝒏𝒅𝒖𝒉..."
+    STATUS_CLONING = "𝑲𝒍𝒐𝒏𝒊𝒏𝒈..."
+    STATUS_QUEUEDL = "𝑴𝒆𝒏𝒖𝒏𝒈𝒈𝒖 𝒂𝒏𝒕𝒓𝒊𝒂𝒏 𝒖𝒏𝒅𝒖𝒉..."
+    STATUS_QUEUEUP = "𝑴𝒆𝒏𝒖𝒏𝒈𝒈𝒖 𝒂𝒏𝒕𝒓𝒊𝒂𝒏 𝒖𝒏𝒈𝒈𝒂𝒉..."
+    STATUS_PAUSED = "𝑫𝒊𝒉𝒆𝒏𝒕𝒊𝒌𝒂𝒏..."
+    STATUS_ARCHIVING = "𝑨𝒓𝒔𝒊𝒑..."
+    STATUS_EXTRACTING = "𝑬𝒌𝒔𝒕𝒓𝒂𝒌..."
+    STATUS_SPLITTING = "𝑴𝒆𝒎𝒃𝒂𝒈𝒊..."
+    STATUS_CHECKING = "𝑴𝒆𝒏𝒈𝒆𝒄𝒆𝒌..."
+    STATUS_SEEDING = "𝑴𝒆𝒏𝒈𝒆𝒔𝒆𝒆𝒅..."
 
 
 class setInterval:
@@ -106,9 +106,9 @@ def get_progress_bar_string(pct):
     pct = float(pct.strip('%'))
     p = min(max(pct, 0), 100)
     cFull = int(p // 8)
-    p_str = '■' * cFull
-    p_str += '□' * (12 - cFull)
-    return f"[{p_str}]"
+    p_str = '█' * cFull
+    p_str += '▒' * (12 - cFull)
+    return f"{p_str}"
 
 
 def get_readable_message():
@@ -121,37 +121,37 @@ def get_readable_message():
         globals()['STATUS_START'] = STATUS_LIMIT * (PAGES - 1)
         globals()['PAGE_NO'] = PAGES
     for download in list(download_dict.values())[STATUS_START:STATUS_LIMIT+STATUS_START]:
-        msg += f"<code>{escape(f'{download.name()}')}</code>"
+        msg += f"<code><i>{escape(f'{download.name()}')}</code></i>\n"
+        msg += f"\n</b><code>{download.status()}</code>"
         if download.status() not in [MirrorStatus.STATUS_SPLITTING, MirrorStatus.STATUS_SEEDING]:
-            msg += f"\n<b>┌┤{get_progress_bar_string(download.progress())}» <code>{download.progress()}</code></b>"
+            msg += f"\n<b>{get_progress_bar_string(download.progress())} » <code>{download.progress()}</code></b>"
             if download.message.chat.type.name in ['SUPERGROUP', 'CHANNEL']:
-                msg += f"\n<b>├ Status :</b> <a href='{download.message.link}'>{download.status()}</a>"
-            else:
-                msg += f"\n<b>├ Status :</b> <code>{download.status()}</code>"
-            msg += f"\n<b>├ Proses :</b> <code>{download.processed_bytes()}</code> dari <code>{download.size()}</code>"
-            msg += f"\n<b>├ Kec :</b> <code>{download.speed()}</code> | <b>ETA :</b> <code>{download.eta()}</code>"
+                msg += f"\n<b>Status :</b> <a href='{download.message.link}'>{download.status()}</a>"
+            else:                
+                msg += f"\n<b>Proses :</b> <code>{download.processed_bytes()}</code> dr <code>{download.size()}</code>"
+            msg += f"\n<b>Kec :</b> <code>{download.speed()}</code> | <b>ETA :</b> <code>{download.eta()}</code>"
             if hasattr(download, 'seeders_num'):
                 try:
-                    msg += f"\n<b>├ Seeders :</b> <code>{download.seeders_num()}</code> | <b>Leechers :</b> <code>{download.leechers_num()}</code>"
+                    msg += f"\n<b>Seeders :</b> <code>{download.seeders_num()}</code> | <b>Leechers :</b> <code>{download.leechers_num()}</code>"
                 except:
                     pass
         elif download.status() == MirrorStatus.STATUS_SEEDING:
             if download.message.chat.type.name in ['SUPERGROUP', 'CHANNEL']:
-                msg += f"\n<b>┌ Status :</b> <a href='{download.message.link}'>{download.status()}</a>"
+                msg += f"\n<b>Status :</b> <a href='{download.message.link}'>{download.status()}</a>"
             else:
-                msg += f"\n<b>┌ Status :</b> <code>{download.status()}</code>"
-            msg += f"\n<b>├ Ukuran :</b> <code>{download.size()}</code>"
-            msg += f"\n<b>├ Kec :</b> <code>{download.upload_speed()}</code> | <b>Diupload :</b> <code>{download.uploaded_bytes()}</code>"
-            msg += f"\n<b>├ Ratio :</b> <code>{download.ratio()}</code> | <b>Waktu :</b> <code>{download.seeding_time()}</code>"
+                msg += f"\n<b>Status :</b> <code>{download.status()}</code>"
+            msg += f"\n<b>Ukuran :</b> <code>{download.size()}</code>"
+            msg += f"\n<b>Kec :</b> <code>{download.upload_speed()}</code> | <b>Diupload :</b> <code>{download.uploaded_bytes()}</code>"
+            msg += f"\n<b>Ratio :</b> <code>{download.ratio()}</code> | <b>Waktu :</b> <code>{download.seeding_time()}</code>"
         else:
             if download.message.chat.type.name in ['SUPERGROUP', 'CHANNEL']:
-                msg += f"\n<b>┌ Status :</b> <a href='{download.message.link}'>{download.status()}</a>"
+                msg += f"\n<b>Status :</b> <a href='{download.message.link}'>{download.status()}</a>"
             else:
-                msg += f"\n<b>┌ Status :</b> <code>{download.status()}</code>"
-            msg += f"\n<b>├ Ukuran :</b> <code>{download.size()}</code>"
+                msg += f"\n<b>Status :</b> <code>{download.status()}</code>"
+            msg += f"\n<b>Ukuran :</b> <code>{download.size()}</code>"
         # <a href='tg://user?id={download.message.from_user.id}'>{download.message.from_user.first_name}</a>
-        msg += f"\n<b>├ User :</b> <code>{download.message.from_user.first_name}</code> | <b>ID :</b> <code>{download.message.from_user.id}</code>"
-        msg += f"\n<b>└ Stop :</b> <code>/{BotCommands.CancelMirror[0]} {download.gid()}</code>\n\n"
+        msg += f"\n<b>User :</b> <code>{download.message.from_user.first_name}</code> | <b>ID :</b> <code>{download.message.from_user.id}</code>"
+        msg += f"\n<b>Stop :</b> <code>/{BotCommands.CancelMirror[0]} {download.gid()}</code>\n\n"
     if len(msg) == 0:
         return None, None
     dl_speed = 0
@@ -183,11 +183,10 @@ def get_readable_message():
         buttons.ibutton("🪫", "status ref")
         buttons.ibutton("⫸", "status nex")
         button = buttons.build_menu(3)
-    msg += "═══❰ 𝐁𝐨𝐭 𝐌𝐢𝐫𝐫𝐨𝐫 𝐂𝐌𝐓 ❱═══"
-    msg += f"\n<b>🅲🄿🆄 :</b> <code>{cpu_percent()}%</code> | <b>🆁🄰🅼 :</b> <code>{virtual_memory().percent}%</code>"    
-    msg += f"\n<b>🆃🄳🅻 :</b> <code>{get_readable_file_size(net_io_counters().bytes_recv)}</code> | <b>🆃🅄🅻 :</b> <code>{get_readable_file_size(net_io_counters().bytes_sent)}</code>"
-    msg += f"\n<b>🄳🅸🆂🄺 :</b> <code>{get_readable_file_size(disk_usage(config_dict['DOWNLOAD_DIR']).free)}</code> | <b>🅃🅸🅼🄴 :</b> <code>{get_readable_time(time() - botStartTime)}</code>"
-    msg += f"\n<b>▼ :</b> <code>{get_readable_file_size(dl_speed)}/s</code> | <b>▲ :</b> <code>{get_readable_file_size(up_speed)}/s</code>"
+    msg += "═══❰ 𝐁𝐨𝐭 𝐌𝐢𝐫𝐫𝐨𝐫 𝐂𝐌𝐓 ❱═══"      
+    msg += f"\n<b>TDL :</b> <code>{get_readable_file_size(net_io_counters().bytes_recv)}</code> | <b>TUL :</b> <code>{get_readable_file_size(net_io_counters().bytes_sent)}</code>"
+    msg += f"\n<b>DISK :</b> <code>{get_readable_file_size(disk_usage(config_dict['DOWNLOAD_DIR']).free)}</code> | <b>TIME :</b> <code>{get_readable_time(time() - botStartTime)}</code>"
+    msg += f"\n<b>⧩ :</b> <code>{get_readable_file_size(dl_speed)}/s</code> | <b>◭ :</b> <code>{get_readable_file_size(up_speed)}/s</code>"
     return msg, button
 
 
