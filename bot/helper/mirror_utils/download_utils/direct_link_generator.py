@@ -9,20 +9,23 @@ than the modifications. See https://github.com/AvinashReddy3108/PaperplaneExtend
 for original authorship. """
 import json
 import requests
+
 from base64 import b64decode
+from bs4 import BeautifulSoup
+from cloudscraper import create_scraper
 from hashlib import sha256
 from http.cookiejar import MozillaCookieJar
 from json import loads
-from os import path
-from re import findall, match, search, sub
-from time import sleep
-from urllib.parse import parse_qs, quote, unquote, urlparse
-from uuid import uuid4
-
-from bs4 import BeautifulSoup
-from cloudscraper import create_scraper
 from lk21 import Bypass
 from lxml import etree
+from os import path
+from re import findall, match, search, sub
+from requests.adapters import HTTPAdapter
+from threading import Thread
+from time import sleep
+from urllib.parse import parse_qs, quote, unquote, urlparse
+from urllib3.util.retry import Retry
+from uuid import uuid4
 
 from bot import config_dict
 from bot.helper.ext_utils.bot_utils import get_readable_time, is_share_link
@@ -216,29 +219,54 @@ def mediafireFolder(url: str):
     try:
         raw = url.split('/', 4)[-1]
         folderkey = raw.split('/', 1)[0]
+        folderkey = folderkey.split(',')
     except:
         raise DirectDownloadLinkException('ERROR: Link Folder tidak ditemukan!')
-
+    if len(folderkey) == 1:
+        folderkey = folderkey[0]
     details = {'contents': [], 'title': '', 'total_size': 0, 'header': ''}
-    session = requests.Session()
+    
+    session = requests.session()
+    adapter = HTTPAdapter(max_retries=Retry(
+        total=10, read=10, connect=10, backoff_factor=0.3))
+    session.mount("http://", adapter)
+    session.mount("https://", adapter)
+    session = create_scraper(
+        browser={"browser": "firefox", "platform": "windows", "mobile": False},
+        delay=10,
+        sess=session,
+    )
+    folder_infos = []
+
+    def __get_info(folderkey):
+        try:
+            if isinstance(folderkey, list):
+                folderkey = ','.join(folderkey)
+            _json = session.post('https://www.mediafire.com/api/1.5/folder/get_info.php', data={
+                'recursive': 'yes',
+                'folder_key': folderkey,
+                'response_format': 'json'
+            }).json()
+        except Exception as e:
+            raise DirectDownloadLinkException(f"ERROR: {e.__class__.__name__} ketika mencoba mendapatkan Info Folder!")
+        _res = _json['response']
+        if 'folder_infos' in _res:
+            folder_infos.extend(_res['folder_infos'])
+        elif 'folder_info' in _res:
+            folder_infos.append(_res['folder_info'])
+        elif 'message' in _res:
+            raise DirectDownloadLinkException(f"ERROR: {_res['message']}")
+        else:
+            raise DirectDownloadLinkException("ERROR: Info Folder tidak ditemukan!")
+
 
     try:
-        _json = session.post('https://www.mediafire.com/api/1.4/folder/get_info.php', data={
-            'recursive': 'yes',
-            'folder_key': folderkey,
-            'response_format': 'json'
-        }).json()
+        __get_info(folderkey)
     except Exception as e:
-        session.close()
-        raise DirectDownloadLinkException(f"ERROR: {e.__class__.__name__} ketika mendapatkan Info Folder")
+        raise DirectDownloadLinkException(e)
 
-    _res = _json['response']
-    if 'folder_info' not in _res:
-        session.close()
-        if 'message' in _res:
-            raise DirectDownloadLinkException(f"ERROR: {_res['message']}")
-        raise DirectDownloadLinkException("ERROR: Info Folder tidak ditemukan!")
-    details['title'] = _res['folder_info']['name']
+    if isinstance(folderkey, str):
+        details['title'] = folder_infos[0]["name"]
 
     def __scraper(url):
         try:
@@ -249,25 +277,26 @@ def mediafireFolder(url: str):
             return final_link[0]
 
     def __get_content(folderKey, folderPath='', content_type='folders'):
-        params = {
-            'content_type': content_type,
-            'folder_key': folderKey,
-            'response_format': 'json',
-        }
         try:
-            _json = session.get(
-                'https://www.mediafire.com/api/1.4/folder/get_content.php', params=params).json()
+            params = {
+                'content_type': content_type,
+                'folder_key': folderKey,
+                'response_format': 'json',
+            }
+            _json = session.get('https://www.mediafire.com/api/1.5/folder/get_content.php', params=params).json()
         except Exception as e:
-            raise DirectDownloadLinkException(f"ERROR: {e.__class__.__name__} ketika mendapatkan File!")
+            raise DirectDownloadLinkException(f"ERROR: {e.__class__.__name__} ketika mencoba mendapatkan Info File!")
         _res = _json['response']
+        if 'message' in _res:
+            raise DirectDownloadLinkException(f"ERROR: {_res['message']}")
         _folder_content = _res['folder_content']
         if content_type == 'folders':
             folders = _folder_content['folders']
             for folder in folders:
-                if not folderPath:
-                    newFolderPath = path.join(details['title'], folder["name"])
-                else:
+                if folderPath:
                     newFolderPath = path.join(folderPath, folder["name"])
+                else:
+                    newFolderPath = path.join(folder["name"])
                 __get_content(folder['folderkey'], newFolderPath)
             __get_content(folderKey, folderPath, 'files')
         else:
@@ -288,7 +317,14 @@ def mediafireFolder(url: str):
                     details['total_size'] += size
                 details['contents'].append(item)
     try:
-        __get_content(folderkey)
+        threads = []
+        for folder in folder_infos:
+            thread = Thread(target=__get_content, args=(folder['folderkey'], folder['name']))
+            threads.append(thread)
+        for thread in threads:
+            thread.start()
+        for thread in threads:
+            thread.join()
     except Exception as e:
         session.close()
         raise DirectDownloadLinkException(e)
@@ -352,7 +388,7 @@ def letsupload(url: str) -> str:
     if direct_link := findall(r"(https?://letsupload\.io\/.+?)\'", res.text):
         return direct_link[0]
     else:
-        raise DirectDownloadLinkException('ERROR: Link file tidak ditemukan!')
+        raise DirectDownloadLinkException('ERROR: Link File tidak ditemukan!')
 
 
 def anonfilesBased(url: str) -> str:
@@ -419,7 +455,7 @@ def onedrive(link: str) -> str:
     except Exception as e:
         raise DirectDownloadLinkException(f'ERROR: {e.__class__.__name__}')
     if "@content.downloadUrl" not in resp:
-        raise DirectDownloadLinkException('ERROR: Link file tidak ditemukan!')
+        raise DirectDownloadLinkException('ERROR: Link File tidak ditemukan!')
     return resp['@content.downloadUrl']
 
 
@@ -534,7 +570,7 @@ def fichier(link: str) -> str:
                     "ERROR: 1Fichier sedang limit!")
         elif "protect access" in str(str_2).lower():
             raise DirectDownloadLinkException(
-                "ERROR: Link ini memerlukan password!\n\n- Masukkan password dengan <code>::</code> setelah link dan masukkan password setelah tanda <code>::</code>\n\n<b>Contoh :</b> https://1fichier.com/?smmtd8twfpm66awbqz04::love you\n\n* <code>::</code> Tanpa spasi!\n* Untuk password bisa menggunakan spasi!")
+                "ERROR: Link ini memerlukan password!\n\nMasukkan password dengan menambahkan <code>::</code> setelah link dan masukkan password setelah tanda <code>::</code>\n\n<b>Contoh :</b> https://1fichier.com/?smmtd8twfpm66awbqz04::love you\n\n* <code>::</code> Tanpa spasi!\n* Untuk password bisa menggunakan spasi!")
         else:
             raise DirectDownloadLinkException(
                 "ERROR: Link File tidak ditemukan!")
