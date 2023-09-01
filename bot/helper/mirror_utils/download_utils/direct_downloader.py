@@ -27,6 +27,9 @@ async def add_direct_download(details, path, listener, foldername):
 
     if not foldername:
         foldername = details['title']
+    if not foldername:
+        await sendMessage(listener.message, '<b>Nama Folder tidak ditemukan! Tambahkan</b> <code>-n Nama Baru</code> <b>untuk memberi nama Folder baru!</b>')
+        return
     msg, button = await stop_duplicate_check(foldername, listener)
     if msg:
         await sendMessage(listener.message, msg, button)
