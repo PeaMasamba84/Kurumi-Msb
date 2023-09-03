@@ -125,7 +125,7 @@ class MirrorLeechListener:
         if self.join and await aiopath.isdir(dl_path):
             await join_files(dl_path)
 
-        if self.isLeech or self.compress:
+        if self.isLeech:
             LEECH_SPLIT_SIZE = self.user_dict.get('split_size') or config_dict['LEECH_SPLIT_SIZE']
             if self.upDest.startswith('b:') and LEECH_SPLIT_SIZE > 2097152000:
                 LEECH_SPLIT_SIZE = 2097152000
@@ -138,7 +138,9 @@ class MirrorLeechListener:
 
             MAX_SIZE = MAX_SPLIT_SIZE if user_leech else 2097152000
             LEECH_SPLIT_SIZE = min(LEECH_SPLIT_SIZE, MAX_SIZE)
-
+        else:
+            LEECH_SPLIT_SIZE = 0
+            
         if self.extract:
             pswd = self.extract if isinstance(self.extract, str) else ''
             try:
