@@ -162,11 +162,15 @@ def uptobox(url: str) -> str:
     """ Uptobox direct link generator
     based on https://github.com/jovanzers/WinTenCermin and https://github.com/sinoobie/noobie-mirror """
     try:
-        link = findall(r'\bhttps?://.*uptobox\.com\S+', url)[0]
+        urls = findall(r'\bhttps?://.*uptobox\.com\S+', url)[0]
     except IndexError:
-        raise DirectDownloadLinkException("No Uptobox links found")
-    if link := findall(r'\bhttps?://.*\.uptobox\.com/dl\S+', url):
-        return link[0]
+        raise DirectDownloadLinkException("ERROR: Link Uptobox tidak ditemukan!")
+    if urls := findall(r'\bhttps?://.*\.uptobox\.com/dl\S+', url):
+        return urls[0]
+    if "::" in url:
+        pswd = url.split("::")[-1]
+    else:
+        pswd = None
     cget = create_scraper().request
     try:
         file_id = findall(r'\bhttps?://.*uptobox\.com/(\w+)', url)[0]
@@ -174,6 +178,8 @@ def uptobox(url: str) -> str:
             file_link = f'https://uptobox.com/api/link?token={UPTOBOX_TOKEN}&file_code={file_id}'
         else:
             file_link = f'https://uptobox.com/api/link?file_code={file_id}'
+        if pswd:
+            file_link = file_link + f'&password={pswd}'
         res = cget('get', file_link).json()
     except Exception as e:
         raise DirectDownloadLinkException(f"ERROR: {e.__class__.__name__}")
@@ -183,6 +189,8 @@ def uptobox(url: str) -> str:
         sleep(1)
         waiting_token = res["data"]["waitingToken"]
         sleep(res["data"]["waiting"])
+    elif res['statusCode'] == 17:
+        raise DirectDownloadLinkException(f"ERROR: Link File ini memerlukan password!\nTambahkan password dengan menambahkan tanda :: setelah link dan masukan password setelah tanda :: tanpa menggunakan spasi (Password bisa menggunakan spasi)!\n\nContoh :\n{url}::ini password")
     elif res['statusCode'] == 39:
         raise DirectDownloadLinkException(
             f"ERROR: Uptobox sedang limit! Silahkan tunggu {get_readable_time(res['data']['waiting'])} lagi!")
@@ -265,8 +273,7 @@ def mediafireFolder(url: str):
     except Exception as e:
         raise DirectDownloadLinkException(e)
 
-    if isinstance(folderkey, str):
-        details['title'] = folder_infos[0]["name"]
+    details['title'] = folder_infos[0]["name"]
 
     def __scraper(url):
         try:
@@ -570,7 +577,7 @@ def fichier(link: str) -> str:
                     "ERROR: 1Fichier sedang limit!")
         elif "protect access" in str(str_2).lower():
             raise DirectDownloadLinkException(
-                "ERROR: Link ini memerlukan password!\n\nMasukkan password dengan menambahkan <code>::</code> setelah link dan masukkan password setelah tanda <code>::</code>\n\n<b>Contoh :</b> https://1fichier.com/?smmtd8twfpm66awbqz04::love you\n\n* <code>::</code> Tanpa spasi!\n* Untuk password bisa menggunakan spasi!")
+                f"ERROR: Link File ini memerlukan password!\nTambahkan password dengan menambahkan tanda :: setelah link dan masukan password setelah tanda :: tanpa menggunakan spasi (Password bisa menggunakan spasi)!\n\nContoh :\n{link}::ini password")
         else:
             raise DirectDownloadLinkException(
                 "ERROR: Link File tidak ditemukan!")
@@ -978,7 +985,7 @@ def gofile(url):
         except Exception as e:
             raise DirectDownloadLinkException(f"ERROR: {e.__class__.__name__}")
         if _json['status'] in 'error-passwordRequired':
-            raise DirectDownloadLinkException(f'ERROR: Link File ini memerlukan password!\nTambahkan dengan <b>::</b> setelah link dan masukan password setelah tanda tanpa spasi!\n\nContoh :\n{url}::ini password')
+            raise DirectDownloadLinkException(f'ERROR: Link File ini memerlukan password!\nTambahkan password dengan menambahkan tanda :: setelah link dan masukan password setelah tanda :: tanpa menggunakan spasi (Password bisa menggunakan spasi)!\n\nContoh :\n{url}::ini password')
         if _json['status'] in 'error-passwordWrong':
             raise DirectDownloadLinkException('ERROR: Password salah!')
         if _json['status'] in 'error-notFound':
@@ -1336,8 +1343,7 @@ def pake(url: str) -> str:
 
             details = {'contents':[], 'title': '', 'total_size': 0}
 
-            if not details['title']:
-                details['title'] = f"{req['data']['title']}.mp4"
+            details['title'] = f"{req['data']['title']}.mp4"
 
             item = {
                 "path": path.join(details['title']),
@@ -1372,8 +1378,7 @@ def nurlresolver(url: str) -> str:
             headers = file["headers"]
             details["header"] = ' '.join(f'{key}: {value}' for key, value in headers.items())
             
-            if not details['title']:
-                details['title'] = file["title"]
+            details['title'] = file["title"]
             
             item = {
                 "path": path.join(details['title']),
