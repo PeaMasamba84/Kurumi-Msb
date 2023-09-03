@@ -135,8 +135,7 @@ def get_readable_message():
                     pass
         elif download.status() == MirrorStatus.STATUS_SEEDING:
             if download.message.chat.type.name in ['SUPERGROUP', 'CHANNEL']:                
-                msg += f"\n<b>Status :</b> <code>{download.status()}</code>"
-            msg += f"\n<b>Ukuran :</b> <code>{download.size()}</code>"
+                msg += f"\n<b>Ukuran :</b> <code>{download.size()}</code>"
             msg += f"\n<b>Kec :</b> <code>{download.upload_speed()}</code> | <b>Diupload :</b> <code>{download.uploaded_bytes()}</code>"
             msg += f"\n<b>Ratio :</b> <code>{download.ratio()}</code> | <b>Waktu :</b> <code>{download.seeding_time()}</code>"
         else:                                
