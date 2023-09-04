@@ -80,6 +80,9 @@ Note: Doesn't work with torrents.
 <b>Direct link authorization</b>: -au -ap
 <code>/{BotCommands.MirrorCommand[0]}</code> link -au username -ap password
 
+<b>Direct link custom headers</b>: -h
+<code>/cmd</code> link -h Key: value Key1: value1
+
 <b>Extract/Zip</b>: -e -z
 <code>/{BotCommands.MirrorCommand[0]}</code> link -e password (extract password protected)
 <code>/{BotCommands.MirrorCommand[0]}</code> link -z password (zip password protected)
@@ -168,6 +171,9 @@ Note: Doesn't work with torrents.
 
 <b>Direct link authorization</b>: -au -ap
 <code>/{BotCommands.LeechCommand[0]}</code> link -au username -ap password
+
+<b>Direct link custom headers</b>: -h
+<code>/cmd</code> link -h Key: value Key1: value1
 
 <b>Extract/Zip</b>: -e -z
 <code>/{BotCommands.LeechCommand[0]}</code> link -e password (extract password protected)
