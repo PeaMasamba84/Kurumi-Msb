@@ -245,6 +245,8 @@ class YoutubeDLHelper:
 
         msg, button = await stop_duplicate_check(name, self.__listener)
         if msg:
+            for style_ in ["<b>", "</b>", "<code>", "</code>"]:
+                msg = msg.replace(style_, "")
             await self.__listener.onDownloadError(msg, button)
             return
 
