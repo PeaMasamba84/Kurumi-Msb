@@ -56,6 +56,8 @@ async def __stop_duplicate(tor):
     name = tor.content_path.rsplit('/', 1)[-1].rsplit('.!qB', 1)[0]
     msg, button = await stop_duplicate_check(name, listener)
     if msg:
+        for style_ in ["<b>", "</b>", "<code>", "</code>"]:
+            msg = msg.replace(style_, "")
         __onDownloadError(msg, tor, button)
 
 
