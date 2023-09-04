@@ -150,23 +150,11 @@ def get_readable_message():
     for download in download_dict.values():
         tstatus = download.status()
         if tstatus == MirrorStatus.STATUS_DOWNLOADING:
-            spd = download.speed()
-            if 'K' in spd:
-                dl_speed += float(spd.split('K')[0]) * 1024
-            elif 'M' in spd:
-                dl_speed += float(spd.split('M')[0]) * 1048576
+            dl_speed += text_size_to_bytes(download.speed())
         elif tstatus == MirrorStatus.STATUS_UPLOADING:
-            spd = download.speed()
-            if 'K' in spd:
-                up_speed += float(spd.split('K')[0]) * 1024
-            elif 'M' in spd:
-                up_speed += float(spd.split('M')[0]) * 1048576
+            up_speed += text_size_to_bytes(download.speed())
         elif tstatus == MirrorStatus.STATUS_SEEDING:
-            spd = download.upload_speed()
-            if 'K' in spd:
-                up_speed += float(spd.split('K')[0]) * 1024
-            elif 'M' in spd:
-                up_speed += float(spd.split('M')[0]) * 1048576
+            up_speed +=text_size_to_bytes(download.upload_speed())
     if tasks > STATUS_LIMIT:
         msg += f"<b>Halaman :</b> <code>{PAGE_NO}/{PAGES}</code> | <b>Total Tugas :</b> <code>{tasks}</code>\n"
         buttons = ButtonMaker()
@@ -178,6 +166,7 @@ def get_readable_message():
     msg += f"\n<b>TDL :</b> <code>{get_readable_file_size(net_io_counters().bytes_recv)}</code> | <b>TUL :</b> <code>{get_readable_file_size(net_io_counters().bytes_sent)}</code>"
     msg += f"\n<b>DISK :</b> <code>{get_readable_file_size(disk_usage(config_dict['DOWNLOAD_DIR']).free)}</code> | <b>TIME :</b> <code>{get_readable_time(time() - botStartTime)}</code>"
     msg += f"\n<b>⧩ :</b> <code>{get_readable_file_size(dl_speed)}/s</code> | <b>◭ :</b> <code>{get_readable_file_size(up_speed)}/s</code>"
+    return msg, button
     return msg, button
 
 
@@ -330,6 +319,20 @@ async def sync_to_async(func, *args, wait=True, **kwargs):
 def async_to_sync(func, *args, wait=True, **kwargs):
     future = run_coroutine_threadsafe(func(*args, **kwargs), bot_loop)
     return future.result() if wait else future
+
+
+def text_size_to_bytes(size_text):
+    size = 0
+    size_text = size_text.lower()
+    if 'k' in size_text:
+        size += float(size_text.split('k')[0]) * 1024
+    elif 'm' in size_text:
+        size += float(size_text.split('m')[0]) * 1048576
+    elif 'g' in size_text:
+        size += float(size_text.split('g')[0]) *1073741824 
+    elif 't' in size_text:
+        size += float(size_text.split('t')[0]) *1099511627776 
+    return size
 
 
 def new_thread(func):
