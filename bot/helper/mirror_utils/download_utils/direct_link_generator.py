@@ -40,17 +40,17 @@ anonfilesBaseSites = ['anonfiles.com', 'hotfile.io', 'bayfiles.com', 'megaupload
                       'filechan.org', 'myfile.is', 'vshare.is', 'rapidshare.nu', 'lolabits.se',
                       'openload.cc', 'share-online.is', 'upvid.cc', 'zippysha.re']
 
-pake_sites = ['doodstream.com', 'dooood.com', 'doods.pro', 'dood.yt']
+pake_sites = ['dood.watch', 'doodstream.com', 'dood.to', 'dood.so', 'dood.cx', 'dood.la', 'dood.ws', 'dood.sh', 'doodstream.co', 'dood.pm', 'dood.wf', 'dood.re', 'dood.video', 'dooood.com', 'dood.yt', 'dood.stream', 'doods.pro']
 
 
 def direct_link_generator(link: str):
     """ direct links generator """
     domain = urlparse(link).hostname
     if not domain:
-        raise DirectDownloadLinkException("ERROR: Invalid URL")
+        raise DirectDownloadLinkException("ERROR: URL Salah!")
     if 'youtube.com' in domain or 'youtu.be' in domain:
         raise DirectDownloadLinkException(
-            "ERROR: Use ytdl cmds for Youtube links")
+            "ERROR: Gunakan perintah ytdl untuk mengunduh Youtube!")
     elif 'yadi.sk' in domain or 'disk.yandex.com' in domain:
         return yandex_disk(link)
     elif 'mediafire.com' in domain:
@@ -169,9 +169,9 @@ def uptobox(url: str) -> str:
     if urls := findall(r'\bhttps?://.*\.uptobox\.com/dl\S+', url):
         return urls[0]
     if "::" in url:
-        pswd = url.split("::")[-1]
+        _password = url.split("::")[-1]
     else:
-        pswd = None
+        _password = None
     cget = create_scraper().request
     try:
         file_id = findall(r'\bhttps?://.*uptobox\.com/(\w+)', url)[0]
@@ -179,8 +179,8 @@ def uptobox(url: str) -> str:
             file_link = f'https://uptobox.com/api/link?token={UPTOBOX_TOKEN}&file_code={file_id}'
         else:
             file_link = f'https://uptobox.com/api/link?file_code={file_id}'
-        if pswd:
-            file_link = file_link + f'&password={pswd}'
+        if _password:
+            file_link = file_link + f'&password={_password}'
         res = cget('get', file_link).json()
     except Exception as e:
         raise DirectDownloadLinkException(f"ERROR: {e.__class__.__name__}")
@@ -506,15 +506,19 @@ def streamtape(url: str) -> str:
     """ Streamtape direct link generator
     Based on https://github.com/zevtyardt/lk21
     """
+    splitted_url = url.split("/")
+    _id = splitted_url[4] if len(splitted_url) >= 6 else splitted_url[-1]
     try:
         with requests.Session() as session:
             res = session.get(url)
     except Exception as e:
         raise DirectDownloadLinkException(f"ERROR: {e.__class__.__name__}")
-    if link := findall(r"document.*((?=id\=)[^\"']+)", res.text):
-        return f"https://streamtape.com/get_video?{link[-1]}"
-    else:
+    html = HTML(res.text)
+    if not (script := html.xpath("//script[contains(text(),'ideoooolink')]/text()")):
+        raise DirectDownloadLinkException("ERROR: Script tidak ditemukan!")
+    if not (link := findall(r"(&expires\S+)'", script[0])):
         raise DirectDownloadLinkException("ERROR: Link File tidak ditemukan!")
+    return f"https://streamtape.com/get_video?id={_id}{link[-1]}"
 
 
 def racaty(url):
@@ -748,6 +752,8 @@ def terabox(url) -> str:
         session.close()
         raise DirectDownloadLinkException(e)
     session.close()
+    if len(details['contents']) == 1:
+        return details['contents'][0]['url']
     return details
 
 
@@ -1030,6 +1036,8 @@ def gofile(url):
         session.close()
         raise DirectDownloadLinkException(e)
     session.close()
+    if len(details['contents']) == 1:
+        return (details['contents'][0]['url'], details['header'])
     return details
 
 
@@ -1050,22 +1058,35 @@ def cf_bypass(url):
 
 
 def send_cm_file(url, file_id=None):
+    if "::" in url:
+        _password = url.split("::")[-1]
+        url = url.split("::")[-2]
+    else:
+        _password = ''
+    _passwordNeed = False
     with create_scraper() as session:
         if file_id is None:
             try:
                 html = HTML(session.get(url).text)
             except Exception as e:
-                raise DirectDownloadLinkException(f'ERROR: {e.__class__.__name__}')
-            if not (file_id :=html.xpath("//input[@name='id']/@value")):
+                raise DirectDownloadLinkException(
+                    f'ERROR: {e.__class__.__name__}')
+            if html.xpath("//input[@name='password']"):
+                _passwordNeed = True
+            if not (file_id := html.xpath("//input[@name='id']/@value")):
                 raise DirectDownloadLinkException('ERROR: Link File tidak ditemukan!')
         try:
-            _res = session.post(
-                'https://send.cm/', data={'op': 'download2', 'id': file_id}, allow_redirects=False)
+            data = {'op': 'download2', 'id': file_id}
+            if _password and _passwordNeed:
+                data["password"] = _password
+            _res = session.post('https://send.cm/', data=data, allow_redirects=False)
             if 'Location' in _res.headers:
                 return (_res.headers['Location'], 'Referer: https://send.cm/')
-            raise DirectDownloadLinkException("ERROR: Direct Link tidak ditemukan!")
         except Exception as e:
             raise DirectDownloadLinkException(f'ERROR: {e.__class__.__name__}')
+    if _passwordNeed:
+        raise DirectDownloadLinkException(f"ERROR: Link File ini memerlukan password!\nTambahkan password dengan menambahkan tanda :: setelah link dan masukan password setelah tanda :: tanpa menggunakan spasi (Password bisa menggunakan spasi)!\n\nContoh :\n{url}::ini password")
+    raise DirectDownloadLinkException("ERROR: Direct Link tidak ditemukan!")
 
 
 def send_cm(url: str):
@@ -1149,9 +1170,14 @@ def send_cm(url: str):
         session.close()
         raise DirectDownloadLinkException(f"ERROR: {e.__class__.__name__} ketika mencoba mendapatkan Konten!")
     session.close()
+    if len(details['contents']) == 1:
+        return (details['contents'][0]['url'], details['header'])
     return details
 
-def doods(url):
+
+def doods(url: str):
+    if "/e/" in url:
+        url = url.replace("/e/", "/d/")
     parsed_url = urlparse(url)
     session = create_scraper()
     try:
