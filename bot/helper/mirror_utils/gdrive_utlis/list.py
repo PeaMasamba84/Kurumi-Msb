@@ -28,7 +28,7 @@ async def id_updates(_, query, obj):  # sourcery skip: avoid-builtin-shadow
     message = query.message
     data = query.data.split()
     if data[1] == 'cancel':
-        obj.id = 'Tugas dibatalkan oleh User!'
+        obj.id = '<b>Tugas dibatalkan oleh User!</b>'
         obj.is_cancelled = True
         obj.event.set()
         await deleteMessage(message)
