@@ -199,12 +199,12 @@ async def _mirror_leech(client, message, isQbit=False, isLeech=False, sameDir=No
             if "uptobox" in link:
                 ddl = await sendMessage(
                     message,
-                    f"<b>Generating Uptobox Direct Link (±30s) :</b>\n<code>{link}</code>"
+                    f"<b>Membuat Link Akses Uptobox (±30s) :</b>\n<code>{link}</code>"
                 )
             else:
                 ddl = await sendMessage(
                     message,
-                    f"<b>Generating Direct Link :</b>\n<code>{link}</code>"
+                    f"<b>Membuat Link Akses :</b>\n<code>{link}</code>"
                 )
             try:
                 link = await sync_to_async(direct_link_generator, link)
@@ -212,14 +212,16 @@ async def _mirror_leech(client, message, isQbit=False, isLeech=False, sameDir=No
                     link, headers = link
                 if isinstance(link, str):
                     LOGGER.info(f"Generated link: {link}")
-                    await editMessage(ddl, f"<b>Generated Direct Link :</b>\n<code>{link}</code>")
+                    await editMessage(ddl, f"<b>Membuat Link Akses :</b>\n<code>{link}</code>")
                     await sleep(3)
                 await deleteMessage(ddl)
             except DirectDownloadLinkException as e:
                 await sleep(1)
                 await deleteMessage(ddl)
-                LOGGER.info(str(e))
-                if str(e).startswith('ERROR:'):
+                e = str(e)
+                if "password" not in e:
+                    LOGGER.info(e)
+                if e.startswith('ERROR:'):
                     await sendMessage(message, str(e))
                     return
 
