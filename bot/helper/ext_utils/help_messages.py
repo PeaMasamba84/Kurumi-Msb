@@ -470,3 +470,17 @@ Note: If -up not specified then rclone destination will be the RCLONE_PATH from 
 
 <b>By @peamasamba</b>
 """
+
+PASSWORD_ERROR_MESSAGE = """
+Link File ini memerlukan password!
+Tambahkan password dengan menambahkan tanda <code>::</code> setelah link dan masukan password setelah tanda!
+
+<b>Contoh :</b>
+<code>/mirror {}::ini password</code>
+
+<b>Note :</b>
+- Tidak ada spasi setelah tanda <code>::</code>
+- Password bisa menggunakan spasi
+
+<b>By @peamasamba</b>
+"""
