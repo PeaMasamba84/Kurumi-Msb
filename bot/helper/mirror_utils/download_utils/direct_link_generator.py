@@ -30,6 +30,7 @@ from uuid import uuid4
 from bot import config_dict
 from bot.helper.ext_utils.bot_utils import get_readable_time, is_share_link, text_size_to_bytes
 from bot.helper.ext_utils.exceptions import DirectDownloadLinkException
+from bot.helper.ext_utils.help_messages import PASSWORD_ERROR_MESSAGE
 
 _caches = {}
 
@@ -91,6 +92,8 @@ def direct_link_generator(link: str):
         return gofile(link)
     elif 'send.cm' in domain:
         return send_cm(link)
+    elif 'easyupload.io' in domain:
+        return easyupload(link)
     # elif 'doods.pro' in domain:
     #     return doods(link)
     elif any(x in domain for x in pake_sites):
@@ -143,6 +146,19 @@ def direct_link_generator(link: str):
             f'Tidak ada fungsi Generator Direct Link untuk {link}')
 
 
+def get_captcha_token(session, params):
+    recaptcha_api = 'https://www.google.com/recaptcha/api2'
+    res = session.get(f'{recaptcha_api}/anchor', params=params)
+    anchor_html = HTML(res.text)
+    if not (anchor_token:= anchor_html.xpath('//input[@id="recaptcha-token"]/@value')):
+        return
+    params['c'] = anchor_token[0]
+    params['reason'] = 'q'
+    res = session.post(f'{recaptcha_api}/reload', params=params)
+    if token := findall(r'"rresp","(.*?)"', res.text):
+        return token[0]
+
+
 def yandex_disk(url: str) -> str:
     """ Yandex.Disk direct link generator
     Based on https://github.com/wldhx/yadisk-direct """
@@ -191,7 +207,7 @@ def uptobox(url: str) -> str:
         waiting_token = res["data"]["waitingToken"]
         sleep(res["data"]["waiting"])
     elif res['statusCode'] == 17:
-        raise DirectDownloadLinkException(f"ERROR: Link File ini memerlukan password!\nTambahkan password dengan menambahkan tanda :: setelah link dan masukan password setelah tanda :: tanpa menggunakan spasi (Password bisa menggunakan spasi)!\n\nContoh :\n{url}::ini password")
+        raise DirectDownloadLinkException(f"ERROR:\n{PASSWORD_ERROR_MESSAGE.format(url)}")
     elif res['statusCode'] == 39:
         raise DirectDownloadLinkException(
             f"ERROR: Uptobox sedang limit! Silahkan tunggu {get_readable_time(res['data']['waiting'])} lagi!")
@@ -582,7 +598,7 @@ def fichier(link: str) -> str:
                     "ERROR: 1Fichier sedang limit!")
         elif "protect access" in str(str_2).lower():
             raise DirectDownloadLinkException(
-                f"ERROR: Link File ini memerlukan password!\nTambahkan password dengan menambahkan tanda :: setelah link dan masukan password setelah tanda :: tanpa menggunakan spasi (Password bisa menggunakan spasi)!\n\nContoh :\n{link}::ini password")
+                f"ERROR:\n{PASSWORD_ERROR_MESSAGE.format(link)}")
         else:
             raise DirectDownloadLinkException(
                 "ERROR: Link File tidak ditemukan!")
@@ -1085,7 +1101,7 @@ def send_cm_file(url, file_id=None):
         except Exception as e:
             raise DirectDownloadLinkException(f'ERROR: {e.__class__.__name__}')
     if _passwordNeed:
-        raise DirectDownloadLinkException(f"ERROR: Link File ini memerlukan password!\nTambahkan password dengan menambahkan tanda :: setelah link dan masukan password setelah tanda :: tanpa menggunakan spasi (Password bisa menggunakan spasi)!\n\nContoh :\n{url}::ini password")
+        raise DirectDownloadLinkException(f"ERROR:\n{PASSWORD_ERROR_MESSAGE.format(url)}")
     raise DirectDownloadLinkException("ERROR: Direct Link tidak ditemukan!")
 
 
@@ -1197,6 +1213,54 @@ def doods(url: str):
     if not (link := search(r"window\.open\('(\S+)'", _res.text)):
         raise DirectDownloadLinkException("ERROR: Direct Link tidak ditemukan!")
     return (link.group(1), f'Referer: {parsed_url.scheme}://{parsed_url.hostname}/')
+
+
+def easyupload(url):
+    if "::" in url:
+        _password = url.split("::")[-1]
+        url = url.split("::")[-2]
+    else:
+        _password = ''
+    file_id = url.split("/")[-1]
+    with create_scraper() as session:
+        try:
+            _res = session.get(url)
+        except Exception as e:
+            raise DirectDownloadLinkException(f'ERROR: {e.__class__.__name__}')
+        first_page_html = HTML(_res.text)
+        if first_page_html.xpath("//h6[contains(text(),'Password Protected')]") and not _password:
+            raise DirectDownloadLinkException(f"ERROR:\n{PASSWORD_ERROR_MESSAGE.format(url)}")
+        if not (match := search(r'https://eu(?:[1-9][0-9]?|100)\.easyupload\.io/action\.php', _res.text)):
+            raise DirectDownloadLinkException("ERROR: Link EasyUpload tidak ditemukan!")
+        action_url = match.group()
+        session.headers.update({'referer': 'https://easyupload.io/'})
+        recaptcha_params = {
+            'k': '6LfWajMdAAAAAGLXz_nxz2tHnuqa-abQqC97DIZ3',
+            'ar': '1',
+            'co': 'aHR0cHM6Ly9lYXN5dXBsb2FkLmlvOjQ0Mw..',
+            'hl': 'en',
+            'v': '0hCdE87LyjzAkFO5Ff-v7Hj1',
+            'size': 'invisible',
+            'cb': 'c3o1vbaxbmwe'
+        }
+        if not (captcha_token :=get_captcha_token(session, recaptcha_params)):
+            raise DirectDownloadLinkException('ERROR: Token Captcha tidak ditemukan!')
+        try:
+            data = {'type': 'download-token',
+                    'url': file_id,
+                    'value': _password,
+                    'captchatoken': captcha_token,
+                    'method': 'regular'}
+            json_resp = session.post(url=action_url, data=data).json()
+        except Exception as e:
+            raise DirectDownloadLinkException(f'ERROR: {e.__class__.__name__}')
+    if 'download_link' in json_resp:
+        return json_resp['download_link']
+    elif 'data' in json_resp:
+        raise DirectDownloadLinkException(
+            f"ERROR: {json_resp['data']}")
+    raise DirectDownloadLinkException(
+        "ERROR: Direct Link tidak ditemukan!")
 
 
 # NOTE: Added from other repositories
