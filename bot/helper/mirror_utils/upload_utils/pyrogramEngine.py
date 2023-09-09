@@ -74,9 +74,7 @@ class TgUploader:
             self.__thumb = None
         if IS_PREMIUM_USER and (self.__listener.user_dict.get('user_leech', False) or 'user_leech' not in self.__listener.user_dict and config_dict['USER_LEECH']):
             self.__user_leech = True
-        self.__upload_dest = self.__listener.upDest or self.__listener.user_dict.get(
-            'leech_dest') or self.__listener.message.chat.id
-        self.__thread_id = int(self.__listener.message.message_thread_id) if self.__listener.message.chat.is_forum else None
+        self.__upload_dest = self.__listener.user_dict.get('leech_dest', None) or self.__listener.message.chat.id
         if not isinstance(self.__upload_dest, int):
             if self.__upload_dest.startswith('b:'):
                 self.__upload_dest = self.__upload_dest.lstrip('b:')
@@ -84,8 +82,18 @@ class TgUploader:
             elif self.__upload_dest.startswith('u:'):
                 self.__upload_dest = self.__upload_dest.lstrip('u:')
                 self.__user_leech = IS_PREMIUM_USER
+            else:
+                if ":" in self.__upload_dest:
+                    self.__upload_dest = self.__upload_dest.split(":")[0]
             if self.__upload_dest.isdigit() or self.__upload_dest.startswith('-'):
                 self.__upload_dest = int(self.__upload_dest)
+        self.__thread_id = self.__listener.user_dict.get('leech_dest', None) or self.__listener.message.message_thread_id if self.__listener.message.chat.is_forum else None
+        if not isinstance(self.__thread_id, int):
+            if ":" in self.__thread_id:
+                self.__thread_id = self.__thread_id.split(":")[1]
+            if self.__thread_id.isdigit():
+                self.__thread_id = int(self.__thread_id)
+
 
     async def __msg_to_reply(self):
         if self.__upload_dest:
