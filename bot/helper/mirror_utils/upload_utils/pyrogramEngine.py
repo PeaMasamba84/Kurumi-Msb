@@ -87,12 +87,13 @@ class TgUploader:
                     self.__upload_dest = self.__upload_dest.split(":")[0]
             if self.__upload_dest.isdigit() or self.__upload_dest.startswith('-'):
                 self.__upload_dest = int(self.__upload_dest)
-        self.__thread_id = self.__listener.user_dict.get('leech_dest', None) or self.__listener.message.message_thread_id if self.__listener.message.chat.is_forum else None
-        if not isinstance(self.__thread_id, int):
-            if ":" in self.__thread_id:
-                self.__thread_id = self.__thread_id.split(":")[1]
-            if self.__thread_id.isdigit():
-                self.__thread_id = int(self.__thread_id)
+        self.__thread_id = self.__listener.user_dict.get('leech_dest', None) or (self.__listener.message.message_thread_id if self.__listener.message.chat.is_forum else None)
+        if self.__thread_id:
+            if not isinstance(self.__thread_id, int):
+                if ":" in self.__thread_id:
+                    self.__thread_id = self.__thread_id.split(":")[1]
+                if self.__thread_id.isdigit():
+                    self.__thread_id = int(self.__thread_id)
 
 
     async def __msg_to_reply(self):
