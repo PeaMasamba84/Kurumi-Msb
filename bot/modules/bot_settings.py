@@ -143,7 +143,7 @@ async def edit_variable(_, message, pre_message, key):
         if not value.endswith('/'):
             value += '/'
     elif key in ['LOG_CHAT_ID', 'DUMP_CHAT_ID', 'RSS_CHAT_ID']:
-        if value.isdigit() or value.startswith('-'):
+        if value.isdigit():
             value = int(value)
     elif key == 'STATUS_UPDATE_INTERVAL':
         value = int(value)
