@@ -296,19 +296,30 @@ class TgUploader:
                     app = bot
             else:
                 app = bot
+            # Leech Chat
+            LEECH_CHAT = False
+            if LEECH_CHAT_ID := config_dict['LEECH_CHAT_ID']:
+                LEECH_CHAT = True
+                if ":" in LEECH_CHAT_ID:
+                    LEECH_CHAT_ID = int(LEECH_CHAT_ID.split(":")[0])
+                    LEECH_CHAT_THREAD_ID = int(LEECH_CHAT_ID.split(":")[1])
+                else:
+                    LEECH_CHAT_ID = int(LEECH_CHAT_ID)
+                    LEECH_CHAT_THREAD_ID = None
             if self.__as_doc or force_document or (not is_video and not is_audio and not is_image):
                 key = 'documents'
                 if is_video and thumb is None:
                     thumb = await take_ss(self.__up_path, None)
                 if self.__is_cancelled:
                     return
-                if DUMP_CHAT_ID := config_dict['DUMP_CHAT_ID']:
-                    self.__sent_msg = await app.send_document(chat_id=DUMP_CHAT_ID,
+                if LEECH_CHAT:
+                    self.__sent_msg = await app.send_document(chat_id=LEECH_CHAT_ID,
                                                               document=self.__up_path,
                                                               thumb=thumb,
                                                               caption=cap_mono,
                                                               force_document=True,
                                                               disable_notification=True,
+                                                              message_thread_id=LEECH_CHAT_THREAD_ID,
                                                               progress=self.__upload_progress)
                 else:
                     self.__sent_msg = await self.__listener.message.reply_document(document=self.__up_path,
@@ -343,8 +354,8 @@ class TgUploader:
                         self.__up_path = new_path
                 if self.__is_cancelled:
                     return
-                if DUMP_CHAT_ID := config_dict['DUMP_CHAT_ID']:
-                    self.__sent_msg = await app.send_video(chat_id=DUMP_CHAT_ID,
+                if LEECH_CHAT:
+                    self.__sent_msg = await app.send_video(chat_id=LEECH_CHAT_ID,
                                                            video=self.__up_path,
                                                            caption=cap_mono,
                                                            duration=duration,
@@ -353,6 +364,7 @@ class TgUploader:
                                                            thumb=thumb,
                                                            supports_streaming=True,
                                                            disable_notification=True,
+                                                           message_thread_id=LEECH_CHAT_THREAD_ID,
                                                            progress=self.__upload_progress)
                 else:
                     self.__sent_msg = await self.__listener.message.reply_video(video=self.__up_path,
@@ -371,8 +383,8 @@ class TgUploader:
                 duration, artist, title = await get_media_info(self.__up_path)
                 if self.__is_cancelled:
                     return
-                if DUMP_CHAT_ID := config_dict['DUMP_CHAT_ID']:
-                    self.__sent_msg = await app.send_audio(chat_id=DUMP_CHAT_ID,
+                if LEECH_CHAT:
+                    self.__sent_msg = await app.send_audio(chat_id=LEECH_CHAT_ID,
                                                            audio=self.__up_path,
                                                            caption=cap_mono,
                                                            duration=duration,
@@ -380,6 +392,7 @@ class TgUploader:
                                                            title=title,
                                                            thumb=thumb,
                                                            disable_notification=True,
+                                                           message_thread_id=LEECH_CHAT_THREAD_ID,
                                                            progress=self.__upload_progress)
                 else:
                     self.__sent_msg = await self.__listener.message.reply_audio(audio=self.__up_path,
@@ -395,11 +408,12 @@ class TgUploader:
                 key = 'photos'
                 if self.__is_cancelled:
                     return
-                if DUMP_CHAT_ID := config_dict['DUMP_CHAT_ID']:
-                    self.__sent_msg = await app.send_photo(chat_id=DUMP_CHAT_ID,
+                if LEECH_CHAT:
+                    self.__sent_msg = await app.send_photo(chat_id=LEECH_CHAT_ID,
                                                            photo=self.__up_path,
                                                            caption=cap_mono,
                                                            disable_notification=True,
+                                                           message_thread_id=LEECH_CHAT_THREAD_ID,
                                                            progress=self.__upload_progress)
                 else:
                     self.__sent_msg = await self.__listener.message.reply_photo(photo=self.__up_path,
@@ -425,7 +439,7 @@ class TgUploader:
                 await aioremove(thumb)
             if not self.__is_cancelled:
                 # Forward
-                if DUMP_CHAT_ID := config_dict['DUMP_CHAT_ID']:
+                if LEECH_CHAT:
                     try:
                         if self.__thread_id:
                             await bot.copy_message(
