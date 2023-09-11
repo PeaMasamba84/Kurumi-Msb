@@ -125,7 +125,7 @@ def get_readable_message():
         msg += f"\n</b><code>{download.status()}</code>"
         if download.status() not in [MirrorStatus.STATUS_SPLITTING, MirrorStatus.STATUS_SEEDING]:
             msg += f"\n<b>{get_progress_bar_string(download.progress())} » <code>{download.progress()}</code></b>"
-            if download.message.chat.type.name in ['SUPERGROUP', 'CHANNEL']:                               
+            if download.message.chat.type.name in ['SUPERGROUP', 'CHANNEL']:
                 msg += f"\n<b>Proses :</b> <code>{download.processed_bytes()}</code> dr <code>{download.size()}</code>"
             msg += f"\n<b>Kec :</b> <code>{download.speed()}</code> | <b>ETA :</b> <code>{download.eta()}</code>"
             if hasattr(download, 'seeders_num'):
@@ -134,12 +134,15 @@ def get_readable_message():
                 except:
                     pass
         elif download.status() == MirrorStatus.STATUS_SEEDING:
-            if download.message.chat.type.name in ['SUPERGROUP', 'CHANNEL']:                
+            if download.message.chat.type.name in ['SUPERGROUP', 'CHANNEL']:
                 msg += f"\n<b>Ukuran :</b> <code>{download.size()}</code>"
             msg += f"\n<b>Kec :</b> <code>{download.upload_speed()}</code> | <b>Diupload :</b> <code>{download.uploaded_bytes()}</code>"
             msg += f"\n<b>Ratio :</b> <code>{download.ratio()}</code> | <b>Waktu :</b> <code>{download.seeding_time()}</code>"
-        else:                                
-            msg += f"\n<b>Ukuran :</b> <code>{download.size()}</code>"
+        else:
+            if download.message.chat.type.name in ['SUPERGROUP', 'CHANNEL']:
+                msg += f"\n<b>┌ Status :</b> <a href='{download.message.link}'>{download.status()}</a>"
+            else:
+                msg += f"\n<b>Ukuran :</b> <code>{download.size()}</code>"
         # <a href='tg://user?id={download.message.from_user.id}'>{download.message.from_user.first_name}</a>
         msg += f"\n<b>User :</b> <code>{download.message.from_user.first_name}</code> | <b>ID :</b> <code>{download.message.from_user.id}</code>"
         msg += f"\n<b>Stop :</b> <code>/{BotCommands.CancelMirror[0]} {download.gid()}</code>\n\n"
@@ -167,8 +170,6 @@ def get_readable_message():
     msg += f"\n<b>DISK :</b> <code>{get_readable_file_size(disk_usage(config_dict['DOWNLOAD_DIR']).free)}</code> | <b>TIME :</b> <code>{get_readable_time(time() - botStartTime)}</code>"
     msg += f"\n<b>⧩ :</b> <code>{get_readable_file_size(dl_speed)}/s</code> | <b>◭ :</b> <code>{get_readable_file_size(up_speed)}/s</code>"
     return msg, button
-    return msg, button
-
 
 async def turn_page(data):
     STATUS_LIMIT = config_dict['STATUS_LIMIT']
@@ -329,9 +330,9 @@ def text_size_to_bytes(size_text):
     elif 'm' in size_text:
         size += float(size_text.split('m')[0]) * 1048576
     elif 'g' in size_text:
-        size += float(size_text.split('g')[0]) *1073741824 
+        size += float(size_text.split('g')[0]) *1073741824
     elif 't' in size_text:
-        size += float(size_text.split('t')[0]) *1099511627776 
+        size += float(size_text.split('t')[0]) *1099511627776
     return size
 
 
