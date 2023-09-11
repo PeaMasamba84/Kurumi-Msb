@@ -415,16 +415,23 @@ class MirrorLeechListener:
                 button = None
             msg += f'\n\n<b>Oleh :</b> {self.tag}'
             await sendMessage(self.message, msg, button)
-            # Forward to Log
-            try:
-                if LOG_CHAT_ID := config_dict['LOG_CHAT_ID']:
+            # Log Chat
+            if LOG_CHAT_ID := config_dict['LOG_CHAT_ID']:
+                if ":" in LOG_CHAT_ID:
+                    LOG_CHAT_ID = int(LOG_CHAT_ID.split(":")[0])
+                    LOG_CHAT_THREAD_ID = int(LOG_CHAT_ID.split(":")[1])
+                else:
+                    LOG_CHAT_ID = int(LOG_CHAT_ID)
+                    LOG_CHAT_THREAD_ID = None
+                try:
                     await bot.send_message(chat_id=LOG_CHAT_ID,
                                            text=msg,
                                            disable_web_page_preview=True,
                                            disable_notification=True,
+                                           message_thread_id=LOG_CHAT_THREAD_ID,
                                            reply_markup=buttons.build_menu(2))
-            except Exception as e:
-                LOGGER.error(f"Failed when forward message => {e}")
+                except Exception as e:
+                    LOGGER.error(f"Failed when forward message => {e}")
             if self.seed:
                 if self.newDir:
                     await clean_target(self.newDir)
