@@ -218,6 +218,10 @@ UPTOBOX_TOKEN = environ.get('UPTOBOX_TOKEN', '')
 if len(UPTOBOX_TOKEN) == 0:
     UPTOBOX_TOKEN = ''
 
+FILELION_API = environ.get('FILELION_API', '')
+if len(FILELION_API) == 0:
+    FILELION_API = ''
+
 INDEX_URL = environ.get('INDEX_URL', '').rstrip("/")
 if len(INDEX_URL) == 0:
     INDEX_URL = ''
@@ -262,11 +266,11 @@ if len(YT_DLP_OPTIONS) == 0:
 SEARCH_LIMIT = environ.get('SEARCH_LIMIT', '')
 SEARCH_LIMIT = 0 if len(SEARCH_LIMIT) == 0 else int(SEARCH_LIMIT)
 
-DUMP_CHAT_ID = environ.get('DUMP_CHAT_ID', '')
-DUMP_CHAT_ID = '' if len(DUMP_CHAT_ID) == 0 else int(DUMP_CHAT_ID)
+LEECH_CHAT_ID = environ.get('LEECH_CHAT_ID', '')
+LEECH_CHAT_ID = '' if len(LEECH_CHAT_ID) == 0 else LEECH_CHAT_ID
 
 LOG_CHAT_ID = environ.get('LOG_CHAT_ID', '')
-LOG_CHAT_ID = '' if len(LOG_CHAT_ID) == 0 else int(LOG_CHAT_ID)
+LOG_CHAT_ID = '' if len(LOG_CHAT_ID) == 0 else LOG_CHAT_ID
 
 STATUS_LIMIT = environ.get('STATUS_LIMIT', '')
 STATUS_LIMIT = 10 if len(STATUS_LIMIT) == 0 else int(STATUS_LIMIT)
@@ -370,10 +374,11 @@ config_dict = {'AS_DOCUMENT': AS_DOCUMENT,
                'DATABASE_URL': DATABASE_URL,
                'DEFAULT_UPLOAD': DEFAULT_UPLOAD,
                'DOWNLOAD_DIR': DOWNLOAD_DIR,
-               'DUMP_CHAT_ID': DUMP_CHAT_ID,
+               'LEECH_CHAT_ID': LEECH_CHAT_ID,
                'LOG_CHAT_ID': LOG_CHAT_ID,
                'EQUAL_SPLITS': EQUAL_SPLITS,
                'EXTENSION_FILTER': EXTENSION_FILTER,
+               'FILELION_API': FILELION_API,
                'GDRIVE_ID': GDRIVE_ID,
                'INCOMPLETE_TASK_NOTIFIER': INCOMPLETE_TASK_NOTIFIER,
                'INDEX_URL': INDEX_URL,
