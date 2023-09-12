@@ -298,14 +298,15 @@ class TgUploader:
                 app = bot
             # Leech Chat
             LEECH_CHAT = False
+            LEECH_CHAT_THREAD_ID = None
             if LEECH_CHAT_ID := config_dict['LEECH_CHAT_ID']:
                 LEECH_CHAT = True
-                if ":" in LEECH_CHAT_ID:
-                    LEECH_CHAT_ID = int(LEECH_CHAT_ID.split(":")[0])
-                    LEECH_CHAT_THREAD_ID = int(LEECH_CHAT_ID.split(":")[1])
-                else:
-                    LEECH_CHAT_ID = int(LEECH_CHAT_ID)
-                    LEECH_CHAT_THREAD_ID = None
+                if not isinstance(LEECH_CHAT_ID, int):
+                    if ":" in LEECH_CHAT_ID:
+                        LEECH_CHAT_THREAD_ID = int(LEECH_CHAT_ID.split(":")[1])  
+                        LEECH_CHAT_ID = LEECH_CHAT_ID.split(":")[0]          
+                    if LEECH_CHAT_ID.isdigit() or LEECH_CHAT_ID.startswith("-"):
+                        LEECH_CHAT_ID = int(LEECH_CHAT_ID)
             if self.__as_doc or force_document or (not is_video and not is_audio and not is_image):
                 key = 'documents'
                 if is_video and thumb is None:
