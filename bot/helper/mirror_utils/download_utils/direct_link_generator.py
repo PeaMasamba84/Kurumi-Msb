@@ -214,6 +214,8 @@ def mediafire(url, session=None):
         return final_link[0]
     if session is None:
         session = requests.Session()
+        parsed_url = urlparse(url)
+        url = f'{parsed_url.scheme}://{parsed_url.netloc}{parsed_url.path}'
     try:
         html = HTML(session.get(url).text)
     except Exception as e:
@@ -1136,6 +1138,7 @@ def doods(url: str):
     with create_scraper() as session:
         try:
             _res = session.get(url)
+            _res = session.get(_res.url)
             html = HTML(_res.text)
         except Exception as e:
             raise DirectDownloadLinkException(f'ERROR: {e.__class__.__name__} ketika mencoba mendapatkan Token Link!')
