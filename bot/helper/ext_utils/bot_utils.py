@@ -130,7 +130,7 @@ def get_readable_message():
             msg += f"\n<b>Kec :</b> <code>{download.speed()}</code> | <b>ETA :</b> <code>{download.eta()}</code>"
             if hasattr(download, 'seeders_num'):
                 try:
-                    msg += f"\n <b>S/L:</b> <code>{download.seeders_num()}/{download.leechers_num()}</code>"                    
+                    msg += f"\n<b>S/L:</b> <code>{download.seeders_num()}/{download.leechers_num()}</code>"                    
                 except:
                     pass
         elif download.status() == MirrorStatus.STATUS_SEEDING:
