@@ -130,7 +130,7 @@ def get_readable_message():
             msg += f"\n<b>Kec :</b> <code>{download.speed()}</code> | <b>ETA :</b> <code>{download.eta()}</code>"
             if hasattr(download, 'seeders_num'):
                 try:
-                    msg += f"\n<b>Seeders :</b> <code>{download.seeders_num()}</code> | <b>Leechers :</b> <code>{download.leechers_num()}</code>"
+                    msg += f"\n <b>S/L:</b> <code>{download.seeders_num()}/{download.leechers_num()}</code>"                    
                 except:
                     pass
         elif download.status() == MirrorStatus.STATUS_SEEDING:
@@ -140,7 +140,7 @@ def get_readable_message():
             msg += f"\n<b>Ratio :</b> <code>{download.ratio()}</code> | <b>Waktu :</b> <code>{download.seeding_time()}</code>"
         else:
             if download.message.chat.type.name in ['SUPERGROUP', 'CHANNEL']:
-                msg += f"\n<b>┌ Status :</b> <a href='{download.message.link}'>{download.status()}</a>"
+                msg += f"\n<b>Status :</b> <a href='{download.message.link}'>{download.status()}</a>"
             else:
                 msg += f"\n<b>Ukuran :</b> <code>{download.size()}</code>"
         # <a href='tg://user?id={download.message.from_user.id}'>{download.message.from_user.first_name}</a>
