@@ -199,12 +199,12 @@ async def _mirror_leech(client, message, isQbit=False, isLeech=False, sameDir=No
             if "uptobox" in link:
                 ddl = await sendMessage(
                     message,
-                    f"<b>Membuat Link Akses Uptobox (±30s) :</b>\n<code>{link}</code>"
+                    f"<b>Generating Uptobox Direct Link (±30s) :</b>\n<code>{link}</code>"
                 )
             else:
                 ddl = await sendMessage(
                     message,
-                    f"<b>Membuat Link Akses :</b>\n<code>{link}</code>"
+                    f"<b>Generating Direct Link :</b>\n<code>{link}</code>"
                 )
             try:
                 link = await sync_to_async(direct_link_generator, link)
@@ -212,7 +212,7 @@ async def _mirror_leech(client, message, isQbit=False, isLeech=False, sameDir=No
                     link, headers = link
                 if isinstance(link, str):
                     LOGGER.info(f"Generated link: {link}")
-                    await editMessage(ddl, f"<b>Membuat Link Akses :</b>\n<code>{link}</code>")
+                    await editMessage(ddl, f"<b>Generated Direct Link :</b>\n<code>{link}</code>")
                     await sleep(3)
                 await deleteMessage(ddl)
             except DirectDownloadLinkException as e:
@@ -310,12 +310,8 @@ async def _mirror_leech(client, message, isQbit=False, isLeech=False, sameDir=No
         pssw = args['-ap']
         if ussr or pssw:
             auth = f"{ussr}:{pssw}"
-            auth = f"Authorization: Basic {b64encode(auth.encode()).decode('ascii')}"
-        else:
-            auth = ''
-        if headers:
-            auth += f'{auth} {headers}'
-        await add_aria2c_download(link, path, listener, name, auth, ratio, seed_time)
+            headers += f" authorization: Basic {b64encode(auth.encode()).decode('ascii')}"
+        await add_aria2c_download(link, path, listener, name, headers, ratio, seed_time)
 
 
 async def mirror(client, message):
