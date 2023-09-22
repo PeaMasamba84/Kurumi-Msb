@@ -102,6 +102,8 @@ def direct_link_generator(link: str):
     elif any(x in domain for x in ['filelions.com', 'filelions.live', 'filelions.to', 'filelions.online','embedwish.com',
                                    'streamwish.com', 'kitabmarkaz.xyz', 'wishfast.top']):
         return filelions_and_streamwish(link)
+    elif any(x in domain for x in ['streamhub.ink', 'streamhub.to']):
+        return streamhub(link)
     elif any(x in domain for x in ['linkbox.to', 'lbx.to']):
         return linkBox(link)
     elif is_share_link(link):
@@ -1306,6 +1308,34 @@ def filelions_and_streamwish(url):
             error += f"\n<b>HD</b>"
         error +=f": <code>{url}_{version['name']}</code>"
     raise DirectDownloadLinkException(f'{error}')
+
+
+def streamhub(url):
+    file_code = url.split('/')[-1]
+    parsed_url = urlparse(url)
+    url = f'{parsed_url.scheme}://{parsed_url.hostname}/d/{file_code}'
+    with create_scraper() as session:
+        try:
+            html = HTML(session.get(url).text)
+        except Exception as e:
+            raise DirectDownloadLinkException(f'ERROR: {e.__class__.__name__}')
+        if not (inputs := html.xpath('//form[@name="F1"]//input')):
+            raise DirectDownloadLinkException('ERROR: Link File tidak ditemukan!')
+        data = {}
+        for i in inputs:
+            if key := i.get('name'):
+                data[key] = i.get('value')
+        session.headers.update({'referer': url})
+        sleep(1)
+        try:
+            html = HTML(session.post(url, data=data).text)
+        except Exception as e:
+            raise DirectDownloadLinkException(f'ERROR: {e.__class__.__name__}')
+        if directLink := html.xpath('//a[@class="btn btn-primary btn-go downloadbtn"]/@href'):
+            return directLink[0]
+        if error := html.xpath('//div[@class="alert alert-danger"]/text()[2]'):
+            raise DirectDownloadLinkException(f"ERROR: {error[0]}")
+        raise DirectDownloadLinkException("ERROR: Link File tidak ditemukan!")
 
 
 def pake(url):
