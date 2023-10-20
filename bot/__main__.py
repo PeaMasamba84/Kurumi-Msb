@@ -45,7 +45,7 @@ def progress_bar(percentage):
     except:
         percentage = 0
     return ''.join(
-        '■' if i <= percentage // 10 else '□' for i in range(1, 11)
+        '▰' if i <= percentage // 10 else '▱' for i in range(1, 11)
     )
 
 
