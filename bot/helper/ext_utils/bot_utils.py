@@ -145,7 +145,7 @@ def get_readable_message():
                 msg += f"\n<b>Ukuran :</b> <code>{download.size()}</code>"
         # <a href='tg://user?id={download.message.from_user.id}'>{download.message.from_user.first_name}</a>
         msg += f"\n<b>User :</b> <code>{download.message.from_user.first_name}</code> | <b>ID :</b> <code>{download.message.from_user.id}</code>"
-        msg += f"\n<b>Stop :</b> <code>/{BotCommands.CancelMirror[0]} {download.gid()}</code>\n\n"
+        msg += f"\n<b>Stop :</b> <code>/{BotCommands.CancelMirror[0]} {download.gid()}</code>"
         msg += f"\n<b>▬▬▬▬▬▬▬▬▬▬▬▬▬</b>"
         msg += "\n\n"
     if len(msg) == 0:
