@@ -117,29 +117,29 @@ async def stats(_, message):
     # Versi
     stats = f'''
 <pre languange="bash"><code>{neofetch}</code>
-<b>CPU</b>
+𝐂𝐏𝐔 𝐒𝐲𝐬𝐭𝐞𝐦
 <b>Cores        :</b> <code>{p_core}</code>
 <b>Logical      :</b> <code>{t_core}</code>
 <b>Frequency    :</b> <code>{freqcurrent}</code>
 <code>[{progress_bar(cpuUsage)}] {cpuUsage}%</code>
 
-<b>RAM</b> 
+𝐊𝐚𝐩𝐚𝐬𝐢𝐭𝐚𝐬 𝐑𝐀𝐌
 <b>Terpakai     :</b> <code>{mem_u}</code>
 <b>Tersedia     :</b> <code>{mem_a}</code>
 <b>Total        :</b> <code>{mem_t}</code>
 <code>[{progress_bar(mem_p)}] {mem_p}%</code>
 
-<b>Penyimpanan</b> 
+𝐏𝐞𝐧𝐲𝐢𝐦𝐩𝐚𝐧𝐚𝐧
 <b>Terpakai     :</b> <code>{used}</code>
 <b>Tersedia     :</b> <code>{free}</code>
 <b>Total        :</b> <code>{total}</code>
 <code>[{progress_bar(disk)}] {disk}%</code>
 
-<b>Jaringan</b>
+𝐈𝐧𝐟𝐨 𝐉𝐚𝐫𝐢𝐧𝐠𝐚𝐧
 <b>Total Unduh  :</b> <code>{recv}</code>
 <b>Total Unggah :</b> <code>{sent}</code>
 
-<b>Versi</b>
+𝐕𝐞𝐫𝐬𝐢 𝐁𝐨𝐭
 <b>Aria2c       :</b> <code>v{arv}</code>
 <b>FFMPEG       :</b> <code>v{ffv}</code>
 <b>Google Api   :</b> <code>v{gav}</code>
@@ -150,13 +150,13 @@ async def stats(_, message):
 <b>Qbittorrent  :</b> <code>{qbv}</code>
 <b>YT-DLP       :</b> <code>v{ytv}</code>
 
-<b>Lainnya</b>
+𝐒𝐢𝐬𝐭𝐞𝐦 𝐋𝐚𝐢𝐧𝐧𝐲𝐚
 <b>Username     :</b> <code>@{bot.me.username}</code>
 <b>Waktu Bot    :</b> <code>{currentTime}</code>
 <b>Waktu Mesin  :</b> <code>{osUptime}</code>
 <b>Diperbarui   :</b> <code>{last_commit}</code>
 
-<b>Quotes       :</b> 
+𝐐𝐮𝐨𝐭𝐞𝐬 𝐇𝐚𝐫𝐢 𝐈𝐧𝐢  :</b> 
 <code>{get_quotes()}</code>
 </pre>
 '''
