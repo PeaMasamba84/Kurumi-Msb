@@ -349,8 +349,7 @@ class MirrorLeechListener:
             await DbManger().rm_complete_task(self.message.link)
         msg = f"<b>Nama :</b> <code>{escape(name)}</code>"
         msg += f"\n\n<b>Ukuran :</b> <code>{get_readable_file_size(size)}</code>"
-        msg += f"\n\n</b>Hasil mirror sudah kami pindahkan<a href='https://t.me/+HinXd5vSf-5iZDVl'> 𝑫𝒊𝒔𝒊𝒏𝒊</a> </b>"
-        msg += f"\n\n</b>Join Group Google Drive CMT<a href='https://groups.google.com/g/jagoan-masamba02'> 𝑫𝒊𝒔𝒊𝒏𝒊</a> </b>"
+        msg += f"\n\n</b>Hasil mirror sudah kami pindahkan<a href='https://t.me/+HinXd5vSf-5iZDVl'> 𝑫𝒊𝒔𝒊𝒏𝒊</a> </b>"        
         msg += f'\n\n<b>𝐏𝐄𝐀 𝐌𝐀𝐒𝐀𝐌𝐁𝐀\n\n'
         LOGGER.info(f'Task Done: {name}')
         if self.isLeech:
