@@ -167,8 +167,8 @@ def get_readable_message():
         buttons.ibutton("🪫", "status ref")
         buttons.ibutton("⫸", "status nex")
         button = buttons.build_menu(3)
-    msg += "═══❰ 𝐁𝐨𝐭 𝐌𝐢𝐫𝐫𝐨𝐫 𝐂𝐌𝐓 ❱═══"         
-    msg += f"\n<b>DISK :</b> <code>{get_readable_file_size(disk_usage(config_dict['DOWNLOAD_DIR']).free)}</code> | <b>TIME :</b> <code>{get_readable_time(time() - botStartTime)}</code>"
+    msg += "══❰ 𝐁𝐨𝐭 𝐌𝐢𝐫𝐫𝐨𝐫 𝐂𝐌𝐓 ❱══"         
+    msg += f"\n<b>𝐓𝐋 :</b> <code>{get_readable_file_size(net_io_counters().bytes_recv)}</code> | <b>𝐓𝐔 :</b> <code>{get_readable_file_size(net_io_counters().bytes_sent)}</code>"
     msg += f"\n<b>⧩ :</b> <code>{get_readable_file_size(dl_speed)}/s</code> | <b>◭ :</b> <code>{get_readable_file_size(up_speed)}/s</code>"
     return msg, button
 
