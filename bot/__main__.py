@@ -214,12 +214,12 @@ async def stats(_, message):
 async def start(client, message):
     buttons = ButtonMaker()
     buttons.ubutton(
-        "Owner", "https://t.me/save_usdt")
-    buttons.ubutton("Channel", "https://t.me/arakurumi")
+        "Owner", "https://www.comelmuewa84.eu.org")
+    buttons.ubutton("Group", "https://t.me/peamasamba")
     reply_markup = buttons.build_menu(2)
     if await CustomFilters.authorized(client, message):
         start_string = f"""
-<b>Mirror Tautan Lambat menjadi Tautan Cepat!</b>
+<b>Ini Bot Mirror Super Cepat!</b>
 
 <b>Note :</b>
 Selalu backup File setelah Mirror untuk menghindari Drive terhapus!
