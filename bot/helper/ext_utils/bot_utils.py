@@ -59,23 +59,23 @@ def bt_selection_buttons(id_):
 async def initiate_help_messages():
     mirror, yt, clone = await gather(
         telegraph.create_page(
-            title="Bantuan Mirror Leech KQRM Bot", content=MIRROR_HELP_MESSAGE
+            title="Bantuan Mirror Leech Bot", content=MIRROR_HELP_MESSAGE
         ),
         telegraph.create_page(
-            title="Bantuan YT-DLP KQRM Bot", content=YT_HELP_MESSAGE
+            title="Bantuan YT-DLP Bot", content=YT_HELP_MESSAGE
         ),
         telegraph.create_page(
-            title="Bantuan Clone KQRM Bot", content=CLONE_HELP_MESSAGE
+            title="Bantuan Clone Bot", content=CLONE_HELP_MESSAGE
         ),
     )
     buttons = ButtonMaker()
-    buttons.ubutton("🤖 Petunjuk Penggunaan [Mirror-Leech]", f"https://telegra.ph/{mirror['path']}")
+    buttons.ubutton("Panduan Penggunaan [Mirror-Leech]", f"https://telegra.ph/{mirror['path']}")
     COMMAND_USAGE["main"] = buttons.build_menu(1)
     buttons.reset()
-    buttons.ubutton("🤖 Petunjuk Penggunaan [YT-DLP]", f"https://telegra.ph/{yt['path']}")
+    buttons.ubutton("Panduan Penggunaan [YT-DLP]", f"https://telegra.ph/{yt['path']}")
     COMMAND_USAGE["yt"] = buttons.build_menu(1)
     buttons.reset()
-    buttons.ubutton("🤖 Petunjuk Penggunaan [Clone]", f"https://telegra.ph/{clone['path']}")
+    buttons.ubutton("Panduan Penggunaan [Clone]", f"https://telegra.ph/{clone['path']}")
     COMMAND_USAGE["clone"] = buttons.build_menu(1)
 
 
@@ -83,7 +83,7 @@ async def get_telegraph_list(telegraph_content):
     path = [
         (
             await telegraph.create_page(
-                title="Pencari KQRM Bot", content=content
+                title="Pencari Bot", content=content
             )
         )["path"]
         for content in telegraph_content
@@ -91,7 +91,7 @@ async def get_telegraph_list(telegraph_content):
     if len(path) > 1:
         await telegraph.edit_telegraph(path, telegraph_content)
     buttons = ButtonMaker()
-    buttons.ubutton("🔎 Lihat", f"https://telegra.ph/{path[0]}")
+    buttons.ubutton("🔦 Lihat", f"https://telegra.ph/{path[0]}")
     return buttons.build_menu(1)
 
 
