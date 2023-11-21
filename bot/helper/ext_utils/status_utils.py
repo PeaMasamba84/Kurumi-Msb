@@ -15,30 +15,30 @@ from bot.helper.telegram_helper.button_build import ButtonMaker
 SIZE_UNITS = ["B", "KB", "MB", "GB", "TB", "PB"]
 
 class MirrorStatus:
-    STATUS_DOWNLOADING = "Unduh"
-    STATUS_UPLOADING = "Unggah"
-    STATUS_QUEUEDL = "AntriDownload"
-    STATUS_QUEUEUP = "AntriUpload"
-    STATUS_PAUSED = "Henti"
-    STATUS_ARCHIVING = "Arsip"
-    STATUS_EXTRACTING = "Ekstrak"
-    STATUS_CLONING = "Clone"
-    STATUS_SEEDING = "Seed"
-    STATUS_SPLITTING = "Bagi"
-    STATUS_CHECKING = "Cek"
-    STATUS_SAMVID = "SampleVideo"
+    STATUS_DOWNLOADING = "📤𝑼𝒏𝒅𝒖𝒉"
+    STATUS_UPLOADING = "📥𝑼𝒏𝒈𝒈𝒂𝒉"
+    STATUS_QUEUEDL = "⌚️𝑨𝒏𝒕𝒓𝒊𝑫𝒐𝒘𝒏"
+    STATUS_QUEUEUP = "⌚️𝑨𝒏𝒕𝒓𝒊𝑼𝒑"
+    STATUS_PAUSED = "💤𝑱𝒆𝒅𝒂"
+    STATUS_ARCHIVING = "📚𝑨𝒓𝒔𝒊𝒑"
+    STATUS_EXTRACTING = "🔄𝑬𝒌𝒔𝒕𝒓𝒂𝒌"
+    STATUS_CLONING = "🧬𝑪𝒍𝒐𝒏𝒆"
+    STATUS_SEEDING = "🌱𝑺𝒆𝒆𝒅"
+    STATUS_SPLITTING = "✂𝑴𝒆𝒎𝒃𝒂𝒈𝒊"
+    STATUS_CHECKING = "📝𝑪𝒆𝒌"
+    STATUS_SAMVID = "🎞𝑺𝒂𝒎𝒑𝒍𝒆𝑽𝒊𝒅𝒆𝒐"
      
 STATUS_VALUES = [
-    ("ALL", "All"),
-    ("DL", MirrorStatus.STATUS_DOWNLOADING),
-    ("UP", MirrorStatus.STATUS_UPLOADING),
-    ("QD", MirrorStatus.STATUS_QUEUEDL),
-    ("QU", MirrorStatus.STATUS_QUEUEUP),
-    ("AR", MirrorStatus.STATUS_ARCHIVING),
-    ("EX", MirrorStatus.STATUS_EXTRACTING),
-    ("CL", MirrorStatus.STATUS_CLONING),
-    ("SD", MirrorStatus.STATUS_SEEDING),
-    ("SV", MirrorStatus.STATUS_SAMVID)
+    ("𝐀𝐋𝐋", "All"),
+    ("𝐃𝐋", MirrorStatus.STATUS_DOWNLOADING),
+    ("𝐔𝐏", MirrorStatus.STATUS_UPLOADING),
+    ("𝐐𝐃", MirrorStatus.STATUS_QUEUEDL),
+    ("𝐐𝐔", MirrorStatus.STATUS_QUEUEUP),
+    ("𝐀𝐑", MirrorStatus.STATUS_ARCHIVING),
+    ("𝐄𝐗", MirrorStatus.STATUS_EXTRACTING),
+    ("𝐂𝐋", MirrorStatus.STATUS_CLONING),
+    ("𝐒𝐃", MirrorStatus.STATUS_SEEDING),
+    ("𝐒𝐕", MirrorStatus.STATUS_SAMVID)
 ]
 
 
@@ -99,7 +99,7 @@ def get_progress_bar_string(pct):
     cFull = int(p // 8)
     p_str = "■" * cFull
     p_str += "□" * (12 - cFull)
-    return f"[{p_str}]"
+    return f"{p_str}"
 
 
 def get_readable_message(sid, is_user, page_no=1, status="All", page_step=1):
@@ -134,37 +134,38 @@ def get_readable_message(sid, is_user, page_no=1, status="All", page_step=1):
         tasks[start_position : STATUS_LIMIT + start_position], start=1
     ):
         tstatus = task.status()
-        msg += f"<blockquote><code>{escape(f'{task.name()}')}</code></blockquote>"
-        msg += f"\n<b>┌┤{get_progress_bar_string(task.progress())} <code>{task.progress()}</code>├┐</b>"
+        msg += f"\n💾 Nama:<blockquote><code>{escape(f'{task.name()}')}</code></blockquote>\n"
+        msg += f"\n{get_progress_bar_string(task.progress())} » <code>{task.progress()}</code>"
         if task.listener.isSuperChat:
-            msg += f"\n<b>├ Status :</b> <a href='{task.listener.message.link}'>{tstatus}</a>"
+            msg += f"\n<b>┌📲 Status :</b> <a href='{task.listener.message.link}'>{tstatus}</a>"
         else:
-            msg += f"\n<b>├ Status :</b> <code>{tstatus}</code>"
+            msg += f"\n<b>┌📲 Status :</b> <code>{tstatus}</code>"
         if tstatus not in [
             MirrorStatus.STATUS_SPLITTING,
             MirrorStatus.STATUS_SEEDING,
             MirrorStatus.STATUS_SAMVID,
         ]:
-            msg += f"\n<b>├ Proses :</b> <code>{task.processed_bytes()}</code> dari <code>{task.size()}</code>"
-            msg += f"\n<b>├ Perkiraan :</b> <code>{task.eta()}</code>"
-            msg += f"\n<b>├ Kecepatan :</b> <code>{task.speed()}</code>"
+            msg += f"\n<b>├🔄 Diproses :</b> <code>{task.processed_bytes()}</code>"
+            msg += f"\n<b>├🔋 Total :</b> <code>{task.size()}</code>"
+            msg += f"\n<b>├🕰 Estimasi :</b> <code>{task.eta()}</code>"
+            msg += f"\n<b>├🛸 Kecepatan :</b> <code>{task.speed()}</code>"
             if hasattr(task, "seeders_num"):
                 try:
-                    msg += f"\n<b>├ Seeders :</b> <code>{task.seeders_num()}</code>"
-                    msg += f"\n<b>├ Leechers :</b> <code>{task.leechers_num()}</code>"
+                    msg += f"\n<b>├🌱 Seed :</b> <code>{task.seeders_num()}</code>"
+                    msg += f"\n<b>├🐌 Leech :</b> <code>{task.leechers_num()}</code>"
                 except:
                     pass
         elif tstatus == MirrorStatus.STATUS_SEEDING:
-            msg += f"\n<b>├ Rasio : </b> <code>{task.ratio()}</code>"
-            msg += f"\n<b>├ Waktu : </b> <code>{task.seeding_time()}</code>"
-            msg += f"\n<b>├ Ukuran : </b> <code>{task.size()}</code>"
-            msg += f"\n<b>├ Diupload : </b> <code>{task.uploaded_bytes()}</code>"
-            msg += f"\n<b>├ Kecepatan : </b> <code>{task.seed_speed()}</code>"
+            msg += f"\n<b>├🚦 Rasio : </b> <code>{task.ratio()}</code>"
+            msg += f"\n<b>├⏰ Waktu : </b> <code>{task.seeding_time()}</code>"
+            msg += f"\n<b>├📦 Ukuran : </b> <code>{task.size()}</code>"
+            msg += f"\n<b>├◭ Diupload : </b> <code>{task.uploaded_bytes()}</code>"
+            msg += f"\n<b>├🛸 Kecepatan : </b> <code>{task.seed_speed()}</code>"
         else:
-            msg += f"\n<b>├ Ukuran : </b> <code>{task.size()}</code>"
-        msg += f"\n<b>├ ID :</b> <code>{task.listener.message.from_user.id}</code>"
-        msg += f"\n<b>├ User :</b> <code>{task.listener.message.from_user.first_name}</code>"
-        msg += f"\n<b>└</b> <code>/{BotCommands.CancelTaskCommand[0]} {task.gid()}</code>\n\n"
+            msg += f"\n<b>├📦 Ukuran : </b> <code>{task.size()}</code>"
+        msg += f"\n<b>├🔖 ID :</b> <code>{task.listener.message.from_user.id}</code>"
+        msg += f"\n<b>├🦹 User :</b> <code>{task.listener.message.from_user.first_name}</code>"
+        msg += f"\n<b>└📵 Stop :</b> <code>/{BotCommands.CancelTaskCommand[0]} {task.gid()}</code>\n\n"
 
     if len(msg) == 0 and status == "All":
         return None, None
@@ -172,13 +173,11 @@ def get_readable_message(sid, is_user, page_no=1, status="All", page_step=1):
         msg = f"<b>Tidak ada tugas</b> <code>{status}</code>!\n\n"
     buttons = ButtonMaker()
     if not is_user:
-        buttons.ibutton("👀", "status 0 ov", position="header")
+        buttons.ibutton("🇩​​​​​🇪​​​​​🇹​​​​​🇦​​​​​🇮​​​​​🇱​​​​​🇸​​​​​", "status 0 ov", position="header")
     if len(tasks) > STATUS_LIMIT:
-        msg += f"<b>Step :</b> <code>{page_step}</code>"
-        msg += f"\n<b>Halaman :</b> <code>{page_no}/{pages}</code>"
-        msg += f"\n<b>Total Tugas :</b> <code>{tasks_no}</code>\n"
-        buttons.ibutton("⏪", f"status {sid} pre", position="header")
-        buttons.ibutton("⏩", f"status {sid} nex", position="header")
+        msg += f"<b>Hal:</b> {page_no}/{pages} | <b>Tugas:</b> {tasks_no} | <b>Step:</b> {page_step}\n"        
+        buttons.ibutton("⫷", f"status {sid} pre", position="header")
+        buttons.ibutton("⫸", f"status {sid} nex", position="header")
         if tasks_no > 30:
             for i in [1, 2, 4, 6, 8, 10, 15, 20]:
                 buttons.ibutton(i, f"status {sid} ps {i}", position="footer")
@@ -186,9 +185,8 @@ def get_readable_message(sid, is_user, page_no=1, status="All", page_step=1):
         for label, status_value in STATUS_VALUES:
             if status_value != status:
                 buttons.ibutton(label, f"status {sid} st {status_value}")
-    buttons.ibutton("♻️", f"status {sid} ref", position="header")
+    buttons.ibutton("🇨​​​​​🇱​​​​​🇴​​​​​🇸​​​​​🇪​​​​​", f"status {sid} ref", position="header")
     button = buttons.build_menu(8)
-    msg += f"\n<b>🅲🄿🆄 :</b> <code>{cpu_percent()}%</code> | <b>🆁🄰🅼 :</b> <code>{virtual_memory().percent}%</code>"
-    msg += f"\n<b>🆃🅳🅻 :</b> <code>{get_readable_file_size(net_io_counters().bytes_recv)}</code> | <b>🆃🆄🅻 :</b> <code>{get_readable_file_size(net_io_counters().bytes_sent)}</code>"
-    msg += f"\n<b>🅳🅸🆂🅺 :</b> <code>{get_readable_file_size(disk_usage(config_dict['DOWNLOAD_DIR']).free)}</code> | <b>🆃🅸🅼🅴 :</b> <code>{get_readable_time(time() - botStartTime)}</code>"
+    msg += "═══❰ 𝑪𝑴𝑻 𝑴𝒂𝒔𝒂𝒎𝒃𝒂 ❱═══"
+    msg += f"\n<b>▼:</b> <code>{get_readable_file_size(net_io_counters().bytes_recv)}</code> | <b>▲:</b> <code>{get_readable_file_size(net_io_counters().bytes_sent)}</code> | <b>🕯:</b> <code>{get_readable_time(time() - botStartTime)}</code>"
     return msg, button
