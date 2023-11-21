@@ -11,7 +11,7 @@ class _BotCommands:
         self.LeechCommand = [f"pealeech{CMD_SUFFIX}", f"pl{CMD_SUFFIX}"]
         self.QbLeechCommand = [f"peaqbleech{CMD_SUFFIX}", f"pqbl{CMD_SUFFIX}"]
         self.YtdlLeechCommand = [
-            f"ytdlleech{CMD_SUFFIX}", f"peayl{CMD_SUFFIX}", f"peawatchleech{CMD_SUFFIX}", f"pwl{CMD_SUFFIX}"]
+            f"ytdlleech{CMD_SUFFIX}", f"peaytdl{CMD_SUFFIX}", f"peawatchleech{CMD_SUFFIX}", f"pwl{CMD_SUFFIX}"]
         self.CloneCommand = [f"peaclone{CMD_SUFFIX}", f"pcl{CMD_SUFFIX}"]
         self.CountCommand = [f"peacount{CMD_SUFFIX}", f"pco{CMD_SUFFIX}"]
         self.DeleteCommand = [f"peadelete{CMD_SUFFIX}", f"pdel{CMD_SUFFIX}"]
