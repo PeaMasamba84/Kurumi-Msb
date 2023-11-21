@@ -192,6 +192,7 @@ class Mirror(TaskListener):
                 self.link = (
                     reply_markup.inline_keyboard[0][0].url
                     or reply_markup.inline_keyboard[0].url
+                    or None
                 )
             if not ( 
                 is_url(self.link) 
