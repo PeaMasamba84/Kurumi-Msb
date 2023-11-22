@@ -172,7 +172,7 @@ def get_readable_message(sid, is_user, page_no=1, status="All", page_step=1):
         msg = f"<b>Tidak ada tugas</b> <code>{status}</code>!\n\n"
     buttons = ButtonMaker()
     if not is_user:
-        buttons.ibutton("👀", "status 0 ov", position="header")
+        buttons.ibutton("S̲t̲a̲t̲s̲", "status 0 ov", position="header")
     if len(tasks) > STATUS_LIMIT:
         msg += f"<b>Hal:</b> {page_no}/{pages} | <b>Tugas:</b> {tasks_no} | <b>Step:</b> {page_step}\n"        
         buttons.ibutton("⫷", f"status {sid} pre", position="header")
