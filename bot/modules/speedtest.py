@@ -49,7 +49,6 @@ async def speedtest(_, message):
 <b>Negara       :</b> <code>{result['server']['country']}, {result['server']['cc']}</code>
 <b>Latitude     :</b> <code>{result['server']['lat']}</code>
 <b>Longitude    :</b> <code>{result['server']['lon']}</code>
-</pre>
 """
     try:
         await sendPhoto(
