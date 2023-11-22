@@ -161,7 +161,7 @@ async def stats(_, message):
     neofetch = check_output(
         ["neofetch --shell_version off --stdout"], shell=True).decode()
     stats = f"""
-<pre languange='bash'><code>{neofetch}</code>
+
 <b>CPU</b>
 <b>Cores        :</b> <code>{p_core}</code>
 <b>Logical      :</b> <code>{t_core}</code>
@@ -201,9 +201,8 @@ async def stats(_, message):
 <b>Waktu Mesin  :</b> <code>{osUptime}</code>
 <b>Diperbarui   :</b> <code>{last_commit}</code>
 
-<b>Quotes       :</b> 
+<b>Kutipan      :</b> 
 <code>{get_quotes()}</code>
-</pre>
 """
     await sendMessage(
         message, 
@@ -404,13 +403,12 @@ async def restart_notification():
     if await aiopath.isfile(".restartmsg"):
         try:
             msg = f"""
-<b>Bot berhasil dimulai ulang!</b>
-<pre languange="bash"><b>Hari      :</b> <code>{now.strftime('%A')}</code>
+<b>Bot sudah di restart!</b>
+<b>Hari      :</b> <code>{now.strftime('%A')}</code>
 <b>Tanggal   :</b> <code>{now.strftime('%d %B %Y')}</code>
 <b>Waktu     :</b> <code>{now.strftime('%H:%M:%S WIB')}</code>
 <b>Kutipan   :</b>
-<code>{get_quotes()}</code>
-</pre>           
+<code>{get_quotes()}</code>          
 """
             await bot.edit_message_text(
                 chat_id=chat_id, 
