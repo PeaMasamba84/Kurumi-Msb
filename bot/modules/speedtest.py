@@ -17,7 +17,7 @@ from bot.helper.ext_utils.status_utils import get_readable_file_size
 
 @new_task
 async def speedtest(_, message):
-    msg = await sendMessage(message, "<b>Mengetes kecepatan Unduh & Unggah...</b>")
+    msg = await sendMessage(message, "<b>Sementara Proses...</b>")
     test = Speedtest()
     test.get_best_server()
     test.download()
@@ -25,7 +25,7 @@ async def speedtest(_, message):
     test.results.share()
     result = test.results.dict()
     caption = f"""
-<pre languange='bash'>
+
 <b>Hasil SpeedTest</b>
 <b>Ping         :</b> <code>{result['ping']} ms</code>
 <b>Waktu        :</b> <code>{result['timestamp']}</code>
