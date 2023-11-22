@@ -191,8 +191,7 @@ class Mirror(TaskListener):
             ) and (reply_markup := reply_to.reply_markup):
                 self.link = (
                     reply_markup.inline_keyboard[0][0].url
-                    or reply_markup.inline_keyboard[0].url
-                    or None
+                    or ""
                 )
             if not ( 
                 is_url(self.link) 
@@ -260,7 +259,7 @@ class Mirror(TaskListener):
                 ) and (reply_markup := reply_to.reply_markup):
                     self.link = (
                         reply_markup.inline_keyboard[0][0].url
-                        or reply_markup.inline_keyboard[0].url
+                        or ""
                     )
                 else:
                     reply_to = None
