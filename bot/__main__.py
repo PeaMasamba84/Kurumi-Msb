@@ -218,7 +218,7 @@ async def start(client, message):
     reply_markup = buttons.build_menu(2)
     if await CustomFilters.authorized(client, message):
         start_string = f"""
-<b>Mirror Tautan Lambat menjadi Tautan Cepat!</b>
+<b>Memirror file lebih Cepat!</b>
 
 <b>Note :</b>
 Selalu backup File setelah Mirror untuk menghindari Drive terhapus!
@@ -235,7 +235,7 @@ Enjoy :D
     else:
         await sendMessage(
             message, 
-            "<b>Tidak ada izin!</b>\nGabung Grup/Channel untuk menggunakan Bot!\n\n<b>Note :</b>\nJika Group ini mengaktifkan Topik, Kirim perintah di Topik yang diizinkan!", 
+            "<b>Tidak ada izin!</b>\nGabung ke group jika mau gunakan Bot ini!", 
             reply_markup
         )
 
@@ -380,13 +380,12 @@ async def restart_notification():
         if notifier_dict := await DbManger().get_incomplete_tasks():
             for cid, data in notifier_dict.items():
                 msg = f"""
-{'<b>Bot berhasil dimulai ulang!</b>' if cid == chat_id else '<b>Bot dimulai ulang!</b>'}
-<pre languange="bash"><b>Hari      :</b> <code>{now.strftime('%A')}</code>
-<b>Tanggal   :</b> <code>{now.strftime('%d %B %Y')}</code>
+{'<b>Bot sudah di restart!</b>' if cid == chat_id else '<b>Bot dimulai ulang!</b>'}
+<b>Hari      :</b> <code>{now.strftime('%A')}</code>
+<b>Tgl       :</b> <code>{now.strftime('%d %B %Y')}</code>
 <b>Waktu     :</b> <code>{now.strftime('%H:%M:%S WIB')}</code>
-<b>Quotes    :</b>
-<code>{get_quotes()}</code>
-</pre>           
+<b>Kutipan    :</b>
+<code>{get_quotes()}</code>         
 """
                 if data.items():
                     msg += f"<b>Tugas yang belum selesai :</b>"
@@ -405,7 +404,7 @@ async def restart_notification():
             msg = f"""
 <b>Bot sudah di restart!</b>
 <b>Hari      :</b> <code>{now.strftime('%A')}</code>
-<b>Tanggal   :</b> <code>{now.strftime('%d %B %Y')}</code>
+<b>Tgl       :</b> <code>{now.strftime('%d %B %Y')}</code>
 <b>Waktu     :</b> <code>{now.strftime('%H:%M:%S WIB')}</code>
 <b>Kutipan   :</b>
 <code>{get_quotes()}</code>          
