@@ -1,14 +1,3 @@
-# Copyright (C) 2019 The Raphielscape Company LLC.
-#
-# Licensed under the Raphielscape Public License, Version 1.c (the "License");
-# you may not use this file except in compliance with the License.
-#
-""" 
-Helper Module containing various sites direct links generators. This module is copied and modified as per need
-from https://github.com/AvinashReddy3108/PaperplaneExtended . I hereby take no credit of the following code other
-than the modifications. See https://github.com/AvinashReddy3108/PaperplaneExtended/commits/master/userbot/modules/direct_links.py
-for original authorship. 
-"""
 import base64
 import urllib3
 
@@ -21,9 +10,7 @@ from time import sleep
 from urllib.parse import parse_qs, urlparse
 from uuid import uuid4
 from bs4 import BeautifulSoup
-
 from cloudscraper import create_scraper
-from lk21 import Bypass
 from lxml.etree import HTML
 from requests import Session, post
 from requests import session as req_session
@@ -144,24 +131,6 @@ def direct_link_generator(link: str):
         ]
     ):
         return terabox(link)
-    elif any(
-        x in domain
-        for x in [
-            "fembed.net",
-            "fembed.com",
-            "femax20.com",
-            "fcdn.stream",
-            "feurl.com",
-            "layarkacaxxi.icu",
-            "naniplay.nanime.in",
-            "naniplay.nanime.biz",
-            "naniplay.com",
-            "mm9842.com",
-        ]
-    ):
-        return fembed(link)
-    elif any(x in domain for x in ["sbembed.com", "watchsb.com", "streamsb.net", "sbplay.org"]):
-        return sbembed(link)
     elif any(
         x in domain
         for x in [
@@ -555,26 +524,6 @@ def hxfile(url):
     if direct_link:= html.xpath("//a[@class='btn btn-dow']/@href"):
         return direct_link[0]
     raise DirectDownloadLinkException("ERROR: Link File tidak ditemukan!")
-
-
-def fembed(link):
-    try:
-        dl_url = Bypass().bypass_fembed(link)
-        count = len(dl_url)
-        lst_link = [dl_url[i] for i in dl_url]
-        return lst_link[count-1]
-    except Exception as e:
-        raise DirectDownloadLinkException(f"ERROR: {e.__class__.__name__}")
-
-
-def sbembed(link):
-    try:
-        dl_url = Bypass().bypass_sbembed(link)
-        count = len(dl_url)
-        lst_link = [dl_url[i] for i in dl_url]
-        return lst_link[count-1]
-    except Exception as e:
-        raise DirectDownloadLinkException(f"ERROR: {e.__class__.__name__}")
 
 
 def onedrive(link):
@@ -1440,7 +1389,14 @@ def filelions_and_streamwish(url):
     scheme = parsed_url.scheme
     if any(
         x in hostname
-        for x in ["filelions.co", "filelions.live", "filelions.to", "filelions.site", "filelions.online", "cabecabean.lol"]
+        for x in [
+            "filelions.co",
+            "filelions.live",
+            "filelions.to", 
+            "filelions.site", 
+            "filelions.online", 
+            "cabecabean.lol"
+        ]
     ):
         apiKey = config_dict["FILELION_API"]
         apiUrl = "https://api.filelions.co"
@@ -1516,8 +1472,8 @@ def pcloud(url):
             res = session.get(url)
         except Exception as e:
             raise DirectDownloadLinkException(f"ERROR: {e.__class__.__name__}")
-    if link := findall(r'.downloadlink.:..(https:.*)..', res.text):
-        return link[0].replace('\/', '/')
+    if link := findall(r".downloadlink.:..(https:.*)..", res.text):
+        return link[0].replace("\/", "/")
     raise DirectDownloadLinkException("ERROR: Link File tidak ditemukan!")
 
 
