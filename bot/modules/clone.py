@@ -122,7 +122,7 @@ class Clone(TaskListener):
             ) and (reply_markup := reply_to.reply_markup):
                 self.link = (
                     reply_markup.inline_keyboard[0][0].url
-                    or reply_markup.inline_keyboard[0].url
+                    or ""
                 )
             if not (
                 is_gdrive_link(self.link)
