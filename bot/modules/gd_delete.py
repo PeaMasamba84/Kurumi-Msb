@@ -25,7 +25,7 @@ async def deletefile(_, message):
             if not is_gdrive_link(link) and reply_to.reply_markup:
                 link = (
                     reply_to.reply_markup.inline_keyboard[0][0].url
-                    or reply_to.reply_markup.inline_keyboard[0].url
+                    or ""
                 )
     else:
         link = ""
