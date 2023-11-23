@@ -531,7 +531,8 @@ if not ospath.exists("accounts"):
 aria2 = ariaAPI(
     ariaClient(
         host="http://localhost", 
-        port=6800, secret=""
+        port=6800, 
+        secret=""
     )
 )
 
