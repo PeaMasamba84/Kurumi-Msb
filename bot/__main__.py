@@ -91,7 +91,7 @@ def progress_bar(percentage):
     except:
         percentage = 0
     return "".join(
-        "■" if i <= percentage // 10 else "□" for i in range(1, 11)
+        "⬢" if i <= percentage // 10 else "□" for i in range(1, 11)
     )
 
 
@@ -214,8 +214,8 @@ async def stats(_, message):
 async def start(client, message):
     buttons = ButtonMaker()
     buttons.ubutton(
-        "Owner", "https://t.me/save_usdt")
-    buttons.ubutton("Channel", "https://t.me/arakurumi")
+        "Owner", "https://www.comelmuewa84.eu.org")
+    buttons.ubutton("Group", "https://t.me/peamasamba")
     reply_markup = buttons.build_menu(2)
     if await CustomFilters.authorized(client, message):
         start_string = f"""
