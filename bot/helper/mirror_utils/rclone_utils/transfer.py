@@ -206,7 +206,7 @@ class RcloneTransferHelper:
             destination = epath
 
         cmd = [
-            "rclone",
+            "edge",
             "lsjson",
             "--fast-list",
             "--no-mimetype",
@@ -353,7 +353,7 @@ class RcloneTransferHelper:
             else:
                 destination = f"{oremote}:{self._listener.name}"
 
-            cmd = ["rclone", "link", "--config", oconfig_path, destination]
+            cmd = ["edge", "link", "--config", oconfig_path, destination]
             res, err, code = await cmd_exec(cmd)
 
             if code == 0:
@@ -424,7 +424,7 @@ class RcloneTransferHelper:
                         f"/{self._listener.name}" if dst_path else self._listener.name
                     )
 
-                cmd = ["rclone", "link", "--config", config_path, destination]
+                cmd = ["edge", "link", "--config", config_path, destination]
                 res, err, code = await cmd_exec(cmd)
 
                 if self._is_cancelled:
@@ -442,7 +442,7 @@ class RcloneTransferHelper:
     def _getUpdatedCommand(self, config_path, source, destination, method):
         ext = "*.{" + ",".join(self.extension_filter) + "}"
         cmd = [
-            "rclone",
+            "edge",
             method,
             "--fast-list",
             "--config",
