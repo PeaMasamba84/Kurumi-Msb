@@ -143,7 +143,7 @@ class RcloneList:
             await wait_for(self.event.wait(), timeout=self._timeout)
         except:
             self.path = ""
-            self.remote = "Waktu habis. Tugas dibatalkan!"
+            self.remote = "<b>Waktu habis. Tugas dibatalkan!</b>"
             self.is_cancelled = True
             self.event.set()
         finally:
@@ -218,7 +218,7 @@ class RcloneList:
         elif self.list_status == "rcu":
             self.item_type == "--dirs-only"
         cmd = [
-            "rclone",
+            "edge",
             "lsjson",
             self.item_type,
             "--fast-list",
