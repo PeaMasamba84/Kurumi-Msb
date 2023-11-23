@@ -43,7 +43,7 @@ from bot import (
     qbv, 
     ytv
 )
-from .helper.ext_utils.files_utils import start_cleanup, clean_all, exit_clean_up
+from .helper.ext_utils.files_utils import clean_all, exit_clean_up
 from .helper.ext_utils.bot_utils import cmd_exec, sync_to_async, initiate_help_messages
 from .helper.ext_utils.status_utils import get_readable_file_size, get_readable_time
 from .helper.ext_utils.db_handler import DbManger
@@ -161,7 +161,6 @@ async def stats(_, message):
     neofetch = check_output(
         ["neofetch --shell_version off --stdout"], shell=True).decode()
     stats = f"""
-
 <b>CPU</b>
 <b>Cores        :</b> <code>{p_core}</code>
 <b>Logical      :</b> <code>{t_core}</code>
@@ -235,7 +234,7 @@ Enjoy :D
     else:
         await sendMessage(
             message, 
-            "<b>Tidak ada izin!</b>\nGabung ke group jika mau gunakan Bot ini!", 
+            "<b>Tidak ada izin!</b>\nGabung ke group jika mau gunakan Bot ini!",  
             reply_markup
         )
 
@@ -252,7 +251,6 @@ async def restart(_, message):
     if Interval:
         for intvl in list(Interval.values()):
             intvl.cancel()
-    await sync_to_async(clean_all)
     proc1 = await create_subprocess_exec("pkill", "-9", "-f", "gunicorn|chrome|firefox|opera|edge")
     if user:
         await user.stop()
@@ -272,7 +270,7 @@ async def ping(_, message):
     end_time = int(round(time() * 1000))
     await editMessage(
         reply, 
-        f"🤖 <b>Respon Bot :</b> <code>{end_time - start_time} ms</code>"
+        f"<b>Respon Bot :</b> <code>{end_time - start_time} ms</code>"
     )
 
 
@@ -384,7 +382,7 @@ async def restart_notification():
 <b>Hari      :</b> <code>{now.strftime('%A')}</code>
 <b>Tgl       :</b> <code>{now.strftime('%d %B %Y')}</code>
 <b>Waktu     :</b> <code>{now.strftime('%H:%M:%S WIB')}</code>
-<b>Kutipan    :</b>
+<b>Kutipan   :</b>
 <code>{get_quotes()}</code>         
 """
                 if data.items():
@@ -421,7 +419,7 @@ async def restart_notification():
 
 async def main():
     await gather(
-        start_cleanup(), 
+        clean_all(),
         torrent_search.initiate_search_tools(), 
         restart_notification(),
         initiate_help_messages()
