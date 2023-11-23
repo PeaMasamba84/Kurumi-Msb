@@ -91,7 +91,7 @@ def progress_bar(percentage):
     except:
         percentage = 0
     return "".join(
-        "■" if i <= percentage // 10 else "□" for i in range(1, 11)
+        "⬢" if i <= percentage // 10 else "□" for i in range(1, 11)
     )
 
 
@@ -214,12 +214,12 @@ async def stats(_, message):
 async def start(client, message):
     buttons = ButtonMaker()
     buttons.ubutton(
-        "Owner", "https://t.me/save_usdt")
-    buttons.ubutton("Channel", "https://t.me/arakurumi")
+        "Owner", "https://www.comelmuewa84.eu.org")
+    buttons.ubutton("Group", "https://t.me/peamasamba")
     reply_markup = buttons.build_menu(2)
     if await CustomFilters.authorized(client, message):
         start_string = f"""
-<b>Mirror Tautan Lambat menjadi Tautan Cepat!</b>
+<b>Memirror file lebih Cepat!</b>
 
 <b>Note :</b>
 Selalu backup File setelah Mirror untuk menghindari Drive terhapus!
@@ -236,7 +236,7 @@ Enjoy :D
     else:
         await sendMessage(
             message, 
-            "<b>Tidak ada izin!</b>\nGabung Grup/Channel untuk menggunakan Bot!\n\n<b>Note :</b>\nJika Group ini mengaktifkan Topik, Kirim perintah di Topik yang diizinkan!", 
+            "<b>Tidak ada izin!</b>\nGabung ke group jika mau gunakan Bot ini!", 
             reply_markup
         )
 
@@ -272,7 +272,7 @@ async def ping(_, message):
     end_time = int(round(time() * 1000))
     await editMessage(
         reply, 
-        f"🤖 <b>Respon Bot :</b> <code>{end_time - start_time} ms</code>"
+        f"<b>Respon Bot :</b> <code>{end_time - start_time} ms</code>"
     )
 
 
