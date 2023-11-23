@@ -91,7 +91,7 @@ def progress_bar(percentage):
     except:
         percentage = 0
     return "".join(
-        "⬢" if i <= percentage // 10 else "□" for i in range(1, 11)
+        "■" if i <= percentage // 10 else "□" for i in range(1, 11)
     )
 
 
@@ -161,6 +161,7 @@ async def stats(_, message):
     neofetch = check_output(
         ["neofetch --shell_version off --stdout"], shell=True).decode()
     stats = f"""
+<pre languange='bash'><code>{neofetch}</code>
 <b>CPU</b>
 <b>Cores        :</b> <code>{p_core}</code>
 <b>Logical      :</b> <code>{t_core}</code>
@@ -200,8 +201,9 @@ async def stats(_, message):
 <b>Waktu Mesin  :</b> <code>{osUptime}</code>
 <b>Diperbarui   :</b> <code>{last_commit}</code>
 
-<b>Kutipan      :</b> 
+<b>Quotes       :</b> 
 <code>{get_quotes()}</code>
+</pre>
 """
     await sendMessage(
         message, 
@@ -212,12 +214,12 @@ async def stats(_, message):
 async def start(client, message):
     buttons = ButtonMaker()
     buttons.ubutton(
-        "Owner", "https://www.comelmuewa84.eu.org")
-    buttons.ubutton("Group", "https://t.me/peamasamba")
+        "Owner", "https://t.me/save_usdt")
+    buttons.ubutton("Channel", "https://t.me/arakurumi")
     reply_markup = buttons.build_menu(2)
     if await CustomFilters.authorized(client, message):
         start_string = f"""
-<b>Memirror file lebih Cepat!</b>
+<b>Mirror Tautan Lambat menjadi Tautan Cepat!</b>
 
 <b>Note :</b>
 Selalu backup File setelah Mirror untuk menghindari Drive terhapus!
@@ -234,7 +236,7 @@ Enjoy :D
     else:
         await sendMessage(
             message, 
-            "<b>Tidak ada izin!</b>\nGabung ke group jika mau gunakan Bot ini!",  
+            "<b>Tidak ada izin!</b>\nGabung Grup/Channel untuk menggunakan Bot!\n\n<b>Note :</b>\nJika Group ini mengaktifkan Topik, Kirim perintah di Topik yang diizinkan!", 
             reply_markup
         )
 
@@ -270,7 +272,7 @@ async def ping(_, message):
     end_time = int(round(time() * 1000))
     await editMessage(
         reply, 
-        f"<b>Respon Bot :</b> <code>{end_time - start_time} ms</code>"
+        f"🤖 <b>Respon Bot :</b> <code>{end_time - start_time} ms</code>"
     )
 
 
@@ -378,12 +380,13 @@ async def restart_notification():
         if notifier_dict := await DbManger().get_incomplete_tasks():
             for cid, data in notifier_dict.items():
                 msg = f"""
-{'<b>Bot sudah di restart!</b>' if cid == chat_id else '<b>Bot dimulai ulang!</b>'}
-<b>Hari      :</b> <code>{now.strftime('%A')}</code>
-<b>Tgl       :</b> <code>{now.strftime('%d %B %Y')}</code>
+{'<b>Bot berhasil dimulai ulang!</b>' if cid == chat_id else '<b>Bot dimulai ulang!</b>'}
+<pre languange="bash"><b>Hari      :</b> <code>{now.strftime('%A')}</code>
+<b>Tanggal   :</b> <code>{now.strftime('%d %B %Y')}</code>
 <b>Waktu     :</b> <code>{now.strftime('%H:%M:%S WIB')}</code>
-<b>Kutipan   :</b>
-<code>{get_quotes()}</code>         
+<b>Quotes    :</b>
+<code>{get_quotes()}</code>
+</pre>           
 """
                 if data.items():
                     msg += f"<b>Tugas yang belum selesai :</b>"
@@ -400,12 +403,13 @@ async def restart_notification():
     if await aiopath.isfile(".restartmsg"):
         try:
             msg = f"""
-<b>Bot sudah di restart!</b>
-<b>Hari      :</b> <code>{now.strftime('%A')}</code>
-<b>Tgl       :</b> <code>{now.strftime('%d %B %Y')}</code>
+<b>Bot berhasil dimulai ulang!</b>
+<pre languange="bash"><b>Hari      :</b> <code>{now.strftime('%A')}</code>
+<b>Tanggal   :</b> <code>{now.strftime('%d %B %Y')}</code>
 <b>Waktu     :</b> <code>{now.strftime('%H:%M:%S WIB')}</code>
-<b>Kutipan   :</b>
-<code>{get_quotes()}</code>          
+<b>Quotes    :</b>
+<code>{get_quotes()}</code>
+</pre>           
 """
             await bot.edit_message_text(
                 chat_id=chat_id, 
