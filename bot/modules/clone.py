@@ -137,7 +137,7 @@ class Clone(TaskListener):
         if len(self.link) == 0:
             await sendMessage(
                 self.message, 
-                f"<b>Hai {self.tag} !</b>\n<b>Sepertinya perintah yang kamu gunakan tidak tepat. Buka tautan berikut untuk mendapatkan bantuan!</b>", 
+                f"<b>Hai {self.tag} !</b>\n<b>Sepertinya perintah yang anda gunakan tidak tepat. Buka tautan berikut untuk mendapatkan bantuan!</b>", 
                 COMMAND_USAGE["clone"]
             )
             return
@@ -302,7 +302,7 @@ class Clone(TaskListener):
         else:
             await sendMessage(
                 self.message, 
-                f"<b>Hai {self.tag} !</b>\n<b>Sepertinya perintah yang kamu gunakan tidak tepat. Buka tautan berikut untuk mendapatkan bantuan!</b>",
+                f"<b>Hai {self.tag} !</b>\n<b>Sepertinya perintah yang anda gunakan tidak tepat. Buka tautan berikut untuk mendapatkan bantuan!</b>",
                 COMMAND_USAGE["clone"]
             )
 
