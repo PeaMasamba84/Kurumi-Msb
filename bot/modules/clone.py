@@ -137,7 +137,7 @@ class Clone(TaskListener):
         if len(self.link) == 0:
             await sendMessage(
                 self.message, 
-                f"<b>Hai {self.tag} !</b>\n<b>Sepertinya perintah yang kamu gunakan tidak tepat. Buka tautan berikut untuk mendapatkan bantuan!</b>", 
+                f"<b>Hai {self.tag} !</b>\n<b>Sepertinya perintah yang anda gunakan tidak tepat. Buka tautan berikut untuk mendapatkan bantuan!</b>", 
                 COMMAND_USAGE["clone"]
             )
             return
@@ -207,7 +207,7 @@ class Clone(TaskListener):
             src_path = src_path.strip("/")
 
             cmd = [
-                "rclone",
+                "edge",
                 "lsjson",
                 "--fast-list",
                 "--stat",
@@ -251,7 +251,7 @@ class Clone(TaskListener):
                 return
             LOGGER.info(f"Cloning Done: {self.name}")
             cmd1 = [
-                "rclone",
+                "edge",
                 "lsf",
                 "--fast-list",
                 "-R",
@@ -261,7 +261,7 @@ class Clone(TaskListener):
                 destination,
             ]
             cmd2 = [
-                "rclone",
+                "edge",
                 "lsf",
                 "--fast-list",
                 "-R",
@@ -271,7 +271,7 @@ class Clone(TaskListener):
                 destination,
             ]
             cmd3 = [
-                "rclone",
+                "edge",
                 "size",
                 "--fast-list",
                 "--json",
@@ -302,7 +302,7 @@ class Clone(TaskListener):
         else:
             await sendMessage(
                 self.message, 
-                f"<b>Hai {self.tag} !</b>\n<b>Sepertinya perintah yang kamu gunakan tidak tepat. Buka tautan berikut untuk mendapatkan bantuan!</b>",
+                f"<b>Hai {self.tag} !</b>\n<b>Sepertinya perintah yang anda gunakan tidak tepat. Buka tautan berikut untuk mendapatkan bantuan!</b>",
                 COMMAND_USAGE["clone"]
             )
 
