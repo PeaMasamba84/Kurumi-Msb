@@ -23,7 +23,7 @@ async def add_rclone_download(listener, path):
     listener.link = escape(listener.link.strip("/"))
 
     cmd1 = [
-        "rclone",
+        "edge",
         "lsjson",
         "--fast-list",
         "--stat",
@@ -34,7 +34,7 @@ async def add_rclone_download(listener, path):
         f"{remote}:{listener.link}",
     ]
     cmd2 = [
-        "rclone",
+        "edge",
         "size",
         "--fast-list",
         "--json",
