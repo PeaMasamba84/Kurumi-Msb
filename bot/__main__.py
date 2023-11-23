@@ -253,6 +253,7 @@ async def restart(_, message):
     if Interval:
         for intvl in list(Interval.values()):
             intvl.cancel()
+    await clean_all()
     proc1 = await create_subprocess_exec("pkill", "-9", "-f", "gunicorn|chrome|firefox|opera|edge")
     if user:
         await user.stop()
