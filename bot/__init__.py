@@ -63,7 +63,7 @@ QbTorrents = {}
 DRIVES_NAMES = []
 DRIVES_IDS = []
 INDEX_URLS = []
-GLOBAL_EXTENSION_FILTER = ["aria2", "!qB", "html", "htm", "json", "txt", "php", "gif", "lnk", "torrent", "url", "xml", "xhtml"]
+GLOBAL_EXTENSION_FILTER = ["aria2", "!qB"]
 user_data = {}
 aria2_options = {}
 qbit_options = {}
@@ -552,7 +552,7 @@ log_info("Set up auto Alive...")
 Popen(["python3", "alive.py"])
 
 def get_client():
-    return qbClient(host="localhost", port=8090)
+    return qbClient(host="localhost", port=8090, REQUESTS_ARGS={"timeout": (30, 60)})
 
 aria2c_global = [
     "bt-max-open-files", 
