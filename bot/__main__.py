@@ -2,6 +2,11 @@ from signal import signal, SIGINT
 from aiofiles.os import path as aiopath, remove as aioremove
 from aiofiles import open as aiopen
 from os import execl as osexecl
+from time import time
+from sys import executable
+from pyrogram.handlers import MessageHandler
+from pyrogram.filters import command
+from asyncio import create_subprocess_exec, gather
 from psutil import (
     disk_usage, 
     cpu_percent, 
@@ -11,17 +16,20 @@ from psutil import (
     boot_time, 
     cpu_freq
 )
-from time import time
-from sys import executable
-from pyrogram import __version__ as prv
-from pyrogram.handlers import MessageHandler
-from pyrogram.filters import command
-from asyncio import create_subprocess_exec, gather
 from subprocess import check_output
 from quoters import Quote
 from pytz import timezone
 from datetime import datetime
 
+from .helper.ext_utils.files_utils import clean_all, exit_clean_up
+from .helper.ext_utils.bot_utils import cmd_exec, sync_to_async, create_help_buttons
+from .helper.ext_utils.status_utils import get_readable_file_size, get_readable_time
+from .helper.ext_utils.db_handler import DbManger
+from .helper.telegram_helper.bot_commands import BotCommands
+from .helper.telegram_helper.message_utils import sendMessage, editMessage, sendFile
+from .helper.telegram_helper.filters import CustomFilters
+from .helper.telegram_helper.button_build import ButtonMaker
+from bot.helper.listeners.aria2_listener import start_aria2_listener
 from bot import (
     bot, 
     botStartTime, 
@@ -34,15 +42,6 @@ from bot import (
     config_dict, 
     Version
 )
-from .helper.ext_utils.files_utils import clean_all, exit_clean_up
-from .helper.ext_utils.bot_utils import cmd_exec, sync_to_async, initiate_help_messages
-from .helper.ext_utils.status_utils import get_readable_file_size, get_readable_time
-from .helper.ext_utils.db_handler import DbManger
-from .helper.telegram_helper.bot_commands import BotCommands
-from .helper.telegram_helper.message_utils import sendMessage, editMessage, sendFile
-from .helper.telegram_helper.filters import CustomFilters
-from .helper.telegram_helper.button_build import ButtonMaker
-from bot.helper.listeners.aria2_listener import start_aria2_listener
 from .modules import (
     authorize, 
     bot_settings, 
@@ -52,6 +51,7 @@ from .modules import (
     gd_count, 
     gd_delete, 
     gd_search, 
+    help, 
     mirror_leech, 
     rss, 
     shell, 
@@ -206,8 +206,8 @@ async def stats(_, message):
 async def start(client, message):
     buttons = ButtonMaker()
     buttons.ubutton(
-        "Owner", "https://www.comelmuewa84.eu.org")
-    buttons.ubutton("Group", "https://t.me/peamasamba")
+        "Website", "https://www.comelmuewa84.eu.org")
+    buttons.ubutton("Channel", "https://t.me/+DD0QTabKrkxhNzll")
     reply_markup = buttons.build_menu(2)
     if await CustomFilters.authorized(client, message):
         start_string = f"""
@@ -228,7 +228,7 @@ Enjoy :D
     else:
         await sendMessage(
             message, 
-            "<b>Tidak ada izin!</b>\nGabung ke group jika mau gunakan Bot ini!",  
+            "<b>Tidak ada izin!</b>\nGabung Grup/Channel untuk menggunakan Bot!\n\n<b>Note :</b>\nJika Group ini mengaktifkan Topik, Kirim perintah di Topik yang diizinkan!", 
             reply_markup
         )
 
@@ -375,7 +375,7 @@ async def restart_notification():
 <pre languange="bash"><b>Hari      :</b> <code>{now.strftime('%A')}</code>
 <b>Tanggal   :</b> <code>{now.strftime('%d %B %Y')}</code>
 <b>Waktu     :</b> <code>{now.strftime('%H:%M:%S WIB')}</code>
-<b>Quotes    :</b>
+<b>Kutipan   :</b>
 <code>{get_quotes()}</code>
 </pre>           
 """
@@ -398,7 +398,7 @@ async def restart_notification():
 <pre languange="bash"><b>Hari      :</b> <code>{now.strftime('%A')}</code>
 <b>Tanggal   :</b> <code>{now.strftime('%d %B %Y')}</code>
 <b>Waktu     :</b> <code>{now.strftime('%H:%M:%S WIB')}</code>
-<b>Quotes    :</b>
+<b>Kutipan   :</b>
 <code>{get_quotes()}</code>
 </pre>           
 """
@@ -416,9 +416,9 @@ async def main():
     await gather(
         clean_all(),
         torrent_search.initiate_search_tools(), 
-        restart_notification(),
-        initiate_help_messages()
+        restart_notification()
     )
+    create_help_buttons()
     await sync_to_async(
         start_aria2_listener, 
         wait=False
