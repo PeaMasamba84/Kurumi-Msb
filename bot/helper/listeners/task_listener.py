@@ -48,8 +48,8 @@ from bot.helper.common import TaskConfig
 
 
 class TaskListener(TaskConfig):
-    def __init__(self, message):
-        super().__init__(message)
+    def __init__(self):
+        super().__init__()
 
     async def clean(self):
         try:
@@ -234,7 +234,7 @@ class TaskListener(TaskConfig):
             and DATABASE_URL
         ):
             await DbManger().rm_complete_task(self.message.link)
-        msg = f"<b>Nama :<blockquote></b> <code>{escape(self.name)}</code></blockquote>"
+        msg = f"<b>Nama :</b> <code>{escape(self.name)}</code>"
         msg += f"\n\n<b>Ukuran :</b> <code>{get_readable_file_size(size)}</code>"
         LOGGER.info(f"Task Done: {self.name}")
         if self.isLeech:
