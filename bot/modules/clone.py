@@ -7,6 +7,7 @@ from json import loads
 from bot import LOGGER, task_dict, task_dict_lock, bot
 from bot.helper.mirror_utils.gdrive_utils.clone import gdClone
 from bot.helper.mirror_utils.gdrive_utils.count import gdCount
+from bot.helper.ext_utils.help_messages import CLONE_HELP_MESSAGE
 from bot.helper.telegram_helper.message_utils import (
     sendMessage,
     deleteMessage,
@@ -20,8 +21,7 @@ from bot.helper.ext_utils.bot_utils import (
     sync_to_async,
     new_task,
     cmd_exec,
-    arg_parser,
-    COMMAND_USAGE,
+    arg_parser
 )
 from bot.helper.ext_utils.links_utils import (
     is_gdrive_link,
@@ -46,21 +46,20 @@ class Clone(TaskListener):
         message,
         _=None,
         __=None,
-        sameDir=None,
+        ___=None,
         bulk=None,
         multiTag=None,
         options="",
     ):
-        if sameDir is None:
-            sameDir = {}
         if bulk is None:
             bulk = []
-        super().__init__(message)
+        self.message = message
         self.client = client
         self.multiTag = multiTag
         self.options = options
-        self.sameDir = sameDir
+        self.sameDir = {}
         self.bulk = bulk
+        super().__init__()
         self.isClone = True
 
     @new_task
@@ -135,11 +134,7 @@ class Clone(TaskListener):
         self.run_multi(input_list, "", Clone)
 
         if len(self.link) == 0:
-            await sendMessage(
-                self.message, 
-                f"<b>Hai {self.tag} !</b>\n<b>Sepertinya perintah yang kamu gunakan tidak tepat. Buka tautan berikut untuk mendapatkan bantuan!</b>", 
-                COMMAND_USAGE["clone"]
-            )
+            await sendMessage(self.message, CLONE_HELP_MESSAGE)
             return
 
         try:
@@ -206,17 +201,8 @@ class Clone(TaskListener):
             remote, src_path = self.link.split(":", 1)
             src_path = src_path.strip("/")
 
-            cmd = [
-                "edge",
-                "lsjson",
-                "--fast-list",
-                "--stat",
-                "--no-modtime",
-                "--config",
-                config_path,
-                f"{remote}:{src_path}",
-            ]
-            res = await cmd_exec(cmd)
+            cmd = f'edge lsjson --fast-list --stat --no-modtime --config {config_path} "{remote}:{src_path}"'
+            res = await cmd_exec(cmd, shell=True)
             if res[2] != 0:
                 if res[2] != -9:
                     msg = f"<b>Gagal mendapatkan link path Rclone</b>\n<b>Path :</b> <code>{remote}:{src_path}</code>\n\n<b>Stderr :</b>\n<code>{res[1][:4000]}</code>"
@@ -250,37 +236,15 @@ class Clone(TaskListener):
             if not flink:
                 return
             LOGGER.info(f"Cloning Done: {self.name}")
-            cmd1 = [
-                "edge",
-                "lsf",
-                "--fast-list",
-                "-R",
-                "--files-only",
-                "--config",
-                config_path,
-                destination,
-            ]
-            cmd2 = [
-                "edge",
-                "lsf",
-                "--fast-list",
-                "-R",
-                "--dirs-only",
-                "--config",
-                config_path,
-                destination,
-            ]
-            cmd3 = [
-                "edge",
-                "size",
-                "--fast-list",
-                "--json",
-                "--config",
-                config_path,
-                destination,
-            ]
+            cmd1 = f'edge lsf --fast-list -R --files-only --config {config_path} "{destination}"'
+            cmd2 = f'edge lsf --fast-list -R --dirs-only --config {config_path} "{destination}"'
+            cmd3 = (
+                f'edge size --fast-list --json --config {config_path} "{destination}"'
+            )
             res1, res2, res3 = await gather(
-                cmd_exec(cmd1), cmd_exec(cmd2), cmd_exec(cmd3)
+                cmd_exec(cmd1, shell=True),
+                cmd_exec(cmd2, shell=True),
+                cmd_exec(cmd3, shell=True),
             )
             if res1[2] != res2[2] != res3[2] != 0:
                 if res1[2] == -9:
@@ -300,11 +264,7 @@ class Clone(TaskListener):
                     flink, size, files, folders, mime_type, destination
                 )
         else:
-            await sendMessage(
-                self.message, 
-                f"<b>Hai {self.tag} !</b>\n<b>Sepertinya perintah yang kamu gunakan tidak tepat. Buka tautan berikut untuk mendapatkan bantuan!</b>",
-                COMMAND_USAGE["clone"]
-            )
+            await sendMessage(self.message, CLONE_HELP_MESSAGE)
 
 
 async def clone(client, message):
