@@ -62,14 +62,15 @@ class Mirror(TaskListener):
             sameDir = {}
         if bulk is None:
             bulk = []
-        super().__init__(message)
+        self.message = message
         self.client = client
-        self.isQbit = isQbit
-        self.isLeech = isLeech
         self.multiTag = multiTag
         self.options = options
         self.sameDir = sameDir
         self.bulk = bulk
+        super().__init__()
+        self.isQbit = isQbit
+        self.isLeech = isLeech
 
     @new_task
     async def newEvent(self):
@@ -283,9 +284,7 @@ class Mirror(TaskListener):
             and not is_gdrive_id(self.link)
         ):
             await sendMessage(
-                self.message, 
-                f"<b>Hai {self.tag} !</b>\n<b>Sepertinya perintah yang kamu gunakan tidak tepat. Buka tautan berikut untuk mendapatkan bantuan!</b>", 
-                COMMAND_USAGE["main"]
+                self.message, COMMAND_USAGE["mirror"][0], COMMAND_USAGE["mirror"][1]
             )
             self.removeFromSameDir()
             return
