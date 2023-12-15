@@ -273,14 +273,15 @@ class YtDlp(TaskListener):
             sameDir = {}
         if bulk is None:
             bulk = []
-        super().__init__(message)
+        self.message = message
         self.client = client
-        self.isLeech = isLeech
-        self.isYtDlp = True
         self.multiTag = multiTag
         self.options = options
         self.sameDir = sameDir
         self.bulk = bulk
+        super().__init__()
+        self.isYtDlp = True
+        self.isLeech = isLeech
 
     @new_task
     async def newEvent(self):
@@ -427,8 +428,7 @@ class YtDlp(TaskListener):
         except Exception as e:
             error = str(e).replace("<", " ").replace(">", " ")
             await sendMessage(
-                self.message, 
-                f"<b>Hai {self.tag} !</b>\n<b>Tugasmu dihentikan karena :</b>\n<code>{error}</code>"
+                self.message, COMMAND_USAGE["yt"][0], COMMAND_USAGE["yt"][1]
             )
             self.removeFromSameDir()
             return
