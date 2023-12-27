@@ -13,7 +13,6 @@ from bs4 import BeautifulSoup
 from cloudscraper import create_scraper
 from lxml.etree import HTML
 from requests import Session, post
-from requests import session as req_session
 from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
 
@@ -26,7 +25,7 @@ from bot.helper.ext_utils.help_messages import PASSWORD_ERROR_MESSAGE
 
 _caches = {}
 
-user_agent  = "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:120.0) Gecko/20100101 Firefox/120.0"
+user_agent  = "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:122.0) Gecko/20100101 Firefox/122.0"
 
 def direct_link_generator(link: str):
     """ direct links generator """
@@ -70,6 +69,8 @@ def direct_link_generator(link: str):
             return send_cm(link)
         else:
             return alldebrid(link)
+    elif "tmpsend.com" in domain:
+        return tmpsend(link)
     elif "easyupload.io" in domain:
         return easyupload(link)
     elif "streamvid.net" in domain:
@@ -1278,6 +1279,17 @@ def send_cm(url):
     return details
 
 
+def tmpsend(url):
+    match = search(r"https://tmpsend.com/(\w+)$", url)
+    if match:
+        file_id = match.group(1)
+        header = f"Referer: https://tmpsend.com/thank-you?d={file_id}"
+        download_link = f"https://tmpsend.com/download?d={file_id}"
+        return download_link, header
+    else:
+        raise DirectDownloadLinkException("ERROR: Direct Link tidak ditemukan!")
+
+
 def doods(url: str):
     if "/e/" in url:
         url = url.replace("/e/", "/d/")
@@ -1559,12 +1571,13 @@ def mp4upload(url):
             if not data:
                 session.close()
                 raise DirectDownloadLinkException("ERROR: Link File tidak ditemukan!")
-            post = session.post(url, 
-                                data=data, 
-                                headers={
-                                    "User-Agent": user_agent, 
-                                    "Referer": "https://www.mp4upload.com/"
-                                }).text
+            post = session.post(
+                url, 
+                data=data, 
+                headers={
+                    "User-Agent": user_agent, 
+                    "Referer": "https://www.mp4upload.com/"
+                }).text
             soup = BeautifulSoup(post, "lxml")
             inputs = soup.find_all("form", {"name": "F1"})[0].find_all("input")
             data = {input.get("name"): input.get("value").replace(" ", "") for input in inputs}
@@ -1604,15 +1617,16 @@ def apkadmin(url: str) -> str:
             soup = BeautifulSoup(req, "lxml")
             op = soup.find("input", {"name": "op"})["value"]
             ids = soup.find("input", {"name": "id"})["value"]
-            post = session.post(url, 
-                                data={
-                                    "op": op,
-                                    "id": ids,
-                                    "rand": " ",
-                                    "referer": " ",
-                                    "method_free": " ",
-                                    "method_premium": " ",
-                                }).text
+            post = session.post(
+                url, 
+                data={
+                    "op": op,
+                    "id": ids,
+                    "rand": " ",
+                    "referer": " ",
+                    "method_free": " ",
+                    "method_premium": " ",
+                }).text
             soup = BeautifulSoup(post, "lxml")
             link = soup.find("div", {"class": "text text-center"})
             direct_link = link.find("a")["href"]
@@ -1718,17 +1732,18 @@ def pandafiles(url):
     with create_scraper() as session:
         try:
             file_id = search(r"(?://|\.)(pandafiles\.com)/([0-9a-zA-Z]+)", url)[2]
-            post = session.post(url, 
-                               headers={
-                                   "User-Agent": user_agent
-                                }, 
-                               data={
-                                   "op": "download2", 
-                                   "usr_login": "", 
-                                   "id": file_id, 
-                                   "referer": url, 
-                                   "method_free": "Free Download"
-                               }).content
+            post = session.post(
+                url, 
+                headers={
+                    "User-Agent": user_agent
+                }, 
+                data={
+                    "op": "download2", 
+                    "usr_login": "", 
+                    "id": file_id, 
+                    "referer": url, 
+                    "method_free": "Free Download"
+                }).content
             soup = BeautifulSoup(post)
             direct_link = soup.find("div", {"id": "direct_link"}).find("a")["href"]
             return direct_link
@@ -1740,10 +1755,11 @@ def pandafiles(url):
 def uploadhaven(url):
     with Session() as session:
         try:
-            req = session.get(url,
-                              headers={
-                                  "User-Agent": user_agent
-                              }).text
+            req = session.get(
+                url,
+                headers={
+                    "User-Agent": user_agent
+                }).text
             soup = BeautifulSoup(req, "lxml")
             d = soup.find("div", {"class": "alert alert-danger col-md-12"})
             if d is not None:
@@ -1812,10 +1828,11 @@ def romsget(url):
                 dlid = soup.find("button", {"data-callback": "onDLSubmit"}).get("dlid")
             except:
                 dlid = soup.find("div", {"data-callback": "onDLSubmit"}).get("dlid")
-            post = session.post("https://www.romsget.io" + upos, 
-                               data={
-                                   meid: dlid
-                                }).text
+            post = session.post(
+                "https://www.romsget.io" + upos, 
+                data={
+                    meid: dlid
+                }).text
             soup = BeautifulSoup(post, "html.parser")
             udl = soup.find("form", {"name": "redirected"}).get("action")
             prm = soup.find("input", {"name": "attach"}).get("value")
