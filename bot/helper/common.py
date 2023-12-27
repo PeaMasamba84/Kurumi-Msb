@@ -330,7 +330,7 @@ class TaskConfig:
             return
         if self.multiTag and self.multiTag not in multi_tags:
             await sendMessage(
-                self.message, f"<b>Tugas Multi dibatalkan oleh User</b> (</code>{self.tag}</code>)!"
+                self.message, f"<b>Tugas Multi dibatalkan oleh User!</b>"
             )
             await sendStatusMessage(self.message)
             return
