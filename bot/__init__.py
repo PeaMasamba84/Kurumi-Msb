@@ -552,7 +552,7 @@ log_info("Set up auto Alive...")
 Popen(["python3", "alive.py"])
 
 def get_client():
-    return qbClient(host="localhost", port=8090, REQUESTS_ARGS={"timeout": (30, 60)})
+    return qbClient(host="localhost", port=8090, FORCE_SCHEME_FROM_HOST=True, REQUESTS_ARGS={"timeout": (30, 60)})
 
 aria2c_global = [
     "bt-max-open-files", 
