@@ -701,7 +701,7 @@ async def send_users_settings(bot, message):
             no += 1
             try:
                 user = await bot.get_users(item)
-            except IndexError:
+            except:
                 user = None
             if user:
                 msg += f"\n<b>{no}. User :</b> <a href='tg://user?id={item}'>{(user.first_name or '')} {(user.last_name or '')}</a>"
