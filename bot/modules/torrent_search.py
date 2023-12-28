@@ -200,7 +200,7 @@ async def _getResult(search_results, key, message, method):
     path = [
         (
             await telegraph.create_page(
-                title="Pencari KQRM Bot", content=content
+                title="Pea Masamba Bot", content=content
             )
         )["path"]
         for content in telegraph_content
