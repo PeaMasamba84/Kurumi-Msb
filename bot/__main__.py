@@ -72,7 +72,7 @@ def get_quotes():
         oleh = quotez.split(":")[0]
         quotes = f"{quote}\n=> {oleh}"
     except:
-        quotes = "Ngga ada Quote bijak buatmu wahai Tuan yang bijaksana :D"
+        quotes = "Gunakan dengan bijak :D"
     return quotes
 
 
@@ -209,8 +209,8 @@ async def stats(_, message):
 async def start(client, message):
     buttons = ButtonMaker()
     buttons.ubutton(
-        "Owner", "https://t.me/save_usdt")
-    buttons.ubutton("Channel", "https://t.me/arakurumi")
+        "Website", "https://www.comelmuewa84.eu.org")
+    buttons.ubutton("Channel", "https://t.me/+IwkWuJNYz5E3ZTU1")
     reply_markup = buttons.build_menu(2)
     if await CustomFilters.authorized(client, message):
         start_string = f"""
