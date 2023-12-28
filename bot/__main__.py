@@ -72,7 +72,7 @@ def get_quotes():
         oleh = quotez.split(":")[0]
         quotes = f"{quote}\n=> {oleh}"
     except:
-        quotes = "Gunakan dengan bijak-lah :D"
+        quotes = "Gunakan dengan Bijak :D"
     return quotes
 
 
@@ -268,7 +268,7 @@ async def ping(_, message):
     end_time = int(round(time() * 1000))
     await editMessage(
         reply, 
-        f"<b>Respon Bot :</b> <code>{end_time - start_time} ms</code>"
+        f"🤖 <b>Respon Bot :</b> <code>{end_time - start_time} ms</code>"
     )
 
 
@@ -277,6 +277,8 @@ async def log(_, message):
 
 help_string = f"""
 <b>Daftar Perintah</b> <code>@{bot.me.username}</code>
+<code>/{BotCommands.StartCommand[0]}</code> : Mulai Bot.
+<code>/{BotCommands.HelpCommand[0]}</code> atau <code>/{BotCommands.HelpCommand[1]}</code> : Cek semua perintah Bot.
 <code>/{BotCommands.MirrorCommand[0]}</code> atau <code>/{BotCommands.MirrorCommand[1]}</code> : Mirror ke Google Drive/Cloud menggunakan Aria2.
 <code>/{BotCommands.QbMirrorCommand[0]}</code> atau <code>/{BotCommands.QbMirrorCommand[1]}</code> : Mirror ke Google Drive/Cloud menggunakan qBittorrent.
 <code>/{BotCommands.JdMirrorCommand[0]}</code> atau <code>/{BotCommands.JdMirrorCommand[1]}</code> : Mirror ke Google Drive/Cloud menggunakan JDownloader.
@@ -297,7 +299,7 @@ help_string = f"""
 <code>/{BotCommands.SearchCommand[0]}</code> atau <code>/{BotCommands.SearchCommand[1]}</code> [query] : Mencari torrent menggunakan API.
 <code>/{BotCommands.StatusCommand[0]}</code> atau <code>/{BotCommands.StatusCommand[1]}</code> : Menampilkan status dari semua tugas yang sedang berjalan.
 <code>/{BotCommands.StatsCommand[0]}</code> atau <code>/{BotCommands.StatsCommand[1]}</code> : Menampilan statistik dari mesin Bot.
-<code>/{BotCommands.PingCommand[0]}</code> atau <code>/{BotCommands.PingCommand[1]}</code> : Mengetes kecepatan respon Bot (Hanya Owner & Sudo).
+<code>/{BotCommands.PingCommand[0]}</code> atau <code>/{BotCommands.PingCommand[1]}</code> : Mengetes kecepatan respon Bot.
 <code>/{BotCommands.SpeedCommand[0]}</code> atau <code>/{BotCommands.SpeedCommand[1]}</code> : Mengetes kecepatan koneksi Bot (Hanya Owner & Sudo).
 <code>/{BotCommands.AuthorizeCommand[0]}</code> atau <code>/{BotCommands.AuthorizeCommand[1]}</code> : Memberikan izin chat atau user untuk menggunakan Bot (Hanya Owner & Sudo).
 <code>/{BotCommands.UnAuthorizeCommand[0]}</code> atau <code>/{BotCommands.UnAuthorizeCommand[1]}</code> : Menghapus izin chat atau user untuk menggunakan Bot (Hanya Owner & Sudo).
