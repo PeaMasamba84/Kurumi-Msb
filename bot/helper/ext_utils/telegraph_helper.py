@@ -3,7 +3,7 @@ from asyncio import sleep
 from telegraph.aio import Telegraph
 from telegraph.exceptions import RetryAfterError
 
-from bot import LOGGER, bot_loop
+from bot import LOGGER
 
 
 class TelegraphHelper:
@@ -70,7 +70,7 @@ class TelegraphHelper:
                     nxt_page += 1
             await self.edit_page(
                 path=path[prev_page],
-                title="Pencari Pea Masamba Bot",
+                title="Cari Pea Masamba Bot",
                 content=content,
             )
         return
@@ -79,5 +79,3 @@ class TelegraphHelper:
 telegraph = TelegraphHelper(
     "Pea Masamba", "https://t.me/peamasamba"
 )
-
-bot_loop.run_until_complete(telegraph.create_account())
