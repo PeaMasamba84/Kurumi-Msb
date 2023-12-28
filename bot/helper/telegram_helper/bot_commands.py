@@ -5,11 +5,13 @@ class _BotCommands:
     def __init__(self):
         self.StartCommand = f"start{CMD_SUFFIX}"
         self.MirrorCommand = [f"pea{CMD_SUFFIX}", f"p{CMD_SUFFIX}"]
-        self.QbMirrorCommand = [f"peaqb{CMD_SUFFIX}", f"pqb{CMD_SUFFIX}"]
+        self.QbMirrorCommand = [f"peaqb{CMD_SUFFIX}", f"pqm{CMD_SUFFIX}"]
+        self.JdMirrorCommand = [f"peajd{CMD_SUFFIX}", f"jm{CMD_SUFFIX}"]
         self.YtdlCommand = [
             f"ytdl{CMD_SUFFIX}", f"peay{CMD_SUFFIX}", f"peawatch{CMD_SUFFIX}", f"pw{CMD_SUFFIX}"]
         self.LeechCommand = [f"pealeech{CMD_SUFFIX}", f"pl{CMD_SUFFIX}"]
-        self.QbLeechCommand = [f"peaqbleech{CMD_SUFFIX}", f"pqbl{CMD_SUFFIX}"]
+        self.QbLeechCommand = [f"peaqbleech{CMD_SUFFIX}", f"pql{CMD_SUFFIX}"]
+        self.JdLeechCommand = [f"peajdleech{CMD_SUFFIX}", f"jl{CMD_SUFFIX}"]
         self.YtdlLeechCommand = [
             f"ytdlleech{CMD_SUFFIX}", f"peaytdl{CMD_SUFFIX}", f"peawatchleech{CMD_SUFFIX}", f"pwl{CMD_SUFFIX}"]
         self.CloneCommand = [f"peaclone{CMD_SUFFIX}", f"pcl{CMD_SUFFIX}"]
@@ -36,8 +38,8 @@ class _BotCommands:
         self.EvalCommand = [f"peaeval{CMD_SUFFIX}", f"ev{CMD_SUFFIX}"]
         self.ExecCommand = [f"peaexec{CMD_SUFFIX}", f"ex{CMD_SUFFIX}"]
         self.ClearLocalsCommand = [f"peaclearlocals{CMD_SUFFIX}", f"clo{CMD_SUFFIX}"]
-        self.BotSetCommand = [f"peabsetting{CMD_SUFFIX}", f"bset{CMD_SUFFIX}"]
-        self.UserSetCommand = [f"peausetting{CMD_SUFFIX}", f"uset{CMD_SUFFIX}"]
+        self.BotSetCommand = [f"peabsetting{CMD_SUFFIX}", f"bs{CMD_SUFFIX}"]
+        self.UserSetCommand = [f"peausetting{CMD_SUFFIX}", f"us{CMD_SUFFIX}"]
         self.BtSelectCommand = [f"peabtsel{CMD_SUFFIX}", f"bts{CMD_SUFFIX}"]
         self.RssCommand = f"pearss{CMD_SUFFIX}"
 
