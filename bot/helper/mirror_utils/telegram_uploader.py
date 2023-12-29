@@ -299,7 +299,7 @@ class TgUploader:
                 try:
                     f_size = await aiopath.getsize(self._up_path)
                     # Force uploads below 2GB using Bot session and above 2GB using User session
-                    if f_size > 2147483648:
+                    if f_size > 2097152000:
                         self._listener.session = "user"
                     else:
                         self._listener.session = "bot"
