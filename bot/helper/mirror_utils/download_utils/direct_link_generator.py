@@ -51,6 +51,8 @@ def direct_link_generator(link: str):
         for x in [
             "mega.nz",
             "mega.co.nz",
+            "devuploads.com",
+            "get.pixelexperience.org"
         ]
     ):
         raise DirectDownloadLinkException(
@@ -59,8 +61,6 @@ def direct_link_generator(link: str):
     elif any(
         x in domain
         for x in [
-            "devuploads.com",
-            "get.pixelexperience.org",
             "arrowos.net"
         ]
     ):
