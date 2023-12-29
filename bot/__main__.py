@@ -72,7 +72,7 @@ def get_quotes():
         oleh = quotez.split(":")[0]
         quotes = f"{quote}\n=> {oleh}"
     except:
-        quotes = "Gunakan dengan bijak :D"
+        quotes = "Ngga ada Quote bijak buatmu wahai Tuan yang bijaksana :D"
     return quotes
 
 
@@ -268,7 +268,7 @@ async def ping(_, message):
     end_time = int(round(time() * 1000))
     await editMessage(
         reply, 
-        f"<b>Respon Bot :</b> <code>{end_time - start_time} ms</code>"
+        f"🤖 <b>Respon Bot :</b> <code>{end_time - start_time} ms</code>"
     )
 
 
@@ -277,7 +277,7 @@ async def log(_, message):
 
 help_string = f"""
 <b>Daftar Perintah</b> <code>@{bot.me.username}</code>
-<code>/{BotCommands.StartCommand[0]}</code> : Mulai Bot.
+<code>/{BotCommands.StartCommand}</code> : Mulai Bot.
 <code>/{BotCommands.HelpCommand[0]}</code> atau <code>/{BotCommands.HelpCommand[1]}</code> : Cek semua perintah Bot.
 <code>/{BotCommands.MirrorCommand[0]}</code> atau <code>/{BotCommands.MirrorCommand[1]}</code> : Mirror ke Google Drive/Cloud menggunakan Aria2.
 <code>/{BotCommands.QbMirrorCommand[0]}</code> atau <code>/{BotCommands.QbMirrorCommand[1]}</code> : Mirror ke Google Drive/Cloud menggunakan qBittorrent.
@@ -385,7 +385,7 @@ async def restart_notification():
 <pre languange="bash"><b>Hari      :</b> <code>{now.strftime('%A')}</code>
 <b>Tanggal   :</b> <code>{now.strftime('%d %B %Y')}</code>
 <b>Waktu     :</b> <code>{now.strftime('%H:%M:%S WIB')}</code>
-<b>Kutipan   :</b>
+<b>Quotes    :</b>
 <code>{get_quotes()}</code>
 </pre>           
 """
@@ -408,7 +408,7 @@ async def restart_notification():
 <pre languange="bash"><b>Hari      :</b> <code>{now.strftime('%A')}</code>
 <b>Tanggal   :</b> <code>{now.strftime('%d %B %Y')}</code>
 <b>Waktu     :</b> <code>{now.strftime('%H:%M:%S WIB')}</code>
-<b>Kutipan   :</b>
+<b>Quotes    :</b>
 <code>{get_quotes()}</code>
 </pre>           
 """
