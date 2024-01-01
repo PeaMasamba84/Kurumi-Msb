@@ -4,7 +4,7 @@ from pyrogram import Client as tgClient, enums, __version__
 from pymongo import MongoClient
 from asyncio import Lock
 from dotenv import load_dotenv, dotenv_values
-from time import time
+from time import time, sleep
 from subprocess import Popen, run, check_output
 from os import remove, path as ospath, environ, getcwd
 from aria2p import API as ariaAPI, Client as ariaClient
@@ -558,8 +558,8 @@ def get_client():
     return qbClient(
         host="localhost", 
         port=8090, 
-        username="admin",
-        password="adminadmin",
+        # username="admin",
+        # password="adminadmin",
         FORCE_SCHEME_FROM_HOST=False, 
         VERIFY_WEBUI_CERTIFICATE=False, 
         REQUESTS_ARGS={"timeout": (30, 60)}
@@ -581,6 +581,7 @@ aria2c_global = [
     "server-stat-of"
 ]
 
+sleep(10)
 qb_client = get_client()
 if not qbit_options:
     qbit_options = dict(qb_client.app_preferences())
