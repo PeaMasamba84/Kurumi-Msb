@@ -36,7 +36,7 @@ class _BotCommands:
         self.ShellCommand = [f"peashell{CMD_SUFFIX}", f"sh{CMD_SUFFIX}"]
         self.SpeedCommand = [f"peaspeedtest{CMD_SUFFIX}", f"sp{CMD_SUFFIX}"]
         self.ExecCommand = [f"peaexec{CMD_SUFFIX}", f"ex{CMD_SUFFIX}"]  
-        self.AExecCommand = [f"aexec{CMD_SUFFIX}", f"aex{CMD_SUFFIX}"]
+        self.AExecCommand = [f"peaaexec{CMD_SUFFIX}", f"aex{CMD_SUFFIX}"]
         self.ClearLocalsCommand = [f"peaclearlocal{CMD_SUFFIX}", f"clo{CMD_SUFFIX}"]
         self.BotSetCommand = [f"peabsetting{CMD_SUFFIX}", f"bset{CMD_SUFFIX}", f"bs{CMD_SUFFIX}"]
         self.UserSetCommand = [f"peausetting{CMD_SUFFIX}", f"uset{CMD_SUFFIX}", f"us{CMD_SUFFIX}"]
