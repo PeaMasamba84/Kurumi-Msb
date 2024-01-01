@@ -191,7 +191,7 @@ def get_readable_message(sid, is_user, page_no=1, status="All", page_step=1):
         for label, status_value in STATUS_VALUES:
             if status_value != status:
                 buttons.ibutton(label, f"status {sid} st {status_value}")
-    buttons.ibutton("📵", f"status {sid} ref", position="header")
+    buttons.ibutton("R̲e̲f̲r̲e̲s̲h̲", f"status {sid} ref", position="header")
     button = buttons.build_menu(8)
     msg += "═══❰ 𝑃𝑒𝑎 𝑀𝑎𝑠𝑎𝑚𝑏𝑎 ❱═══"
     msg += f"\n<b>▼:</b> <code>{get_readable_file_size(net_io_counters().bytes_recv)}</code> | <b>▲:</b> <code>{get_readable_file_size(net_io_counters().bytes_sent)}</code> | <b>🕯:</b> <code>{get_readable_time(time() - botStartTime)}</code>"
