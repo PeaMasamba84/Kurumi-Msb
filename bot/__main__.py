@@ -49,7 +49,7 @@ from .modules import (
     bot_settings, 
     cancel_task, 
     clone, 
-    eval, 
+    exec, 
     gd_count, 
     gd_delete, 
     gd_search, 
@@ -309,9 +309,9 @@ help_string = f"""
 <code>/{BotCommands.RestartCommand[0]}</code> atau <code>/{BotCommands.RestartCommand[1]}</code> : Memulai ulang dan memperbarui Bot (Hanya Owner & Sudo).
 <code>/{BotCommands.LogCommand[0]}</code> atau <code>/{BotCommands.LogCommand[1]}</code> : Mengambil log file dari Bot (Hanya Owner & Sudo).
 <code>/{BotCommands.ShellCommand[0]}</code> atau <code>/{BotCommands.ShellCommand[1]}</code> : Menjalankan perintah Shell (Hanya Owner).
-<code>/{BotCommands.EvalCommand[0]}</code> atau <code>/{BotCommands.EvalCommand[1]}</code> : Menjalankan perintah Kode Python (Hanya Owner).
-<code>/{BotCommands.ExecCommand[0]}</code> atau <code>/{BotCommands.ExecCommand[1]}</code> : Menjalankan perintah Exec (Hanya Owner).
-<code>/{BotCommands.ClearLocalsCommand[0]}</code> atau <code>/{BotCommands.ClearLocalsCommand[1]}</code> : Menghapus penyimpanan lokal (Hanya Owner)
+<code>/{BotCommands.ExecCommand[0]}</code> atau <code>/{BotCommands.ExecCommand[1]}</code> : Menjalankan fungsi Sync Exec (Hanya Owner).
+<code>/{BotCommands.AExecCommand[0]}</code> atau <code>/{BotCommands.AExecCommand[1]}</code> : Menjalankan fungsi Async Exec (Hanya Owner).
+<code>/{BotCommands.ClearLocalsCommand[0]}</code> atau <code>/{BotCommands.ClearLocalsCommand[1]}</code> : Menghapus lokal Sync Exec atau Async Exec (Hanya Owner)
 <code>/{BotCommands.RssCommand}</code> : Menu RSS.
 
 <b>NOTE :</b> Kirim perintah tanpa argument untuk melihat perintah secara detail!
