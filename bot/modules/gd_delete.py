@@ -37,8 +37,8 @@ async def deletefile(_, message):
             user.id
         )
     else:
-        msg = "<b>Kirim perintah dengan Link Google Drive atau balas Link Google Drive dengan perintah!</b>"
-    reply_message = await sendMessage(message, msg)
+        msg = "Kirim perintah dengan Link Google Drive atau balas Link Google Drive dengan perintah!"
+    reply_message = await sendMessage(message, f"<b>{msg}</b>")
     await auto_delete_message(message, reply_message)
 
 
@@ -47,6 +47,6 @@ bot.add_handler(
         deletefile,
         filters=command(
             BotCommands.DeleteCommand
-        ) & CustomFilters.authorized,
+        ) & CustomFilters.sudo
     )
 )
