@@ -708,9 +708,9 @@ async def send_users_settings(bot, message):
             except:
                 user = None
             if user:
-                msg += f"\n<b>{no}. User :</b> <a href='tg://user?id={item}'>{(user.first_name or '')} {(user.last_name or '')}</a>"
+                msg += f"\n<b>{no}. User :</b> <a href='tg://user?id={item}'>{(user.first_name or '')} {(user.last_name or '')}</a> (<code>{item}</code>)"
             else:
-                msg += f"\n<b>{no}. Chat :</b> {item}"
+                msg += f"\n<b>{no}. Chat :</b> <code>{item}</code>"
             for iset, vset in (value or {}).items():
                 msg += f"\n   - <b>{iset}</b> : <code>{vset}</code>"
             msg += "\n"
