@@ -38,19 +38,25 @@ async def send(msg, message):
     if len(str(msg)) > 2000:
         with BytesIO(str.encode(msg)) as out_file:
             out_file.name = "output.txt"
-            await sendFile(message, out_file)
+            await sendFile(message, out_file, f"<b>IN :</b>\n<pre language='python'>{message.text.split(maxsplit=1)[-1]}</pre>")
     else:
         LOGGER.info(f"OUT: '{msg}'")
-        await sendMessage(message, f"<pre language='python'>{msg}</pre>")
+        await sendMessage(message, f"<b>IN :</b>\n<pre language='python'>{message.text.split(maxsplit=1)[-1]}</pre>\n\n<b>OUT :</b>\n<pre language='json'>{msg}</pre>")
 
 
 @new_task
 async def execute(_, message):
+    if len(message.text) < 5:
+        await sendMessage(message, "<b>Kirim perintah disertai dengan Kode yang ingin dieksekusi!</b>")
+        return
     await send(await do("exec", message), message)
 
 
 @new_task
 async def aioexecute(_, message):
+    if len(message.text) < 5:
+        await sendMessage(message, "<b>Kirim perintah disertai dengan Kode yang ingin dieksekusi!</b>")
+        return
     await send(await do("aexec", message), message)
     
 
