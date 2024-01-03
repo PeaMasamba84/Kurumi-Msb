@@ -100,7 +100,8 @@ class TelegramDownloadHelper:
         ):
             self._listener.session = "user"
             message = await user.get_messages(
-                chat_id=message.chat.id, message_ids=message.id
+                chat_id=message.chat.id, 
+                message_ids=message.id
             )
         elif self._listener.session != "user":
             self._listener.session = "bot"
