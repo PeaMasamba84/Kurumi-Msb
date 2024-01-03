@@ -256,7 +256,8 @@ if len(USER_SESSION_STRING) != 0:
             TELEGRAM_HASH_PREMIUM, 
             session_string=USER_SESSION_STRING,
             parse_mode=enums.ParseMode.HTML, 
-            max_concurrent_transmissions=10
+            workers=100, 
+            max_concurrent_transmissions=100
         ).start()
     else:
         user = tgClient(
@@ -265,7 +266,8 @@ if len(USER_SESSION_STRING) != 0:
             TELEGRAM_HASH, 
             session_string=USER_SESSION_STRING,
             parse_mode=enums.ParseMode.HTML, 
-            max_concurrent_transmissions=10
+            workers=100, 
+            max_concurrent_transmissions=100
         ).start()
     IS_PREMIUM_USER = user.me.is_premium
 else:
@@ -356,7 +358,7 @@ STATUS_LIMIT = 10 if len(STATUS_LIMIT) == 0 else int(STATUS_LIMIT)
 CMD_SUFFIX = environ.get("CMD_SUFFIX", "")
 
 RSS_CHAT_ID = environ.get("RSS_CHAT_ID", "")
-RSS_CHAT_ID = "" if len(RSS_CHAT_ID) == 0 else int(RSS_CHAT_ID)
+RSS_CHAT_ID = "" if len(RSS_CHAT_ID) == 0 else RSS_CHAT_ID
 
 RSS_DELAY = environ.get("RSS_DELAY", "")
 RSS_DELAY = 600 if len(RSS_DELAY) == 0 else int(RSS_DELAY)
@@ -602,9 +604,9 @@ bot = tgClient(
     TELEGRAM_API, 
     TELEGRAM_HASH,
     bot_token=BOT_TOKEN, 
-    workers=1000, 
     parse_mode=enums.ParseMode.HTML, 
-    max_concurrent_transmissions=10
+    workers=1000, 
+    max_concurrent_transmissions=100
 ).start()
 
 bot_loop = bot.loop
