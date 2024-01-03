@@ -126,14 +126,14 @@ async def sendRss(text):
     try:
         if user:
             return await user.send_message(
-                chat_id=config_dict["RSS_CHAT"],
+                chat_id=config_dict["RSS_CHAT_ID"],
                 text=text,
                 disable_web_page_preview=True,
                 disable_notification=True,
             )
         else:
             return await bot.send_message(
-                chat_id=config_dict["RSS_CHAT"],
+                chat_id=config_dict["RSS_CHAT_ID"],
                 text=text,
                 disable_web_page_preview=True,
                 disable_notification=True,
@@ -351,6 +351,69 @@ async def customSendMessage(client, chat_id:int, text:str, message_thread_id=Non
     except Exception as e:
         LOGGER.error(str(e))
         raise Exception(e)
+
+
+async def customSendRss(text, image=None, reply_markup=None):
+    chat_id = None
+    message_thread_id = None
+    if chat_id := config_dict.get("RSS_CHAT_ID"):
+        if not isinstance(chat_id, int):
+            if ":" in chat_id:
+                message_thread_id = chat_id.split(":")[1]
+                chat_id = chat_id.split(":")[0]
+        
+        if chat_id.isdigit():
+            chat_id = int(chat_id)
+        
+        if message_thread_id.isdigit():
+            message_thread_id = int(message_thread_id)
+    else:
+        return "RSS_CHAT_ID tidak ditemukan!"
+        
+    try:
+        if image:
+            if len(text) > 1024:
+                reply_photo = await bot.send_photo(
+                    chat_id=chat_id,
+                    photo=image,
+                    disable_notification=True,
+                    message_thread_id=message_thread_id,
+                    reply_markup=reply_markup
+                )
+                return await bot.send_message(
+                    chat_id=chat_id,
+                    text=text,
+                    disable_web_page_preview=True,
+                    disable_notification=True,
+                    message_thread_id=message_thread_id,
+                    reply_to_message_id=reply_photo.id,
+                    reply_markup=reply_markup
+                )
+            else:
+                return await bot.send_photo(
+                    chat_id=chat_id,
+                    photo=image,
+                    caption=text,
+                    disable_notification=True,
+                    message_thread_id=message_thread_id,
+                    reply_markup=reply_markup
+                )
+        else:
+            return await bot.send_message(
+                chat_id=chat_id,
+                text=text,
+                disable_web_page_preview=True,
+                disable_notification=True,
+                message_thread_id=message_thread_id,
+                reply_markup=reply_markup
+            )
+    except FloodWait as f:
+        LOGGER.warning(str(f))
+        await sleep(f.value * 1.2)
+        return await customSendRss(text)
+    except Exception as e:
+        LOGGER.error(str(e))
+        return str(e)
 
 
 async def customSendDocument(client, document, thumb, caption, progress):
