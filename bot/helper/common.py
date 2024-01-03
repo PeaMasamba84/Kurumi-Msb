@@ -3,7 +3,6 @@ from asyncio import sleep, create_subprocess_exec
 from asyncio.subprocess import PIPE
 from secrets import token_urlsafe
 from os import walk, path as ospath
-from pyrogram.enums import ChatType
 
 from bot import (
     DOWNLOAD_DIR,
@@ -99,7 +98,7 @@ class TaskConfig:
         self.thumb = None
         self.extension_filter = []
         self.isSuperChat = bool(self.message.chat.type.name in ["SUPERGROUP", "CHANNEL"])
-        self.isPrivateChat = bool(self.message.chat.type == ChatType.PRIVATE)
+        self.isPrivateChat = bool(self.message.chat.type.name == "PRIVATE")
 
     def getTokenPath(self, dest):
         if dest.startswith("mtp:"):
@@ -256,7 +255,7 @@ class TaskConfig:
                 and len(config_dict["LEECH_CHAT_ID"]) == 0
             ):
                 raise ValueError(
-                    "<b>Gunakan Super Group/Dump Channel untuk mengupload menggunakan User Session pada Private Chat!</b>"
+                    "<b>Gunakan SuperGroup/Dump Channel untuk mengupload menggunakan User Session pada Private Chat!</b>"
                 )
             if self.splitSize:
                 if self.splitSize.isdigit():
@@ -288,13 +287,15 @@ class TaskConfig:
                     self.upDest = self.upDest.lstrip("u:")
                     self.userTransmission = IS_PREMIUM_USER
                 if ":" in self.upDest:
+                    self.threadId = self.upDest.split(":")[1]
                     self.upDest = self.upDest.split(":")[0]
-                    self.threadID = self.upDest.split(":")[1]
-                if self.upDest.isdigit() or self.upDest.startswith("-"):
+                if (
+                    self.upDest.isdigit() 
+                    or self.upDest.startswith("-")
+                ):
                     self.upDest = int(self.upDest)
                 if self.threadId.isdigit():
                     self.threadId = int(self.threadId)
-
             self.as_doc = (
                 self.user_dict.get("as_doc", False)
                 or config_dict["AS_DOCUMENT"]
@@ -355,7 +356,8 @@ class TaskConfig:
                 msgts += f"\nBatalkan Multi : <code>/{BotCommands.CancelTaskCommand[0]} {self.multiTag}</code>"
             nextmsg = await sendMessage(nextmsg, msgts)
         nextmsg = await self.client.get_messages(
-            chat_id=self.message.chat.id, message_ids=nextmsg.id
+            chat_id=self.message.chat.id, 
+            message_ids=nextmsg.id
         )
         if folder_name:
             self.sameDir["tasks"].add(nextmsg.id)
@@ -390,7 +392,8 @@ class TaskConfig:
             b_msg.append(f"{self.bulk[0]} -i {len(self.bulk)} {self.options}")
             nextmsg = await sendMessage(self.message, " ".join(b_msg))
             nextmsg = await self.client.get_messages(
-                chat_id=self.message.chat.id, message_ids=nextmsg.id
+                chat_id=self.message.chat.id, 
+                message_ids=nextmsg.id
             )
             if self.message.from_user:
                 nextmsg.from_user = self.user
