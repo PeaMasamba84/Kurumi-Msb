@@ -1,22 +1,24 @@
 from feedparser import parse as feedparse
-from pyrogram.handlers import MessageHandler, CallbackQueryHandler
-from pyrogram.filters import command, regex, create
 from asyncio import Lock, sleep
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from time import time
 from functools import partial
 from aiohttp import ClientSession
 from apscheduler.triggers.interval import IntervalTrigger
-from re import split as re_split
+from re import split as re_split, sub as re_sub, findall as re_findall
 from io import BytesIO
+
+from pyrogram.filters import command, regex, create
+from pyrogram.handlers import MessageHandler, CallbackQueryHandler
+from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 
 from bot import scheduler, rss_dict, LOGGER, DATABASE_URL, config_dict, bot
 from bot.helper.telegram_helper.message_utils import (
     sendMessage,
     editMessage,
-    sendRss,
     sendFile,
     deleteMessage,
+    customSendRss
 )
 from bot.helper.telegram_helper.filters import CustomFilters
 from bot.helper.telegram_helper.bot_commands import BotCommands
@@ -25,6 +27,7 @@ from bot.helper.telegram_helper.button_build import ButtonMaker
 from bot.helper.ext_utils.bot_utils import new_thread
 from bot.helper.ext_utils.exceptions import RssShutdownException
 from bot.helper.ext_utils.help_messages import RSS_HELP_MESSAGE
+from bot.helper.ext_utils.status_utils import get_readable_file_size
 
 rss_dict_lock = Lock()
 handler_dict = {}
@@ -659,19 +662,12 @@ async def rssMonitor():
                             url = rss_d.entries[feed_count]["links"][1]["href"]
                         except IndexError:
                             url = rss_d.entries[feed_count]["link"]
-                        pub_date = rss_d.entries[feed_count].get("published")
-                        description = rss_d.entries[feed_count].get("description")
+                        view = None
+                        size = rss_d.entries[feed_count].get("size")
                         category = rss_d.entries[feed_count].get("category")
-                        # Nyaa.si
-                        nyaa_view = rss_d.entries[feed_count].get("id")
-                        nyaa_seeders = rss_d.entries[feed_count].get("nyaa_seeders")
-                        nyaa_leechers = rss_d.entries[feed_count].get("nyaa_leechers")
-                        nyaa_downloads = rss_d.entries[feed_count].get("nyaa_downloads")
-                        nyaa_hash = rss_d.entries[feed_count].get("nyaa_infohash")
-                        nyaa_category = rss_d.entries[feed_count].get("nyaa_category")
-                        nyaa_size = rss_d.entries[feed_count].get("nyaa_size")
-                        nyaa_trusted = rss_d.entries[feed_count].get("nyaa_trusted")
-                        nyaa_remake = rss_d.entries[feed_count].get("nyaa_remake")
+                        description = rss_d.entries[feed_count].get("description")
+                        published_date = rss_d.entries[feed_count].get("published")
+                        
                         if data["last_feed"] == url or data["last_title"] == item_title:
                             break
                     except IndexError:
@@ -699,36 +695,156 @@ async def rssMonitor():
                         if not feed_msg.startswith("/"):
                             feed_msg = f"/{feed_msg}"
                     else:
-                        feed_msg = f"<b>Nama :</b>\n<code>{item_title.replace('>', '').replace('<', '')}</code>\n\n"
-                        if nyaa_view:
-                            if nyaa_category:
-                                feed_msg += f"<b>Kategori :</b> <code>{nyaa_category}</code>\n\n"
-                            if nyaa_size:
-                                feed_msg += f"<b>Size :</b> <code>{nyaa_size}</code>\n\n"
-                            if nyaa_hash:
-                                feed_msg += f"<b>Hash :</b> <code>{nyaa_hash}</code>\n\n"
-                            if nyaa_leechers:
-                                feed_msg += f"<b>Leech :</b> <code>{nyaa_leechers}</code>"
-                            if nyaa_seeders:
-                                feed_msg += f" | <b>Seed :</b> <code>{nyaa_seeders}</code>"
-                            if nyaa_downloads:
-                                feed_msg += f" | <b>Down :</b> <code>{nyaa_downloads}</code>\n\n"
-                            if nyaa_trusted:
-                                feed_msg += f"<b>Trusted :</b> <code>{nyaa_trusted}</code>"
-                            if nyaa_remake:
-                                feed_msg += f" | <b>Remake :</b> <code>{nyaa_remake}</code>\n\n"
-                            feed_msg += f"<b>Link :</b>\n<a href='{url}'>Download</a> | <a href='{nyaa_view}'>View</a>\n\n"
-                        else:
-                            if category:
-                                feed_msg += f"<b>Kategori :</b> <code>{category}</code>\n\n"
+                        image = None
+                        p2p_group = None
+                        not_tracker = False
+                        private_tracker = False
+                        
+                        item_title = item_title.replace('>', '').replace('<', '')
+                        
+                        if "-" in item_title:
+                            p2p_group = re_findall(r"(\-[0-9a-zA-Z]+)", item_title)
+                            if len(p2p_group) != 0:
+                                p2p_group = p2p_group[-1].replace("-", "")
+                                if (
+                                    isinstance(p2p_group, str)
+                                    and (not p2p_group.isdigit())
+                                    and len(p2p_group) > 1
+                                    # BlackListed p2p_group / p2p_name
+                                    and p2p_group.lower() not in ["audio", "chan", "compilation", "dl", "hd", "pot", "raw", "raws", "ray", "res", "subs", "subtitle"]
+                                ):
+                                    p2p_group = p2p_group
+                                else:
+                                    p2p_group = None
+                            else:
+                                p2p_group = None
+                                    
+                        # Add Your Custom Here
+                        
+                        if "nyaa" in url.lower():
+                            view = rss_d.entries[feed_count].get("id")
+                            size = rss_d.entries[feed_count].get("nyaa_size")
+                            category = rss_d.entries[feed_count].get("nyaa_category")
+                            description = f"""<b>Remake :</b> <code>{rss_d.entries[feed_count].get('nyaa_remake')}</code> | <b>Trusted :</b> <code>{rss_d.entries[feed_count].get('nyaa_trusted')}</code>
+
+<b>Seed :</b> <code>{rss_d.entries[feed_count].get('nyaa_seeders')}</code> | <b>Leech :</b> <code>{rss_d.entries[feed_count].get('nyaa_leechers')}</code> | <b>Completed :</b> <code>{rss_d.entries[feed_count].get('nyaa_downloads')}</code>
+
+<b>Hash :</b>
+<code>{rss_d.entries[feed_count].get('nyaa_infohash')}</code>"""
+
+                        elif "watercache" in url.lower():
+                            view = rss_d.entries[feed_count].get("comments")
                             if description:
-                                feed_msg += f"<b>Deskripsi :</b>\n<code>{description}</code>\n\n"
-                            feed_msg += f"<b>Link :</b>\n<code>{url}</code>\n\n"
-                        if pub_date:
-                            feed_msg += f"<b>Tanggal Dipublish :</b>\n<code>{pub_date}</code>\n\n"
-                        # feed_msg += f"<b>Tag :</b> {data['tag']} <code>{user}</code>\n\n"
-                        feed_msg += f"#{title}"
-                    await sendRss(feed_msg)
+                                size = description.split("Size: ")[-1].split(" Added:")[0]
+                            description = None
+                            
+                        elif "yts" in url.lower():
+                            view = rss_d.entries[feed_count].get('guid')
+                            if description:
+                                image = re_findall(r"\bhttps?://\S+?\.(?:png|jpe?g)\b", description)[0]
+                                description = re_sub(r"<.*?>", "", description)
+                                size = description.split("Size: ")[-1].split("Runtime: ")[0]
+                                category = description.split("Genre: ")[-1].split("Size: ")[0].replace(" /", ",")
+                                description = rss_d.entries[feed_count].get("description").split("<br />")[-1]
+                            
+                        elif "avistaz" in url.lower():
+                            private_tracker = True
+                            url = "https://avistaz.to/"
+                            view = rss_d.entries[feed_count]["link"]
+                            if description:
+                                description = re_sub(r"<.*?>", "", description)
+                                size = description.split("Size: ")[-1].split("Uploaded: ")[0]
+                                description = f"""<b>Seed :</b> <code>{description.split("Seed: ")[-1].split(" |")[0]}</code> | <b>Leech :</b> <code>{description.split("Leech: ")[-1].split(" |")[0]}</code> | <b>Completed :</b> <code>{description.split("Completed: ")[-1].split("Uploader: ")[0]}</code>
+
+<b>Oleh :</b> <code>{description.split("Uploader: ")[-1].split("Rip Type: ")[0]}</code>"""
+
+                        elif "torrentleech" in url.lower():
+                            private_tracker = True
+                            url = "https://www.torrentleech.org/"
+                            view = rss_d.entries[feed_count].get("guid")
+                            description = f"""<b>Seed :</b> <code>{description.split('Seeders: ', 1)[-1].split(' ')[0]}</code> | <b>Leech :</b> <code>{description.split('Leechers: ', 1)[-1].split(' ')[0]}</code>"""
+                        
+                        elif "psa" in url.lower():
+                            not_tracker = True
+                            view = url
+                            category = ", ".join(x["term"] for x in rss_d.entries[feed_count].get("tags"))
+                            if description:
+                                image = re_findall(r"\bhttps?://\S+?\.(?:png|jpe?g)\b", description)[0]
+                                description = re_sub(r"<.*?>", "", description)
+                            
+                        elif "pahe" in url.lower():
+                            not_tracker = True
+                            view = url
+                            category = ", ".join(x["term"] for x in rss_d.entries[feed_count].get("tags"))
+                            
+                        if published_date:
+                            date = datetime.strptime(published_date, "%a, %d %b %Y %H:%M:%S %z")
+                            date_time_jkt = date.astimezone(timezone(timedelta(hours=7)))
+                            published_date = date_time_jkt.strftime("%A, %d %B %Y %H:%M:%S WIB")
+                                                     
+                        feed_msg = f"""
+<b>Nama :</b> 
+<code>{item_title if item_title else '-'}</code>
+
+<b>Ukuran :</b> 
+<code>{size if size else '-'}</code>
+
+<b>Kategori :</b> 
+<code>{category if category else '-'}</code>
+
+<b>Deskripsi :</b> 
+{description if description else '<code>-</code>'}
+
+<b>Tanggal Dipublish :</b> 
+<code>{published_date if published_date else '-'}</code>
+
+<b>Link :</b>
+<a href='{view}'>Lihat</a> {f'| <a href="{url}">Unduh</a>' if not private_tracker else ''}
+
+#{title}{f' #{p2p_group}' if p2p_group else ''}{' #InternalRelease' if 'KQRM' in item_title else ''}
+"""
+                    if not_tracker:
+                        reply_markup = InlineKeyboardMarkup(
+                            inline_keyboard=(
+                                [
+                                    InlineKeyboardButton(
+                                        text="🚀 Lihat",
+                                        url=view
+                                    ),
+                                ],
+                            ),
+                        )   
+                    elif private_tracker:
+                        reply_markup = InlineKeyboardMarkup(
+                            inline_keyboard=(
+                                [
+                                    InlineKeyboardButton(
+                                        text="🚀 Login",
+                                        url=url
+                                    ),
+                                    InlineKeyboardButton(
+                                        text="✈️ Lihat",
+                                        url=view
+                                    ),
+                                ],
+                            ),
+                        )
+                    else:
+                        reply_markup = InlineKeyboardMarkup(
+                            inline_keyboard=(
+                                [
+                                    InlineKeyboardButton(
+                                        text="🚀 Mirror",
+                                        switch_inline_query=f"/{BotCommands.MirrorCommand[0]} {url}"
+                                    ),
+                                    InlineKeyboardButton(
+                                        text="✈️ Leech",
+                                        switch_inline_query=f"/{BotCommands.LeechCommand[0]} {url}"
+                                    ),
+                                ],
+                            ),
+                        )
+                    await customSendRss(feed_msg, image, reply_markup)
                     feed_count += 1
                 async with rss_dict_lock:
                     if user not in rss_dict or not rss_dict[user].get(title, False):
