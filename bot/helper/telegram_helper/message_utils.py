@@ -377,8 +377,7 @@ async def customSendRss(text, image=None, reply_markup=None):
                     chat_id=chat_id,
                     photo=image,
                     disable_notification=True,
-                    message_thread_id=message_thread_id,
-                    reply_markup=reply_markup
+                    message_thread_id=message_thread_id
                 )
                 return await bot.send_message(
                     chat_id=chat_id,
