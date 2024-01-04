@@ -131,10 +131,11 @@ class TaskListener(TaskConfig):
 
         up_path = f"{self.dir}/{self.name}"
         size = await get_path_size(up_path)
-        async with queue_dict_lock:
-            if self.mid in non_queued_dl:
-                non_queued_dl.remove(self.mid)
-        await start_from_queued()
+        if not config_dict["QUEUE_ALL"]:
+            async with queue_dict_lock:
+                if self.mid in non_queued_dl:
+                    non_queued_dl.remove(self.mid)
+            await start_from_queued()
 
         if self.join and await aiopath.isdir(up_path):
             await join_files(up_path)
@@ -173,6 +174,8 @@ class TaskListener(TaskConfig):
         all_limit = config_dict["QUEUE_ALL"]
         add_to_queue = False
         async with queue_dict_lock:
+            if self.mid in non_queued_dl:
+                non_queued_dl.remove(self.mid)
             dl = len(non_queued_dl)
             up = len(non_queued_up)
             if (
@@ -276,7 +279,7 @@ class TaskListener(TaskConfig):
             ):
                 buttons = ButtonMaker()
                 if link:
-                    buttons.ubutton("Cloud Link", link)
+                    buttons.ubutton("☁️ Cloud Link", link)
                 if rclonePath:
                     msg += f"\n\n<b>Path :</b> <code>{rclonePath}</code>"
                 if (
@@ -289,7 +292,7 @@ class TaskListener(TaskConfig):
                     share_url = f"{RCLONE_SERVE_URL}/{remote}/{url_path}"
                     if mime_type == "Folder":
                         share_url += "/"
-                    buttons.ubutton("Rclone Link", share_url)
+                    buttons.ubutton("🔗 Rclone Link", share_url)
                 if not rclonePath and dir_id:
                     INDEX_URL = ""
                     if self.privateLink:
@@ -302,10 +305,10 @@ class TaskListener(TaskConfig):
                         INDEX_URL = config_dict["INDEX_URL"]
                     if INDEX_URL:
                         share_url = f"{INDEX_URL}findpath?id={dir_id}"
-                        buttons.ubutton("Index Link", share_url)
+                        buttons.ubutton("⚡ Index Link", share_url)
                         if mime_type.startswith(("image", "video", "audio")):
                             share_urls = f"{INDEX_URL}findpath?id={dir_id}&view=true"
-                            buttons.ubutton("View Link", share_urls)
+                            buttons.ubutton("🌐 View Link", share_urls)
                 button = buttons.build_menu(2)
             else:
                 msg += f"\n\n<b>Path :</b> <code>{rclonePath}</code>"
