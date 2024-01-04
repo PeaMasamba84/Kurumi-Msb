@@ -153,7 +153,7 @@ CL : {tasks['Clone']} | CH : {tasks['CheckUp']} | PA : {tasks['Pause']} | SV : {
 
 By: 🅿🅴🅰 🅼🅰🆂🅰🅼🅱🅰
 """
-        await query.answer(msg, show_alert=True)
+        await query.answer(msg, show_alert=True, cache_time=30)
 
 
 bot.add_handler(
