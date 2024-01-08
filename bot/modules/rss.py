@@ -270,7 +270,7 @@ async def rssList(query, start, all_users=False):
                     list_feed += f"<b>Inf:</b> <code>{data['inf']}</code>\n"
                     list_feed += f"<b>Exf:</b> <code>{data['exf']}</code>\n"
                     list_feed += f"<b>Paused:</b> <code>{data['paused']}</code>\n"
-                    list_feed += f"<b>User:</b> {data['tag'].lstrip('@')}"
+                    list_feed += f"<b>User:</b> {data['tag'].replace('@', '', 1)}"
                     index += 1
                     if index == 5:
                         break
@@ -696,6 +696,8 @@ async def rssMonitor():
                             feed_msg = f"/{feed_msg}"
                     else:
                         image = None
+                        image_caption = None
+                        
                         p2p_group = None
                         not_tracker = False
                         private_tracker = False
@@ -711,7 +713,7 @@ async def rssMonitor():
                                     and (not p2p_group.isdigit())
                                     and len(p2p_group) > 1
                                     # BlackListed p2p_group / p2p_name
-                                    and p2p_group.lower() not in ["ass", "audio", "audios", "chan", "compilation", "dl", "dlrip", "empire", "en", "hd", "id", "in", "kun", "pot", "raw", "raws", "ray", "rayrip", "res", "rip", "sama", "srt", "sub", "subs", "subtitle"]
+                                    and p2p_group.lower() not in ["ass", "audio", "audios", "chan", "compilation", "dl", "dlrip", "empire", "en", "hd", "id", "in", "jap", "kun", "off", "pot", "raw", "raws", "ray", "rayrip", "res", "rip", "sama", "srt", "sub", "subs", "subtitle"]
                                 ):
                                     p2p_group = p2p_group
                                 else:
@@ -746,6 +748,8 @@ async def rssMonitor():
                                 size = description.split("Size: ")[-1].split("Runtime: ")[0]
                                 category = description.split("Genre: ")[-1].split("Size: ")[0].replace(" /", ",")
                                 description = rss_d.entries[feed_count].get("description").split("<br />")[-1]
+                            if image:
+                                image_caption = item_title
                             
                         elif "avistaz" in url.lower():
                             private_tracker = True
@@ -771,6 +775,8 @@ async def rssMonitor():
                             if description:
                                 image = re_findall(r"\bhttps?://\S+?\.(?:png|jpe?g)\b", description)[0]
                                 description = re_sub(r"<.*?>", "", description)
+                            if image:
+                                image_caption = item_title
                             
                         elif "pahe" in url.lower():
                             not_tracker = True
@@ -853,7 +859,7 @@ async def rssMonitor():
                                 ],
                             ),
                         )
-                    await customSendRss(feed_msg, image, reply_markup)
+                    await customSendRss(feed_msg, image, image_caption, reply_markup)
                     feed_count += 1
                 async with rss_dict_lock:
                     if user not in rss_dict or not rss_dict[user].get(title, False):
