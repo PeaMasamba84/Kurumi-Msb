@@ -353,7 +353,7 @@ async def customSendMessage(client, chat_id:int, text:str, message_thread_id=Non
         raise Exception(e)
 
 
-async def customSendRss(text, image=None, reply_markup=None):
+async def customSendRss(text, image=None, image_caption=None, reply_markup=None):
     chat_id = None
     message_thread_id = None
     if chat_id := config_dict.get("RSS_CHAT_ID"):
@@ -376,6 +376,7 @@ async def customSendRss(text, image=None, reply_markup=None):
                 reply_photo = await bot.send_photo(
                     chat_id=chat_id,
                     photo=image,
+                    caption=f"<code>{image_caption}</code>",
                     disable_notification=True,
                     message_thread_id=message_thread_id
                 )
