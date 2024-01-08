@@ -125,9 +125,7 @@ async def get_buttons(key=None, edit_type=None):
         buttons.ibutton("Back", "botset back")
         buttons.ibutton("Close", "botset close")
         for x in range(0, len(config_dict), 10):
-            buttons.ibutton(
-                f"{int(x/10)}", f"botset start var {x}", position="footer"
-            )
+            buttons.ibutton(f"{int(x/10)}", f"botset start var {x}", position="footer")
         msg = f"Config Variables | Page: {int(START/10)} | State: {STATE}"
     elif key == "private":
         buttons.ibutton("Back", "botset back")
@@ -147,9 +145,7 @@ Timeout: 60 sec"""
         buttons.ibutton("Back", "botset back")
         buttons.ibutton("Close", "botset close")
         for x in range(0, len(aria2_options), 10):
-            buttons.ibutton(
-                f"{int(x/10)}", f"botset start aria {x}", position="footer"
-            )
+            buttons.ibutton(f"{int(x/10)}", f"botset start aria {x}", position="footer")
         msg = f"Aria2c Options | Page: {int(START/10)} | State: {STATE}"
     elif key == "qbit":
         for k in list(qbit_options.keys())[START : 10 + START]:
@@ -161,9 +157,7 @@ Timeout: 60 sec"""
         buttons.ibutton("Back", "botset back")
         buttons.ibutton("Close", "botset close")
         for x in range(0, len(qbit_options), 10):
-            buttons.ibutton(
-                f"{int(x/10)}", f"botset start qbit {x}", position="footer"
-            )
+            buttons.ibutton(f"{int(x/10)}", f"botset start qbit {x}", position="footer")
         msg = f"Qbittorrent Options | Page: {int(START/10)} | State: {STATE}"
     elif edit_type == "editvar":
         msg = ""
