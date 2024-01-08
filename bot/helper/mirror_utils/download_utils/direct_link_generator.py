@@ -1316,13 +1316,17 @@ def send_cm(url):
 
 
 def tmpsend(url):
-    if match := search(r"https://tmpsend.com/(\w+)$", url):
-        file_id = match.group(1)
-        header = f"Referer: https://tmpsend.com/thank-you?d={file_id}"
-        download_link = f"https://tmpsend.com/download?d={file_id}"
-        return download_link, header
-    else:
+    parsed_url = urlparse(url)
+    if any(x in parsed_url.path for x in ['thank-you','download']):
+        query_params = parse_qs(parsed_url.query)
+        if file_id := query_params.get('d'):
+            file_id = file_id[0]
+    elif not (file_id := parsed_url.path.strip('/')):
         raise DirectDownloadLinkException("ERROR: Direct Link tidak ditemukan!")
+    referer_url = f"https://tmpsend.com/thank-you?d={file_id}"
+    header = f"Referer: {referer_url}"
+    download_link = f"https://tmpsend.com/download?d={file_id}"
+    return download_link, header
 
 
 def doods(url: str):
