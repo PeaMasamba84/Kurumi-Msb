@@ -224,6 +224,7 @@ class Mirror(TaskListener):
                 nextmsg,
                 self.isQbit,
                 self.isLeech,
+                self.isJd,
                 self.sameDir,
                 self.bulk,
                 self.multiTag,
