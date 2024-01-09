@@ -2,7 +2,7 @@ from asyncio import sleep
 from base64 import b64encode
 from re import match as re_match
 from aiofiles.os import path as aiopath
-from myjdapi.exception import MYJDException
+from myjd.exception import MYJDException
 from pyrogram.filters import command
 from pyrogram.handlers import MessageHandler
 
