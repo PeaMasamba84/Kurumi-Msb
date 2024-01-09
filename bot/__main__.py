@@ -376,7 +376,7 @@ async def restart_notification():
         except Exception as e:
             LOGGER.error(e)
 
-    now = datetime.now(timezone(f"Asia/Jakarta"))
+    now = datetime.now(timezone(f"Asia/Makassar"))
     if INCOMPLETE_TASK_NOTIFIER and DATABASE_URL:
         if notifier_dict := await DbManger().get_incomplete_tasks():
             for cid, data in notifier_dict.items():
@@ -385,7 +385,7 @@ async def restart_notification():
 <pre languange="bash"><b>Hari      :</b> <code>{now.strftime('%A')}</code>
 <b>Tanggal   :</b> <code>{now.strftime('%d %B %Y')}</code>
 <b>Waktu     :</b> <code>{now.strftime('%H:%M:%S WIB')}</code>
-<b>Quotes    :</b>
+<b>Kutipan   :</b>
 <code>{get_quotes()}</code>
 </pre>           
 """
@@ -408,7 +408,7 @@ async def restart_notification():
 <pre languange="bash"><b>Hari      :</b> <code>{now.strftime('%A')}</code>
 <b>Tanggal   :</b> <code>{now.strftime('%d %B %Y')}</code>
 <b>Waktu     :</b> <code>{now.strftime('%H:%M:%S WIB')}</code>
-<b>Quotes    :</b>
+<b>Kutipan   :</b>
 <code>{get_quotes()}</code>
 </pre>           
 """
