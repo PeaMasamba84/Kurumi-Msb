@@ -1,15 +1,16 @@
-from tzlocal import get_localzone
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
-from pyrogram import Client as tgClient, enums, __version__
-from pymongo import MongoClient
+from aria2p import API as ariaAPI, Client as ariaClient
 from asyncio import Lock
 from dotenv import load_dotenv, dotenv_values
-from time import time, sleep
-from subprocess import Popen, run, check_output
+from myjd import __version__ as jdv
 from os import remove, path as ospath, environ, getcwd
-from aria2p import API as ariaAPI, Client as ariaClient
+from pymongo import MongoClient
+from pyrogram import Client as tgClient, enums, __version__ as prv
 from qbittorrentapi import Client as qbClient
 from socket import setdefaulttimeout
+from subprocess import Popen, run, check_output
+from time import time, sleep
+from tzlocal import get_localzone
 from uvloop import install
 from logging import (
     getLogger,
@@ -90,10 +91,10 @@ try:
     Version.ar = check_output(["chrome --v"], shell=True).decode().split("\n")[0].split(" ")[2] 
     Version.ff = check_output(["opera -version | grep 'ffmpeg version' | sed -e 's/ffmpeg version //' -e 's/[^0-9.].*//'"], shell=True).decode().replace("\n", "")
     Version.ga = check_output(["pip show google-api-python-client | grep Version"], shell=True).decode().split(" ", 1)[1].replace("\n", "")
-    Version.jd = check_output(["pip show myjdapi | grep Version"], shell=True).decode().split(" ", 1)[1].replace("\n", "")
+    Version.jd = jdv
     Version.jv = check_output(["safari --version | grep openjdk"], shell=True).decode().split(" ")[1]
     Version.p7 = check_output(["7z | grep 7-Zip"], shell=True).decode().split(" ")[2]
-    Version.pr = __version__
+    Version.pr = prv
     Version.py = check_output(["python --version"], shell=True).decode().split()[-1]
     Version.rc = check_output(["edge --version"], shell=True).decode().split("\n")[0].split(" ")[1]
     Version.qb = check_output(["firefox --version"], shell=True).decode().split(" ", 1)[1].replace("\n", "")
