@@ -43,7 +43,7 @@ class JDownloader(Myjdapi):
     async def boot(self):
         await cmd_exec(["pkill", "-9", "java"])
         self.device = None
-        self.error = "Connecting... Try agin after couple of seconds"
+        self.error = "Menghubungkan ke JDownloader...\nCoba lagi setelah beberapa detik!"
         self._device_name = f"{randint(0, 1000)}"
         logs = await listdir("/JDownloader/logs")
         if len(logs) > 2:
