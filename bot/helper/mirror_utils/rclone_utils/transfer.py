@@ -283,7 +283,7 @@ class RcloneTransferHelper:
         else:
             if path.lower().endswith(tuple(self._listener.extension_filter)):
                 await self._listener.onUploadError(
-                    "Ekstensi file ini diblokir oleh bot!"
+                    "Ekstensi file ini diblokir oleh Bot!"
                 )
                 return
             mime_type = await sync_to_async(get_mime_type, path)
