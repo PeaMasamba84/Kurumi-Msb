@@ -49,7 +49,9 @@ async def mirror_status(_, message):
             recv = get_readable_file_size(net_io_counters().bytes_recv)
         except:
             recv = "NaN"
-        msg = "<b>Tidak ada Tugas AKTIF!</b>\n___________________________"
+        msg = "<b>Kosong bro!</b>"
+        msg += f"\n<b>Note :</b> Setiap User bisa tampilkan Tugasnya dengan menambah <code>me</code> atau <code>user_id</code> setelah perintah <code>/{BotCommands.StatusCommand[0]}</code>!"
+        msg += "\n\n___________________________"
         msg += (
             f"\n<b>CPU :</b> <code>{cpu_percent()}%</code> | <b>FREE :</b> <code>{free}</code>" \
             f"\n<b>RAM :</b> <code>{virtual_memory().percent}%</code> | <b>UPTIME :</b> <code>{currentTime}</code>" \
