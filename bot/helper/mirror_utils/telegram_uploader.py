@@ -382,12 +382,12 @@ class TgUploader:
             await clean_unwanted(self._path)
         if self._total_files == 0:
             await self._listener.onUploadError(
-                "Tidak ada file untuk diunggah ke telegram!"
+                "Tidak ada file untuk diunggah ke Telegram!"
             )
             return
         if self._total_files <= self._corrupted:
             await self._listener.onUploadError(
-                "Ekstensi file ini diblokir oleh bot!"
+                "Ekstensi file ini diblokir oleh Bot!"
             )
             return
         LOGGER.info(f"Leech Completed: {self._listener.name}")
