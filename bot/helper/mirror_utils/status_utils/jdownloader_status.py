@@ -15,12 +15,15 @@ def _get_combined_info(result, start_time):
     hosts = result[0].get("hosts")
     bytesLoaded = 0
     bytesTotal = 0
+    status = ""
     for res in result:
         st = res.get("status", "").lower()
         if st and st != "finished":
             status = st
         bytesLoaded += res.get("bytesLoaded", 0)
         bytesTotal += res.get("bytesTotal", 0)
+    if not status:
+        status = "Tidak Diketahui"
     try:
         speed = bytesLoaded / (time() - start_time)
         eta = (bytesTotal - bytesLoaded) / speed
@@ -95,8 +98,6 @@ class JDownloaderStatus:
         state = self._info.get("status", "paused")
         if state == "paused":
             return MirrorStatus.STATUS_PAUSED
-        elif state == "":
-            return "Tidak Diketahui"
         else:
             return state
 
