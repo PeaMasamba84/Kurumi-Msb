@@ -1,7 +1,3 @@
-from requests import get
-from pymongo import MongoClient
-from subprocess import run as srun
-from os import path, environ, remove
 from dotenv import load_dotenv, dotenv_values
 from logging import (
     FileHandler,
@@ -11,6 +7,11 @@ from logging import (
     error as log_error,
     info as log_info,
 )
+
+from os import path, environ, remove
+from pymongo import MongoClient
+from requests import get
+from subprocess import run as srun
 
 
 if path.exists("log.txt"):
