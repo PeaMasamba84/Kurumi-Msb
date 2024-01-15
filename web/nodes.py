@@ -45,17 +45,17 @@ def make_tree(res, aria2=False):
             folders = qb_get_folders(i.name)
             if len(folders) > 1:
                 previous_node = parent
-                for j in range(len(folders)-1):
+                for j in range(len(folders) - 1):
                     current_node = next((k for k in previous_node.children if k.name == folders[j]), None)
                     if current_node is None:
                         previous_node = TorNode(folders[j], parent=previous_node, is_folder=True)
                     else:
                         previous_node = current_node
                 TorNode(folders[-1], is_file=True, parent=previous_node, size=i.size, priority=i.priority, \
-                        file_id=i.id, progress=round(i.progress*100, 5))
+                        file_id=i.id, progress=round(i.progress * 100, 5))
             else:
                 TorNode(folders[-1], is_file=True, parent=parent, size=i.size, priority=i.priority, \
-                        file_id=i.id, progress=round(i.progress*100, 5))
+                        file_id=i.id, progress=round(i.progress * 100, 5))
     else:
         for i in res:
             folders = get_folders(i['path'])
@@ -64,17 +64,17 @@ def make_tree(res, aria2=False):
                 priority = 0
             if len(folders) > 1:
                 previous_node = parent
-                for j in range(len(folders)-1):
+                for j in range(len(folders) - 1):
                     current_node = next((k for k in previous_node.children if k.name == folders[j]), None)
                     if current_node is None:
                         previous_node = TorNode(folders[j], parent=previous_node, is_folder=True)
                     else:
                         previous_node = current_node
                 TorNode(folders[-1], is_file=True, parent=previous_node, size=i['length'], priority=priority, \
-                        file_id=i['index'], progress=round((int(i['completedLength'])/int(i['length']))*100, 5))
+                        file_id=i['index'], progress=round((int(i['completedLength'])/int(i['length'])) * 100, 5))
             else:
                 TorNode(folders[-1], is_file=True, parent=parent, size=i['length'], priority=priority, \
-                        file_id=i['index'], progress=round((int(i['completedLength'])/int(i['length']))*100, 5))
+                        file_id=i['index'], progress=round((int(i['completedLength'])/int(i['length'])) * 100, 5))
     return create_list(parent, ["", 0])
 
 
