@@ -1,13 +1,13 @@
 # -*- encoding: utf-8 -*-
+from base64 import b64encode, b64decode
+from Crypto.Cipher import AES
 from hashlib import sha256
 from hmac import new
 from json import dumps, loads, JSONDecodeError
-from time import time
-from urllib.parse import quote
-from base64 import b64encode, b64decode
 from requests import get, post
 from requests.exceptions import RequestException
-from Crypto.Cipher import AES
+from time import time
+from urllib.parse import quote
 
 from .exception import (
     MYJDException,
@@ -984,7 +984,7 @@ class Myjdapi:
         :param data:
         """
         init_vector = secret_token[: len(secret_token) // 2]
-        key = secret_token[len(secret_token) // 2 :]
+        key = secret_token[len(secret_token) // 2:]
         decryptor = AES.new(key, AES.MODE_CBC, init_vector)
         return UNPAD(decryptor.decrypt(b64decode(data)))
 
@@ -997,7 +997,7 @@ class Myjdapi:
         """
         data = PAD(data.encode("utf-8"))
         init_vector = secret_token[: len(secret_token) // 2]
-        key = secret_token[len(secret_token) // 2 :]
+        key = secret_token[len(secret_token) // 2:]
         encryptor = AES.new(key, AES.MODE_CBC, init_vector)
         encrypted_data = b64encode(encryptor.encrypt(data))
         return encrypted_data.decode("utf-8")
