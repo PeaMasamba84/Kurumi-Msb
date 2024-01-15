@@ -1,49 +1,49 @@
-from signal import signal, SIGINT
-from aiofiles.os import path as aiopath, remove
 from aiofiles import open as aiopen
-from os import execl as osexecl
-from time import time
-from sys import executable
-from pyrogram.handlers import MessageHandler
-from pyrogram.filters import command
+from aiofiles.os import path as aiopath, remove
 from asyncio import gather, create_subprocess_exec
-from psutil import (
-    disk_usage, 
-    cpu_percent, 
-    cpu_count, 
-    virtual_memory, 
-    net_io_counters, 
-    boot_time, 
-    cpu_freq
-)
-from subprocess import check_output
-from quoters import Quote
-from pytz import timezone
 from datetime import datetime
-
-from .helper.mirror_utils.rclone_utils.serve import rclone_serve_booter
-from .helper.ext_utils.jdownloader_booter import jdownloader
-from .helper.ext_utils.telegraph_helper import telegraph
-from .helper.ext_utils.files_utils import clean_all, exit_clean_up
-from .helper.ext_utils.bot_utils import cmd_exec, sync_to_async, create_help_buttons
-from .helper.ext_utils.status_utils import get_readable_file_size, get_readable_time
-from .helper.ext_utils.db_handler import DbManger
-from .helper.telegram_helper.bot_commands import BotCommands
-from .helper.telegram_helper.message_utils import sendMessage, editMessage, sendFile
-from .helper.telegram_helper.filters import CustomFilters
-from .helper.telegram_helper.button_build import ButtonMaker
-from .helper.listeners.aria2_listener import start_aria2_listener
+from os import execl as osexecl, getpid
+from psutil import (
+    boot_time, 
+    cpu_count, 
+    cpu_freq,
+    cpu_percent, 
+    disk_usage, 
+    net_io_counters, 
+    Process,
+    virtual_memory, 
+)
+from pyrogram.filters import command
+from pyrogram.handlers import MessageHandler
+from pytz import timezone
+from quoters import Quote
+from signal import signal, SIGINT
+from sys import executable
+from time import time
 from bot import (
     bot, 
     botStartTime, 
-    LOGGER, 
-    Intervals, 
+    config_dict, 
     DATABASE_URL, 
     INCOMPLETE_TASK_NOTIFIER, 
+    Intervals, 
+    LOGGER, 
     scheduler, 
-    config_dict, 
-    Version
+    user,
+    Version,
 )
+from .helper.ext_utils.bot_utils import cmd_exec, sync_to_async, create_help_buttons
+from .helper.ext_utils.db_handler import DbManager
+from .helper.ext_utils.files_utils import clean_all, exit_clean_up
+from .helper.ext_utils.jdownloader_booter import jdownloader
+from .helper.ext_utils.status_utils import get_progress_bar_string, get_readable_file_size, get_readable_time
+from .helper.ext_utils.telegraph_helper import telegraph
+from .helper.listeners.aria2_listener import start_aria2_listener
+from .helper.mirror_utils.rclone_utils.serve import rclone_serve_booter
+from .helper.telegram_helper.bot_commands import BotCommands
+from .helper.telegram_helper.button_build import ButtonMaker
+from .helper.telegram_helper.filters import CustomFilters
+from .helper.telegram_helper.message_utils import sendMessage, editMessage, sendFile
 from .modules import (
     authorize, 
     bot_settings, 
@@ -68,138 +68,86 @@ from .modules import (
 def get_quotes():
     try:
         quotez = str(Quote.print_series_quote())
-        quote = quotez.split(": ")[1]
+        quote = quotez.split(": ")[1].replace('"', '')
         oleh = quotez.split(":")[0]
-        quotes = f"{quote}\n=> {oleh}"
+        quotes = f"{quote}\n- {oleh}"
     except:
         quotes = "Ngga ada Quote bijak buatmu wahai Tuan yang bijaksana :D"
     return quotes
 
 
-def progress_bar(percentage):
-    if isinstance(percentage, str):
-        return "NaN"
-    try:
-        percentage = int(percentage)
-    except:
-        percentage = 0
-    return "".join(
-        "■" if i <= percentage // 10 else "□" for i in range(1, 11)
-    )
-
 
 async def stats(_, message):
-    if await aiopath.exists(".git"):
-        last_commit = await cmd_exec("git log -1 --date=short --pretty=format:'%cd <b>From</b> %cr'", True)
-        last_commit = last_commit[0]
-    else:
-        last_commit = 'UPSTREAM_REPO tidak ditemukan!'
-    currentTime = get_readable_time(time() - botStartTime)
-    osUptime = get_readable_time(time() - boot_time())
-    total, used, free, disk = disk_usage(config_dict['DOWNLOAD_DIR'])
-    try:
-        total = get_readable_file_size(total)
-    except:
-        total = "NaN"
-    try:
-        used = get_readable_file_size(used)
-    except:
-        used = "NaN"
-    try:
-        free = get_readable_file_size(free)
-    except:
-        free = "NaN"
-    # Net Usage
-    try:
-        sent = get_readable_file_size(net_io_counters().bytes_sent)
-    except:
-        sent = "NaN"
-    try:
-        recv = get_readable_file_size(net_io_counters().bytes_recv)
-    except:
-        recv = "NaN"
-    # Cpu
-    cpuUsage = cpu_percent(interval=0.5)
-    try:
-        p_core = cpu_count(logical=False)
-    except:
-        p_core = "NaN"
-    try:
-        t_core = cpu_count(logical=True)
-    except:
-        t_core = "NaN"
-    try:
-        cpufreq = cpu_freq()
-    except:
-        cpufreq = "NaN"
-    try:
-        freqcurrent = round(cpufreq.current)
-    except:
-        freqcurrent = "NaN"
+    cpu = cpu_freq()
     memory = virtual_memory()
-    mem_p = memory.percent
-    try:
-        mem_t = get_readable_file_size(memory.total)
-    except:
-        mem_t = "NaN"
-    try:
-        mem_a = get_readable_file_size(memory.available)
-    except:
-        mem_a = "NaN"
-    try:
-        mem_u = get_readable_file_size(memory.used)
-    except:
-        mem_u = "NaN"
-    # Neofetch
-    neofetch = check_output(
-        ["neofetch --shell_version off --stdout"], shell=True).decode()
+    network = net_io_counters()
+    bot_uptime = get_readable_time(time() - botStartTime)
+    machine_uptime = get_readable_time(time() - boot_time())
+    total, used, free, disk = disk_usage(config_dict['DOWNLOAD_DIR'])
+    neofetch, _, _ = await cmd_exec("neofetch --shell_version off --stdout", shell=True)
+    
+    if await aiopath.exists(".git"):
+        commit_time, _, _ = await cmd_exec("git log -1 --pretty=format:'%cr'", shell=True)
+        commit_message, _, _ = await cmd_exec("git log -1 --pretty=format:'%s'", shell=True)
+    else:
+        commit_time = "UPSTREAM_REPO tidak ditemukan!"
+        commit_message = "-"
+        
     stats = f"""
 <pre languange='bash'><code>{neofetch}</code>
+
 <b>CPU</b>
-<b>Cores        :</b> <code>{p_core}</code>
-<b>Logical      :</b> <code>{t_core}</code>
-<b>Frequency    :</b> <code>{freqcurrent}</code>
-<code>[{progress_bar(cpuUsage)}] {cpuUsage}%</code>
+<b>Cores        :</b> <code>{cpu_count(logical=False)}</code>
+<b>Logical      :</b> <code>{cpu_count(logical=True)}</code>
+<b>Frequency    :</b> <code>{round(cpu.current)}</code>
+<code>{get_progress_bar_string(cpu_percent(interval=0.5))} - {cpu_percent(interval=0.5)}%</code>
 
 <b>RAM</b> 
-<b>Terpakai     :</b> <code>{mem_u}</code>
-<b>Tersedia     :</b> <code>{mem_a}</code>
-<b>Total        :</b> <code>{mem_t}</code>
-<code>[{progress_bar(mem_p)}] {mem_p}%</code>
+<b>Terpakai     :</b> <code>{get_readable_file_size(memory.used)}</code>
+<b>Tersedia     :</b> <code>{get_readable_file_size(memory.available)}</code>
+<b>Total        :</b> <code>{get_readable_file_size(memory.total)}</code>
+<code>{get_progress_bar_string(memory.percent)} - {memory.percent}%</code>
+
+<b>Pemakaian RAM</b>
+<b>Python       :</b> <code>{get_readable_file_size(Process(getpid()).memory_info().rss)}</code>
 
 <b>Penyimpanan</b> 
-<b>Terpakai     :</b> <code>{used}</code>
-<b>Tersedia     :</b> <code>{free}</code>
-<b>Total        :</b> <code>{total}</code>
-<code>[{progress_bar(disk)}] {disk}%</code>
+<b>Terpakai     :</b> <code>{get_readable_file_size(used)}</code>
+<b>Tersedia     :</b> <code>{get_readable_file_size(free)}</code>
+<b>Total        :</b> <code>{get_readable_file_size(total)}</code>
+<code>{get_progress_bar_string(disk)} - {disk}%</code>
 
 <b>Jaringan</b>
-<b>Total Unduh  :</b> <code>{recv}</code>
-<b>Total Unggah :</b> <code>{sent}</code>
+<b>Total Unduh  :</b> <code>{get_readable_file_size(network.bytes_recv)}</code>
+<b>Total Unggah :</b> <code>{get_readable_file_size(network.bytes_sent)}</code>
 
 <b>Versi</b>
 <b>Aria2c       :</b> <code>v{Version.ar}</code>
 <b>FFMPEG       :</b> <code>v{Version.ff}</code>
-<b>Google Api   :</b> <code>v{Version.ga}</code>
+<b>Google       :</b> <code>v{Version.ga}</code>
 <b>Java         :</b> <code>v{Version.jv}</code>
-<b>MyJD Api     :</b> <code>v{Version.jd}</code>
+<b>MyJD         :</b> <code>v{Version.jd}</code>
 <b>P7Zip        :</b> <code>v{Version.p7}</code>
 <b>Pyro         :</b> <code>v{Version.pr}</code>
 <b>Python       :</b> <code>v{Version.py}</code>
-<b>Rclone       :</b> <code>{Version.rc}</code>
 <b>Qbittorrent  :</b> <code>{Version.qb}</code>
+<b>Rclone       :</b> <code>{Version.rc}</code>
 <b>YT-DLP       :</b> <code>v{Version.yt}</code>
 
 <b>Lainnya</b>
-<b>Username     :</b> <code>@{bot.me.username}</code>
-<b>Waktu Bot    :</b> <code>{currentTime}</code>
-<b>Waktu Mesin  :</b> <code>{osUptime}</code>
-<b>Diperbarui   :</b> <code>{last_commit}</code>
+<b>Bot ID       :</b> <code>{bot.me.id}</code>
+<b>Bot Name     :</b> <code>{bot.me.first_name}</code>
+<b>Bot Username :</b> <code>@{bot.me.username}</code>
+<b>User Status  :</b> <code>{'PREMIUM' if user.me.is_premium else 'FREE'}</code>
+<b>Uptime Bot   :</b> <code>{bot_uptime}</code>
+<b>Uptime Mesin :</b> <code>{machine_uptime}</code>
+<b>Diperbarui   :</b> <code>{commit_time}</code>
+<b>Pembaruan    :</b> <code>{commit_message}</code>
 
-<b>Quotes       :</b> 
+<b>Kutipan      :</b> 
 <code>{get_quotes()}</code>
-</pre>
-"""
+</pre>"""
+
     await sendMessage(
         message, 
         stats
@@ -214,26 +162,29 @@ async def start(client, message):
     reply_markup = buttons.build_menu(2)
     if await CustomFilters.authorized(client, message):
         start_string = f"""
-<b>Mirror Tautan Lambat menjadi Tautan Cepat!</b>
+<b>Unduh/Unggah dari Tautan Lambat menjadi Tautan Cepat!</b>
 
 <b>Note :</b>
-Selalu backup File setelah Mirror untuk menghindari Drive terhapus!
+Selalu backup File setelah Tugas Unduh/Unggah selesai untuk menghindari Cloud terhapus!
 
 Ketik <code>/{BotCommands.HelpCommand[0]}</code> untuk mendapatkan list perintah yang tersedia!
 
 Enjoy :D
 """
-        await sendMessage(
-            message, 
-            start_string, 
-            reply_markup
-        )
     else:
-        await sendMessage(
-            message, 
-            "<b>Tidak ada izin!</b>\nGabung Grup/Channel untuk menggunakan Bot!\n\n<b>Note :</b>\nJika Group ini mengaktifkan Topik, Kirim perintah di Topik yang diizinkan!", 
-            reply_markup
-        )
+        start_string = """
+<b>Tidak ada izin!</b>
+
+<b>Note :</b>
+Gabung Grup/Channel untuk menggunakan Bot!
+Jika Group ini mengaktifkan Topik, Kirim perintah di Topik yang diizinkan!
+"""
+
+    await sendMessage(
+        message, 
+        start_string, 
+        reply_markup
+    )
 
 
 async def restart(_, message):
@@ -275,7 +226,9 @@ async def ping(_, message):
 async def log(_, message):
     await sendFile(message, "log.txt")
 
-help_string = f"""
+
+async def bot_help(_, message):
+    help_string = f"""
 <b>Daftar Perintah</b> <code>@{bot.me.username}</code>
 <code>/{BotCommands.StartCommand}</code> : Mulai Bot.
 <code>/{BotCommands.HelpCommand[0]}</code> atau <code>/{BotCommands.HelpCommand[1]}</code> : Cek semua perintah Bot.
@@ -316,9 +269,6 @@ help_string = f"""
 
 <b>NOTE :</b> Kirim perintah tanpa argument untuk melihat perintah secara detail!
 """
-
-
-async def bot_help(_, message):
     await sendMessage(
         message, 
         help_string
@@ -376,9 +326,9 @@ async def restart_notification():
         except Exception as e:
             LOGGER.error(e)
 
-    now = datetime.now(timezone(f"Asia/Makassar"))
+    now = datetime.now(timezone(f"Asia/Jakarta"))
     if INCOMPLETE_TASK_NOTIFIER and DATABASE_URL:
-        if notifier_dict := await DbManger().get_incomplete_tasks():
+        if notifier_dict := await DbManager().get_incomplete_tasks():
             for cid, data in notifier_dict.items():
                 msg = f"""
 {'<b>Bot berhasil dimulai ulang!</b>' if cid == chat_id else '<b>Bot dimulai ulang!</b>'}
