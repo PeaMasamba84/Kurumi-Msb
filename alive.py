@@ -1,6 +1,3 @@
-from os import environ
-from time import sleep
-from requests import get
 from logging import (
     getLogger,
     FileHandler,
@@ -10,6 +7,9 @@ from logging import (
     error as log_error,
     warning as log_warning,
 )
+from os import environ
+from requests import get
+from time import sleep
 
 
 basicConfig(
@@ -23,7 +23,7 @@ basicConfig(
 LOGGER = getLogger("AutoAlive")
 
 headers = {
-    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:122.0) Gecko/20100101 Firefox/122.0"
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36"
 }
 
 try:
