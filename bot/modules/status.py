@@ -50,7 +50,7 @@ async def mirror_status(_, message):
             recv = get_readable_file_size(net_io_counters().bytes_recv)
         except:
             recv = "NaN"
-        msg = "<b>Tidak ada Tugas AKTIF!</b>"
+        msg = "<b>Kosong bro!</b>"
         msg += f"\n<b>Note :</b> Setiap User dapat menampilkan Tugasnya dengan menambahkan <code>me</code> atau <code>user_id</code> setelah perintah <code>/{BotCommands.StatusCommand[0]}</code>!"
         msg += "\n\n___________________________"
         msg += (
@@ -150,11 +150,11 @@ async def status_pages(_, query):
 EX : {tasks['Extract']} | SP : {tasks['Split']} | QD : {tasks['QueueDl']} | QU : {tasks['QueueUp']}
 CL : {tasks['Clone']} | CH : {tasks['CheckUp']} | PA : {tasks['Pause']} | SV : {tasks['SamVid']}
 
-Kec. Seed : {get_readable_file_size(seed_speed)}/s
-Kec. Unduh : {get_readable_file_size(dl_speed)}/s
-Kec. Unggah : {get_readable_file_size(up_speed)}/s
+Speed Seed : {get_readable_file_size(seed_speed)}/s
+Speed Unduh : {get_readable_file_size(dl_speed)}/s
+Speed Unggah : {get_readable_file_size(up_speed)}/s
 
-@{bot.me.username}
+@JagoanMasambabot
 """
         await query.answer(msg, show_alert=True)
 
