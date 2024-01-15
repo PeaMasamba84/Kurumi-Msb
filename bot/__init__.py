@@ -2,16 +2,6 @@ from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from aria2p import API as ariaAPI, Client as ariaClient
 from asyncio import Lock
 from dotenv import load_dotenv, dotenv_values
-from myjd import __version__ as jdv
-from os import remove, path as ospath, environ, getcwd
-from pymongo import MongoClient
-from pyrogram import Client as tgClient, enums, __version__ as prv
-from qbittorrentapi import Client as qbClient
-from socket import setdefaulttimeout
-from subprocess import Popen, run, check_output
-from time import time, sleep
-from tzlocal import get_localzone
-from uvloop import install
 from logging import (
     getLogger,
     FileHandler,
@@ -23,6 +13,16 @@ from logging import (
     warning as log_warning,
     ERROR,
 )
+from myjd import __version__ as jdv
+from os import remove, path as ospath, environ, getcwd
+from pymongo import MongoClient
+from pyrogram import Client as tgClient, enums, __version__ as prv
+from qbittorrentapi import Client as qbClient
+from socket import setdefaulttimeout
+from subprocess import Popen, run, check_output
+from time import time, sleep
+from tzlocal import get_localzone
+from uvloop import install
 
 # from faulthandler import enable as faulthandler_enable
 # faulthandler_enable()
@@ -96,8 +96,8 @@ try:
     Version.p7 = check_output(["7z | grep 7-Zip"], shell=True).decode().split(" ")[2]
     Version.pr = prv
     Version.py = check_output(["python --version"], shell=True).decode().split()[-1]
-    Version.rc = check_output(["edge --version"], shell=True).decode().split("\n")[0].split(" ")[1]
     Version.qb = check_output(["firefox --version"], shell=True).decode().split(" ", 1)[1].replace("\n", "")
+    Version.rc = check_output(["edge --version"], shell=True).decode().split("\n")[0].split(" ")[1]
     Version.yt = check_output(["yt-dlp --version"], shell=True).decode().split("\n")[0]
 except Exception as e:
     LOGGER.warning(f"Failed when get apps version! : {e}")
@@ -323,7 +323,11 @@ MAX_SPLIT_SIZE = 4194304000 if IS_PREMIUM_USER else 2097152000
 log_info(f"Max Split Size : {MAX_SPLIT_SIZE}")
 
 LEECH_SPLIT_SIZE = environ.get("LEECH_SPLIT_SIZE", "")
-if len(LEECH_SPLIT_SIZE) == 0 or int(LEECH_SPLIT_SIZE) > MAX_SPLIT_SIZE or LEECH_SPLIT_SIZE == "2097152000":
+if (
+    len(LEECH_SPLIT_SIZE) == 0
+    or int(LEECH_SPLIT_SIZE) > MAX_SPLIT_SIZE
+    or LEECH_SPLIT_SIZE == "2097152000"
+):
     LEECH_SPLIT_SIZE = MAX_SPLIT_SIZE
 else:
     LEECH_SPLIT_SIZE = int(LEECH_SPLIT_SIZE)
