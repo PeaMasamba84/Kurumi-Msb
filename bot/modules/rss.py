@@ -95,7 +95,7 @@ async def rssSub(_, message, pre_event):
         if feed_link.startswith(("-inf", "-exf", "-c")):
             await sendMessage(
                 message,
-                f"<b>Terdapat kesalahan pada line<b> <code>{index}</code>! <b>Tambahkan ulang sesuai dengan contoh!</b>",
+                f"<b>Terdapat kesalahan pada line<b> <code>{index}</code>! <b>Tambahkan Judul sesuai dengan contoh!</b>",
             )
             continue
         inf_lists = []
@@ -122,8 +122,8 @@ async def rssSub(_, message, pre_event):
             exf = None
             cmd = None
         try:
-            async with ClientSession(trust_env=True) as session:
-                async with session.get(feed_link) as res:
+            async with ClientSession() as session:
+                async with session.get(feed_link, ssl=False) as res:
                     html = await res.text()
             rss_d = feedparse(html)
             last_title = rss_d.entries[0]["title"]
@@ -175,17 +175,17 @@ async def rssSub(_, message, pre_event):
             await sendMessage(message, emsg + "\nError: " + str(e))
         except Exception as e:
             await sendMessage(message, str(e))
-    if DATABASE_URL:
-        await DbManager().rss_update(user_id)
     if msg:
+        if DATABASE_URL and rss_dict[user_id]:
+            await DbManager().rss_update(user_id)
         await sendMessage(message, msg)
+        is_sudo = await CustomFilters.sudo("", message)
+        if scheduler.state == 2:
+            scheduler.resume()
+        elif is_sudo and not scheduler.running:
+            addJob()
+            scheduler.start()
     await updateRssMenu(pre_event)
-    is_sudo = await CustomFilters.sudo("", message)
-    if scheduler.state == 2:
-        scheduler.resume()
-    elif is_sudo and not scheduler.running:
-        addJob()
-        scheduler.start()
 
 
 async def getUserId(title):
@@ -242,12 +242,14 @@ async def rssUpdate(_, message, pre_event, state):
                 await DbManager().rss_delete(user_id)
                 if not rss_dict:
                     await DbManager().trunc_table("rss")
-    LOGGER.info(f"Rss link with Title(s): {updated} has been {state}d!")
-    await sendMessage(
-        message, f"<b>RSS dengan judul</b> <code>{updated}</code> <b>telah</b> <code>di{state}d</code>!"
-    )
-    if DATABASE_URL and rss_dict.get(user_id):
-        await DbManager().rss_update(user_id)
+    if updated:
+        LOGGER.info(f"Rss link with Title(s): {updated} has been {state}d!")
+        await sendMessage(
+            message,
+            f"<b>RSS dengan judul</b> <code>{updated}</code> <b>telah</b> <code>di{state}d</code>!"
+        )
+        if DATABASE_URL and rss_dict.get(user_id):
+            await DbManager().rss_update(user_id)
     await updateRssMenu(pre_event)
 
 
@@ -287,7 +289,9 @@ async def rssList(query, start, all_users=False):
     buttons.ibutton("Close", f"rss close {user_id}")
     if keysCount > 5:
         for x in range(0, keysCount, 5):
-            buttons.ibutton(f"{int(x/5)}", f"rss list {user_id} {x}", position="footer")
+            buttons.ibutton(
+                f"{int(x / 5)}", f"rss list {user_id} {x}", position="footer"
+            )
     button = buttons.build_menu(2)
     if query.message.text.html == list_feed:
         return
@@ -314,8 +318,8 @@ async def rssGet(_, message, pre_event):
                 msg = await sendMessage(
                     message, f"Getting the last <b>{count}</b> item(s) from {title}"
                 )
-                async with ClientSession(trust_env=True) as session:
-                    async with session.get(data["link"]) as res:
+                async with ClientSession() as session:
+                    async with session.get(data["link"], ssl=False) as res:
                         html = await res.text()
                 rss_d = feedparse(html)
                 item_info = ""
@@ -352,6 +356,7 @@ async def rssEdit(_, message, pre_event):
     user_id = message.from_user.id
     handler_dict[user_id] = False
     items = message.text.split("\n")
+    updated = False
     for item in items:
         args = item.split()
         title = args[0].strip()
@@ -364,6 +369,7 @@ async def rssEdit(_, message, pre_event):
         elif not rss_dict[user_id].get(title, False):
             await sendMessage(message, "<b>Judul tidak ditemukan!</b>")
             continue
+        updated = True
         inf_lists = []
         exf_lists = []
         arg = item.split(" -c ", 1)
@@ -391,7 +397,7 @@ async def rssEdit(_, message, pre_event):
                         y = x.split(" or ")
                         exf_lists.append(y)
                 rss_dict[user_id][title]["exf"] = exf_lists
-    if DATABASE_URL:
+    if DATABASE_URL and updated:
         await DbManager().rss_update(user_id)
     await updateRssMenu(pre_event)
 
@@ -516,11 +522,11 @@ async def rssListener(client, query):
             button = buttons.build_menu(2)
             msg = """Send one or more rss titles with new filters or command separated by new line.
 Examples:
-Title1 -c mirror -up remote:path/subdir -exf none -inf 1080 or 720 opt: up: remote:path/subdir
-Title2 -c none -inf none -opt none
+Title1 -c mirror -up remote:path/subdir -exf none -inf 1080 or 720
+Title2 -c none -inf none
 Title3 -c mirror -rcf xxx -up xxx -z pswd
 Note: Only what you provide will be edited, the rest will be the same like example 2: exf will stay same as it is.
-Timeout: 60 sec. Argument -c for command and options
+Timeout: 60 sec. Argument -c for command and arguments
             """
             await editMessage(message, msg, button)
             pfunc = partial(rssEdit, pre_event=query)
@@ -636,8 +642,8 @@ async def rssMonitor():
             try:
                 if data["paused"]:
                     continue
-                async with ClientSession(trust_env=True) as session:
-                    async with session.get(data["link"]) as res:
+                async with ClientSession() as session:
+                    async with session.get(data["link"], ssl=False) as res:
                         html = await res.text()
                 rss_d = feedparse(html)
                 try:
@@ -676,12 +682,14 @@ async def rssMonitor():
                         break
                     parse = True
                     for flist in data["inf"]:
-                        if all(x not in item_title.lower() for x in flist):
+                        if all(x not in item_title for x in flist):
                             parse = False
                             feed_count += 1
                             break
+                    if not parse:
+                        continue
                     for flist in data["exf"]:
-                        if any(x in item_title.lower() for x in flist):
+                        if any(x in item_title for x in flist):
                             parse = False
                             feed_count += 1
                             break
