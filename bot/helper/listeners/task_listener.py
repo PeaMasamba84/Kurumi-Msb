@@ -226,14 +226,14 @@ class TaskListener(TaskConfig):
             and DATABASE_URL
         ):
             await DbManager().rm_complete_task(self.message.link)
-        msg = f"<b>Nama :</b> <code>{escape(self.name)}</code>"
-        msg += f"\n\n<b>Ukuran :</b> <code>{get_readable_file_size(size)}</code>"
+        msg = f"<b>💾 Nama :</b><blockquote><code>{escape(self.name)}</code></blockquote>"
+        msg += f"\n\n<b>📦 Ukuran :</b> <code>{get_readable_file_size(size)}</code>"
         LOGGER.info(f"Task Done: {self.name}")
         if self.isLeech:
-            msg += f"\n\n<b>Jumlah File :</b> <code>{folders}</code>"
+            msg += f"\n\n<b>🗄 Jumlah File :</b> <code>{folders}</code>"
             if mime_type != 0:
-                msg += f"\n\n<b>File Rusak :</b> <code>{mime_type}</code>"
-            msg += f'\n\n<b>Oleh :</b> {self.tag}\n\n'
+                msg += f"\n\n<b>📕 File Rusak :</b> <code>{mime_type}</code>"
+            msg += f'\n\n<b>👤 Tugas Oleh :</b> {self.tag}\n\n'
             if not files:
                 await sendMessage(self.message, msg)
             else:
@@ -255,10 +255,10 @@ class TaskListener(TaskConfig):
                 await start_from_queued()
                 return
         else:
-            msg += f"\n\n<b>Tipe :</b> <code>{mime_type}</code>"
+            msg += f"\n\n<b>🗂 Tipe :</b> <code>{mime_type}</code>"
             if mime_type == "Folder":
-                msg += f"\n\n<b>Jumlah Folder :</b> <code>{folders}</code>"
-                msg += f"\n\n<b>Jumlah File :</b> <code>{files}</code>"
+                msg += f"\n\n<b>📂 Jumlah Folder :</b> <code>{folders}</code>"
+                msg += f"\n\n<b>📄 Jumlah File :</b> <code>{files}</code>"
             if (
                 link
                 or rclonePath
@@ -269,7 +269,7 @@ class TaskListener(TaskConfig):
                 if link:
                     buttons.ubutton("☁️ Cloud Link", link)
                 if rclonePath:
-                    msg += f"\n\n<b>Path :</b> <code>{rclonePath}</code>"
+                    msg += f"\n\n<b>📁 Path :</b> <code>{rclonePath}</code>"
                 if (
                     rclonePath
                     and (RCLONE_SERVE_URL := config_dict["RCLONE_SERVE_URL"])
@@ -299,9 +299,9 @@ class TaskListener(TaskConfig):
                             buttons.ubutton("🌐 View Link", share_urls)
                 button = buttons.build_menu(2)
             else:
-                msg += f"\n\n<b>Path :</b> <code>{rclonePath}</code>"
+                msg += f"\n\n<b>📁 Path :</b> <code>{rclonePath}</code>"
                 button = None
-            msg += f"\n\n<b>Oleh :</b> {self.tag}"
+            msg += f"\n\n<b>👤 Tugas Oleh :</b> {self.tag}"
             await sendMessage(self.message, msg, button)
             # Log Chat
             LOG_CHAT_ID = None
