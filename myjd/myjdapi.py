@@ -80,12 +80,10 @@ class Jd:
         self.url = "/jd"
 
     def get_core_revision(self):
-        """
-
-        :return:
-        """
         return self.device.action(f"{self.url}/getCoreRevision")
 
+    def version(self):
+        return self.device.action(f"{self.url}/version")
 
 class Update:
     """
@@ -537,6 +535,17 @@ class Linkgrabber:
         params = [dir, package_ids]
         return self.device.action(f"{self.url}/setDownloadDirectory", params)
 
+    def move_to_new_package(
+        self, name: str, path: str, link_ids: list = None, package_ids: list = None
+    ):
+        # Requires at least a link_ids or package_ids list, or both.
+        if link_ids is None:
+            link_ids = []
+        if package_ids is None:
+            package_ids = []
+        params = [link_ids, package_ids, name, path]
+        return self.device.action(f"{self.url}/movetoNewPackage", params)
+
     def remove_links(self, link_ids=None, package_ids=None):
         """
         Remove packages and/or links of the linkgrabber list.
@@ -560,10 +569,6 @@ class Linkgrabber:
         """
         params = [link_id, new_name]
         return self.device.action(f"{self.url}/renameLink", params)
-
-    def move_to_new_package(self, link_ids, package_ids, new_pkg_name, download_path):
-        params = link_ids, package_ids, new_pkg_name, download_path
-        return self.device.action(f"{self.url}/movetoNewPackage", params)
 
     def get_package_count(self):
         return self.device.action(f"{self.url}/getPackageCount")
@@ -984,7 +989,7 @@ class Myjdapi:
         :param data:
         """
         init_vector = secret_token[: len(secret_token) // 2]
-        key = secret_token[len(secret_token) // 2:]
+        key = secret_token[len(secret_token) // 2 :]
         decryptor = AES.new(key, AES.MODE_CBC, init_vector)
         return UNPAD(decryptor.decrypt(b64decode(data)))
 
@@ -997,7 +1002,7 @@ class Myjdapi:
         """
         data = PAD(data.encode("utf-8"))
         init_vector = secret_token[: len(secret_token) // 2]
-        key = secret_token[len(secret_token) // 2:]
+        key = secret_token[len(secret_token) // 2 :]
         encryptor = AES.new(key, AES.MODE_CBC, init_vector)
         encrypted_data = b64encode(encryptor.encrypt(data))
         return encrypted_data.decode("utf-8")
@@ -1164,7 +1169,7 @@ class Myjdapi:
                     )
                 ]
             query = query[0] + "&".join(query[1:])
-            encrypted_response = get(api + query, timeout=3, verify=False)
+            encrypted_response = get(api + query, timeout=2, verify=False)
         else:
             params_request = []
             if params is not None:
@@ -1192,7 +1197,7 @@ class Myjdapi:
                     request_url,
                     headers={"Content-Type": "application/aesjson-jd; charset=utf-8"},
                     data=encrypted_data,
-                    timeout=3,
+                    timeout=2,
                     verify=False,
                 )
             except RequestException as e:
