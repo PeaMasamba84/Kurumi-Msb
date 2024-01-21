@@ -226,7 +226,7 @@ class TaskListener(TaskConfig):
             and DATABASE_URL
         ):
             await DbManager().rm_complete_task(self.message.link)
-        msg = f"<b>💾 Nama :</b><blockquote><code>{escape(self.name)}</code></blockquote>"
+        msg = f"<b>💾 Nama :</b><blockquote><code>{escape(self.name)}</code></blockquote>\n"
         msg += f"\n<b>┌📦 Ukuran :</b> <code>{get_readable_file_size(size)}</code>"
         LOGGER.info(f"Task Done: {self.name}")
         if self.isLeech:
