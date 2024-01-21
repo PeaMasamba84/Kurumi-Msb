@@ -40,11 +40,17 @@ from bot.helper.ext_utils.media_utils import (
     createThumb,
     createSampleVideo,
 )
-from bot.helper.ext_utils.media_utils import split_file, get_document_type
+from bot.helper.ext_utils.media_utils import (
+    split_file,
+    get_document_type,
+    convert_video,
+    convert_audio,
+)
 from bot.helper.mirror_utils.gdrive_utils.list import gdriveList
 from bot.helper.mirror_utils.rclone_utils.list import RcloneList
 from bot.helper.mirror_utils.status_utils.extract_status import ExtractStatus
 from bot.helper.mirror_utils.status_utils.sample_video_status import SampleVideoStatus
+from bot.helper.mirror_utils.status_utils.media_convert_status import MediaConvertStatus
 from bot.helper.mirror_utils.status_utils.split_status import SplitStatus
 from bot.helper.mirror_utils.status_utils.zip_status import ZipStatus
 from bot.helper.telegram_helper.bot_commands import BotCommands
@@ -59,8 +65,8 @@ class TaskConfig:
     def __init__(self):
         self.mid = self.message.id
         self.user = self.message.from_user or self.message.sender_chat
-        self.user_id = self.user.id
-        self.user_dict = user_data.get(self.user_id, {})
+        self.userId = self.user.id
+        self.userDict = user_data.get(self.userId, {})
         self.dir = f"{DOWNLOAD_DIR}{self.mid}"
         self.link = ""
         self.upDest = ""
@@ -90,17 +96,23 @@ class TaskConfig:
         self.privateLink = False
         self.stopDuplicate = False
         self.sampleVideo = False
+        self.convertAudio = False
+        self.convertVideo = False
         self.screenShots = False
-        self.as_doc = False
+        self.asDoc = False
+        self.cancelled = False
+        self.forceRun = False
+        self.forceDownload = False
+        self.forceUpload = False
         self.suproc = None
         self.thumb = None
-        self.extension_filter = []
+        self.extensionFilter = []
         self.isSuperChat = bool(self.message.chat.type.name in ["SUPERGROUP", "CHANNEL"])
         self.isPrivateChat = bool(self.message.chat.type.name == "PRIVATE")
 
     def getTokenPath(self, dest):
         if dest.startswith("mtp:"):
-            return f"tokens/{self.user_id}.pickle"
+            return f"tokens/{self.userId}.pickle"
         elif (
             dest.startswith("sa:")
             or config_dict["USE_SERVICE_ACCOUNTS"]
@@ -112,7 +124,7 @@ class TaskConfig:
 
     def getConfigPath(self, dest):
         return (
-            f"rclone/{self.user_id}.conf" if dest.startswith("mrcc:") else "rclone.conf"
+            f"rclone/{self.userId}.conf" if dest.startswith("mrcc:") else "rclone.conf"
         )
 
     async def isTokenExists(self, path, status):
@@ -135,9 +147,9 @@ class TaskConfig:
                 raise ValueError(f"<b>Token.pickle atau SAccounts</b> <code>{config_path}</code> <b>tidak ditemukan!</b>")
 
     async def beforeStart(self):
-        self.extension_filter = (
-            self.user_dict.get("excluded_extensions") or GLOBAL_EXTENSION_FILTER
-            if "excluded_extensions" not in self.user_dict
+        self.extensionFilter = (
+            self.userDict.get("excluded_extensions") or GLOBAL_EXTENSION_FILTER
+            if "excluded_extensions" not in self.userDict
             else ["aria2", "!qB"]
         )
         if not self.isYtDlp:
@@ -152,30 +164,28 @@ class TaskConfig:
                 if not is_gdrive_id(self.link):
                     raise ValueError(self.link)
                 
-            self.userTransmission = IS_PREMIUM_USER and (
-                self.user_dict.get("user_transmission")
-                or config_dict["USER_TRANSMISSION"]
-                and "user_transmission" not in self.user_dict
-            )
+        self.userTransmission = IS_PREMIUM_USER and (
+            self.userDict.get("user_transmission")
+            or config_dict["USER_TRANSMISSION"]
+            and "user_transmission" not in self.userDict
+        )
 
         if not self.isLeech:
             self.stopDuplicate = (
-                self.user_dict.get("stop_duplicate", config_dict["STOP_DUPLICATE"])
-                or "stop_duplicate" in self.user_dict
+                self.userDict.get("stop_duplicate")
+                or "stop_duplicate" not in self.userDict
                 and config_dict["STOP_DUPLICATE"]
             )
             default_upload = (
-                self.user_dict.get("default_upload", "")
+                self.userDict.get("default_upload", "") 
                 or config_dict["DEFAULT_UPLOAD"]
             )
             if (not self.upDest and default_upload == "rc") or self.upDest == "rc":
                 self.upDest = (
-                    self.user_dict.get("rclone_path") or config_dict["RCLONE_PATH"]
+                    self.userDict.get("rclone_path") or config_dict["RCLONE_PATH"]
                 )
             elif (not self.upDest and default_upload == "gd") or self.upDest == "gd":
-                self.upDest = (
-                    self.user_dict.get("gdrive_id") or config_dict["GDRIVE_ID"]
-                )
+                self.upDest = self.userDict.get("gdrive_id") or config_dict["GDRIVE_ID"]
             if not self.upDest:
                 raise ValueError("<b>Tujuan upload tidak ditemukan!</b>")
             if not is_gdrive_id(self.upDest) and not is_rclone_path(self.upDest):
@@ -249,19 +259,19 @@ class TaskConfig:
                     self.splitSize = getSizeBytes(self.splitSize)
             self.splitSize = (
                 self.splitSize
-                or self.user_dict.get("split_size")
+                or self.userDict.get("split_size")
                 or config_dict["LEECH_SPLIT_SIZE"]
             )
             self.equalSplits = (
-                self.user_dict.get("equal_splits")
+                self.userDict.get("equal_splits")
                 or config_dict["EQUAL_SPLITS"]
-                and "equal_splits" not in self.user_dict
+                and "equal_splits" not in self.userDict
             )
             self.maxSplitSize = MAX_SPLIT_SIZE if self.userTransmission else 2097152000
             self.splitSize = min(self.splitSize, self.maxSplitSize)
             self.upDest = (
                 self.upDest
-                # or self.user_dict.get("leech_dest")
+                # or self.userDict.get("leech_dest")
                 or config_dict["LEECH_CHAT_ID"]
             )
             if not isinstance(self.upDest, int):
@@ -281,10 +291,10 @@ class TaskConfig:
                     self.upDest = int(self.upDest)
                 if self.threadId.isdigit():
                     self.threadId = int(self.threadId)
-            self.as_doc = (
-                self.user_dict.get("as_doc", False)
+            self.asDoc = (
+                self.userDict.get("as_doc", False)
                 or config_dict["AS_DOCUMENT"]
-                and "as_doc" not in self.user_dict
+                and "as_doc" not in self.userDict
             )
 
             if is_telegram_link(self.thumb):
@@ -295,8 +305,8 @@ class TaskConfig:
         if len(text) > 1 and text[1].startswith("Tag: "):
             self.tag, id_ = text[1].split("Tag: ")[1].split()
             self.user = self.message.from_user = await self.client.get_users(id_)
-            self.user_id = self.user.id
-            self.user_dict = user_data.get(self.user_id, {})
+            self.userId = self.user.id
+            self.userDict = user_data.get(self.userId, {})
             try:
                 await self.message.unpin()
             except:
@@ -439,17 +449,17 @@ class TaskConfig:
                             ]
                             if not pswd:
                                 del cmd[2]
+                            if self.cancelled:
+                                return False
                             async with subprocess_lock:
-                                if self.suproc == "cancelled":
-                                    return False
                                 self.suproc = await create_subprocess_exec(
                                     *cmd, stderr=PIPE
                                 )
                             _, stderr = await self.suproc.communicate()
-                            code = self.suproc.returncode
-                            if code == -9:
+                            if self.cancelled:
                                 return False
-                            elif code != 0:
+                            code = self.suproc.returncode
+                            if code != 0:
                                 stderr = stderr.decode().strip()
                                 LOGGER.error(
                                     f"{stderr}. Unable to extract archive splits!. Path: {f_path}"
@@ -465,7 +475,7 @@ class TaskConfig:
                                 try:
                                     await remove(del_path)
                                 except:
-                                    return False
+                                    self.cancelled = True
                 return up_path
             else:
                 up_path = get_base_name(dl_path)
@@ -483,23 +493,23 @@ class TaskConfig:
                 ]
                 if not pswd:
                     del cmd[2]
+                if self.cancelled:
+                    return False
                 async with subprocess_lock:
-                    if self.suproc == "cancelled":
-                        return False
                     self.suproc = await create_subprocess_exec(*cmd, stderr=PIPE)
                 _, stderr = await self.suproc.communicate()
-                code = self.suproc.returncode
-                if code == -9:
+                if self.cancelled:
                     return False
-                elif code == 0:
+                code = self.suproc.returncode
+                if code == 0:
                     LOGGER.info(f"Extracted Path: {up_path}")
                     if not self.seed:
                         try:
                             await remove(dl_path)
                         except:
-                            return False
+                            self.cancelled = True
                     return up_path
-                else:
+                elif code != -9:
                     stderr = stderr.decode().strip()
                     LOGGER.error(
                         f"{stderr}. Unable to extract archive! Uploading anyway. Path: {dl_path}"
@@ -548,20 +558,20 @@ class TaskConfig:
             del cmd[1]
             if not pswd:
                 del cmd[3]
+        if self.cancelled:
+            return False
             LOGGER.info(f"Zip: orig_path: {dl_path}, zip_path: {up_path}")
         async with subprocess_lock:
-            if self.suproc == "cancelled":
-                return False
             self.suproc = await create_subprocess_exec(*cmd, stderr=PIPE)
         _, stderr = await self.suproc.communicate()
+        if self.cancelled:
+            return
         code = self.suproc.returncode
-        if code == -9:
-            return False
-        elif code == 0:
+        if code == 0:
             if not self.seed:
                 await clean_target(dl_path)
             return up_path
-        else:
+        elif code != -9:
             stderr = stderr.decode().strip()
             LOGGER.error(f"{stderr}. Unable to zip this path: {dl_path}")
             return dl_path
@@ -581,24 +591,23 @@ class TaskConfig:
                     res = await split_file(
                         f_path, f_size, dirpath, self.splitSize, self
                     )
+                    if self.cancelled:
+                        return
                     if not res:
-                        return False
-                    if res == "errored":
                         if f_size <= self.maxSplitSize:
                             continue
                         try:
                             await remove(f_path)
                         except:
-                            return False
+                            return
                     elif not self.seed or self.newDir:
                         try:
                             await remove(f_path)
                         except:
-                            return False
+                            return
                     else:
                         m_size.append(f_size)
                         o_files.append(file_)
-        return True
 
     async def generateSampleVideo(self, dl_path, size, gid):
         data = self.sampleVideo.split(":") if isinstance(self.sampleVideo, str) else ""
@@ -638,3 +647,86 @@ class TaskConfig:
                             if not res:
                                 return res
                 return dl_path
+
+    async def convertMedia(self, up_dir, size, gid):
+        async with task_dict_lock:
+            task_dict[self.mid] = MediaConvertStatus(self, size, gid)
+
+        fvext = []
+        if self.convertVideo:
+            vdata = self.convertVideo.split()
+            vext = vdata[0]
+            if len(vdata) > 2:
+                if "+" in vdata[1].split():
+                    vstatus = "+"
+                elif "-" in vdata[1].split():
+                    vstatus = "-"
+                else:
+                    vstatus = ""
+                fvext.extend(f".{ext}" for ext in vdata[2:])
+        else:
+            vdata = ""
+            vext = ""
+            vstatus = ""
+
+        faext = []
+        if self.convertAudio:
+            adata = self.convertAudio.split()
+            aext = adata[0]
+            if len(adata) > 2:
+                if "+" in adata[1].split():
+                    astatus = "+"
+                elif "-" in adata[1].split():
+                    astatus = "-"
+                else:
+                    astatus = ""
+                faext.extend(f".{ext}" for ext in adata[2:])
+        else:
+            adata = ""
+            aext = ""
+            astatus = ""
+
+        checked = False
+        for dirpath, _, files in await sync_to_async(walk, up_dir, topdown=False):
+            for file_ in files:
+                if self.cancelled:
+                    return False
+                f_path = ospath.join(dirpath, file_)
+                is_video, is_audio, _ = await get_document_type(f_path)
+                if (
+                    is_video
+                    and vext
+                    and not f_path.endswith(f".{vext}")
+                    and (
+                        vstatus == "+"
+                        and f_path.endswith(tuple(fvext))
+                        or vstatus == "-"
+                        and not f_path.endswith(tuple(fvext))
+                        or not vstatus
+                    )
+                ):
+                    if not checked:
+                        checked = True
+                        LOGGER.info(f"Converting: {self.name}")
+                    await convert_video(self, f_path, vext)
+                    if self.cancelled:
+                        return False
+                elif (
+                    is_audio
+                    and not is_video
+                    and not f_path.endswith(f".{aext}")
+                    and (
+                        astatus == "+"
+                        and f_path.endswith(tuple(faext))
+                        or astatus == "-"
+                        and not f_path.endswith(tuple(faext))
+                        or not astatus
+                    )
+                ):
+                    if not checked:
+                        checked = True
+                        LOGGER.info(f"Converting: {self.name}")
+                    await convert_audio(self, f_path, aext)
+                    if self.cancelled:
+                        return False
+        return True
