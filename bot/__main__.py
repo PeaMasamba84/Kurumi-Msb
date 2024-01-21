@@ -96,7 +96,7 @@ async def stats(_, message):
         commit_message = "-"
 
         
-    stats = f"𝐏𝐄𝐀 𝐌𝐀𝐒𝐀𝐌𝐁𝐀 𝐒𝐓𝐀𝐓𝐒"
+    stats = f"""
 
 <b>Status Bot:</b>
 <b>Bot ID       :</b> <code>{bot.me.id}</code>
