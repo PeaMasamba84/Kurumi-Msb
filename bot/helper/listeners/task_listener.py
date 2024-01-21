@@ -227,7 +227,7 @@ class TaskListener(TaskConfig):
         ):
             await DbManager().rm_complete_task(self.message.link)
         msg = f"<b>💾 Nama :</b><blockquote><code>{escape(self.name)}</code></blockquote>"
-        msg += f"\n\n<b>┌📦 Ukuran :</b> <code>{get_readable_file_size(size)}</code>"
+        msg += f"\n<b>┌📦 Ukuran :</b> <code>{get_readable_file_size(size)}</code>"
         LOGGER.info(f"Task Done: {self.name}")
         if self.isLeech:
             msg += f"\n<b>├🗄 Jumlah File :</b> <code>{folders}</code>"
@@ -255,7 +255,7 @@ class TaskListener(TaskConfig):
                 await start_from_queued()
                 return
         else:
-            msg += f"\n\n<b>🗂 Tipe :</b> <code>{mime_type}</code>"
+            msg += f"\n<b>🗂└Tipe :</b> <code>{mime_type}</code>\n"
             if mime_type == "Folder":
                 msg += f"\n<b>┌📂 Jumlah Folder :</b> <code>{folders}</code>"
                 msg += f"\n<b>└📄 Jumlah File :</b> <code>{files}</code>"
