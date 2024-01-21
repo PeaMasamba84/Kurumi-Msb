@@ -40,7 +40,7 @@ async def mirror_status(_, message):
     async with task_dict_lock:
         count = len(task_dict)
     if count == 0:
-        msg = "<b>Tidak ada Tugas AKTIF!</b>"
+        msg = "<b>Kosong bro!</b>"
         msg += f"\n<b>Tambahkan</b> <code>me/userId</code> <b>setelah perintah untuk menampilkan Tugas secara spesifik!</b>"
         msg += "\n\n___________________________"
         msg += (
@@ -143,11 +143,11 @@ async def status_pages(_, query):
 EX : {tasks['Extract']} | SP : {tasks['Split']} | QD : {tasks['QueueDl']} | QU : {tasks['QueueUp']}
 CL : {tasks['Clone']} | CH : {tasks['CheckUp']} | PA : {tasks['Pause']} | SV : {tasks['SamVid']}
 
-Kec. Seed : {get_readable_file_size(seed_speed)}/s
-Kec. Unduh : {get_readable_file_size(dl_speed)}/s
-Kec. Unggah : {get_readable_file_size(up_speed)}/s
+🌾𝑺𝒑𝒆𝒆𝒅 𝑺𝒆𝒆𝒅 : {get_readable_file_size(seed_speed)}/s
+📤𝑺𝒑𝒆𝒆𝒅 𝑼𝒏𝒅𝒖𝒉 : {get_readable_file_size(dl_speed)}/s
+📥𝑺𝒑𝒆𝒆𝒅 𝑼𝒏𝒈𝒈𝒂𝒉 : {get_readable_file_size(up_speed)}/s
 
-@{bot.me.username}
+By: 🅿🅴🅰 🅼🅰🆂🅰🅼🅱🅰
 """
         await query.answer(msg, show_alert=True)
 
