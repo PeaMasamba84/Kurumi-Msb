@@ -146,7 +146,7 @@ async def stats(_, message):
 <b>├Rclone       :</b> <code>{Version.rc}</code>
 <b>└┤YT-DLP       :</b> <code>v{Version.yt}</code>
 
-<b>Kutipan      :</b> 
+<b><blockquote>Kutipan      :</blockquote></b> 
 <code>{get_quotes()}</code>
 </pre>"""
 
