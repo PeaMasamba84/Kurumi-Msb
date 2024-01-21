@@ -136,14 +136,14 @@ def get_readable_message(sid, is_user, page_no=1, status="All", page_step=1):
     ):
         tstatus = task.status()
         if task.listener.isPrivateChat: 
-            msg += f"\n💾 File :<blockquote><code>PRIVATE</code></blockquote>"
+            msg += f"💾 File :<blockquote><code>PRIVATE</code></blockquote>"
         else: 
-            msg += f"\n💾 File :<blockquote><code>{escape(f'{task.name()}')}</code></blockquote>\n"
+            msg += f"💾 File :<blockquote><code>{escape(f'{task.name()}')}</code></blockquote>\n"
         msg += f"\n<b>┌┤{get_progress_bar_string(task.progress())} » <code>{task.progress()}</code></b>"
         if task.listener.isSuperChat:
-            msg += f"\n<b>┌📲 Status :</b> <a href='{task.listener.message.link}'>{tstatus}</a>"
+            msg += f"\n<b>├📲 Status :</b> <a href='{task.listener.message.link}'>{tstatus}</a>"
         else:
-            msg += f"\n<b>┌📲 Status :</b> <code>{tstatus}</code>"
+            msg += f"\n<b>├📲 Status :</b> <code>{tstatus}</code>"
         if tstatus not in [
             MirrorStatus.STATUS_SPLITTING,
             MirrorStatus.STATUS_SEEDING,
@@ -196,7 +196,7 @@ def get_readable_message(sid, is_user, page_no=1, status="All", page_step=1):
                 buttons.ibutton(label, f"status {sid} st {status_value}")
     buttons.ibutton("Refresh", f"status {sid} ref", position="header")
     button = buttons.build_menu(8)
-    msg = "<b><a>href='https://subscene.com/u/1271292'>═══❰ 𝙿𝚎𝚊 𝙼𝚊𝚜𝚊𝚖𝚋𝚊 ❱═══</a> </b>\n\n"
+    msg += "═══❰ 𝙿𝚎𝚊 𝙼𝚊𝚜𝚊𝚖𝚋𝚊 ❱═══"
     msg += f"\n<b>💿CPU:</b> <code>{cpu_percent()}%</code> | <b>🚦RAM:</b> <code>{virtual_memory().percent}%</code>"
     msg += f"\n<b>▼:</b> <code>{get_readable_file_size(net_io_counters().bytes_recv)}</code> | <b>▲:</b> <code>{get_readable_file_size(net_io_counters().bytes_sent)}</code>"
     return msg, button
