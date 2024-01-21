@@ -95,8 +95,17 @@ async def stats(_, message):
         commit_time = "UPSTREAM_REPO tidak ditemukan!"
         commit_message = "-"
         
-    stats = f"""
-<pre languange='bash'><code>{neofetch}</code>
+    stats = f"𝐏𝐄𝐀 𝐌𝐀𝐒𝐀𝐌𝐁𝐀 𝐒𝐓𝐀𝐓𝐒"
+    
+<b>Status Bot:</b>
+<b>Bot ID       :</b> <code>{bot.me.id}</code>
+<b>Bot Name     :</b> <code>{bot.me.first_name}</code>
+<b>Bot Username :</b> <code>@{bot.me.username}</code>
+<b>User Status  :</b> <code>{'PREMIUM' if IS_PREMIUM_USER else 'FREE'}</code>
+<b>Uptime Bot   :</b> <code>{bot_uptime}</code>
+<b>Uptime Mesin :</b> <code>{machine_uptime}</code>
+<b>Diperbarui   :</b> <code>{commit_time}</code>
+<b>Pembaruan    :</b> <code>{commit_message}</code>
 
 <b>CPU</b>
 <b>Cores        :</b> <code>{cpu_count(logical=False)}</code>
@@ -136,15 +145,7 @@ async def stats(_, message):
 <b>Rclone       :</b> <code>{Version.rc}</code>
 <b>YT-DLP       :</b> <code>v{Version.yt}</code>
 
-<b>Lainnya</b>
-<b>Bot ID       :</b> <code>{bot.me.id}</code>
-<b>Bot Name     :</b> <code>{bot.me.first_name}</code>
-<b>Bot Username :</b> <code>@{bot.me.username}</code>
-<b>User Status  :</b> <code>{'PREMIUM' if IS_PREMIUM_USER else 'FREE'}</code>
-<b>Uptime Bot   :</b> <code>{bot_uptime}</code>
-<b>Uptime Mesin :</b> <code>{machine_uptime}</code>
-<b>Diperbarui   :</b> <code>{commit_time}</code>
-<b>Pembaruan    :</b> <code>{commit_message}</code>
+<pre languange='bash'><code>{neofetch}</code>
 
 <b>Kutipan      :</b> 
 <code>{get_quotes()}</code>
