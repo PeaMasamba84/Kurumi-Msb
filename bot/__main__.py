@@ -97,7 +97,6 @@ async def stats(_, message):
 
         
     stats = f"𝐏𝐄𝐀 𝐌𝐀𝐒𝐀𝐌𝐁𝐀 𝐒𝐓𝐀𝐓𝐒"
-<pre languange='bash'><code>{neofetch}</code>
 
 <b>Status Bot:</b>
 <b>Bot ID       :</b> <code>{bot.me.id}</code>
