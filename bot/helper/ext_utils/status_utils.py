@@ -104,7 +104,7 @@ def get_progress_bar_string(pct) -> str:
 
 
 def get_readable_message(sid, is_user, page_no=1, status="All", page_step=1):
-    msg = 'href='https://subscene.com/u/1271292'>𝐒𝐔𝐁𝐓𝐈𝐓𝐋𝐄 𝐏𝐄𝐀 𝐌𝐀𝐒𝐀𝐌𝐁𝐀\n\n'
+    msg = "<b><a href='https://subscene.com/u/1271292'>𝑷𝒆𝒂 𝑴𝒂𝒔𝒂𝒎𝒃𝒂</a> </b>\n\n"
     button = None
 
     if status == "All":
