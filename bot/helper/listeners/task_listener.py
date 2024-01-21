@@ -142,21 +142,28 @@ class TaskListener(TaskConfig):
 
         if self.extract:
             up_path = await self.proceedExtract(up_path, size, gid)
-            if not up_path:
+            if self.cancelled:
                 return
             up_dir, self.name = up_path.rsplit("/", 1)
             size = await get_path_size(up_dir)
 
+        if self.convertAudio or self.convertVideo:
+            up_dir, self.name = up_path.rsplit("/", 1)
+            await self.convertMedia(up_dir, size, gid)
+            if self.cancelled:
+                return
+            size = await get_path_size(up_dir)
+
         if self.sampleVideo:
             up_path = await self.generateSampleVideo(up_path, size, gid)
-            if not up_path:
+            if self.cancelled:
                 return
             up_dir, self.name = up_path.rsplit("/", 1)
             size = await get_path_size(up_dir)
 
         if self.compress:
             up_path = await self.proceedCompress(up_path, size, gid)
-            if not up_path:
+            if self.cancelled:
                 return
 
         up_dir, self.name = up_path.rsplit("/", 1)
@@ -166,21 +173,22 @@ class TaskListener(TaskConfig):
             m_size = []
             o_files = []
             if not self.compress:
-                result = await self.proceedSplit(up_dir, m_size, o_files, size, gid)
-                if not result:
+                await self.proceedSplit(up_dir, m_size, o_files, size, gid)
+                if self.cancelled:
                     return
 
-        add_to_queue, event = await check_running_tasks(self.mid, "up")
-        await start_from_queued()
-        if add_to_queue:
-            LOGGER.info(f"Added to Queue/Upload: {self.name}")
-            async with task_dict_lock:
-                task_dict[self.mid] = QueueStatus(self, size, gid, "Up")
-            await event.wait()
-            async with task_dict_lock:
-                if self.mid not in task_dict:
-                    return
-            LOGGER.info(f"Start from Queued/Upload: {self.name}")
+        if not (self.forceRun or self.forceUpload):
+            add_to_queue, event = await check_running_tasks(self.mid, "up")
+            await start_from_queued()
+            if add_to_queue:
+                LOGGER.info(f"Added to Queue/Upload: {self.name}")
+                async with task_dict_lock:
+                    task_dict[self.mid] = QueueStatus(self, size, gid, "Up")
+                await event.wait()
+                async with task_dict_lock:
+                    if self.mid not in task_dict:
+                        return
+                LOGGER.info(f"Start from Queued/Upload: {self.name}")
         async with queue_dict_lock:
             non_queued_up.add(self.mid)
 
@@ -227,12 +235,12 @@ class TaskListener(TaskConfig):
         ):
             await DbManager().rm_complete_task(self.message.link)
         msg = f"<b>💾 Nama :</b><blockquote><code>{escape(self.name)}</code></blockquote>\n"
-        msg += f"\n<b>┌📦 Ukuran :</b> <code>{get_readable_file_size(size)}</code>"
+        msg += f"\n\n<b>┌📦 Ukuran :</b> <code>{get_readable_file_size(size)}</code>"
         LOGGER.info(f"Task Done: {self.name}")
         if self.isLeech:
-            msg += f"\n<b>├🗄 Jumlah File :</b> <code>{folders}</code>"
+            msg += f"\n\n<b>├🗄 Jumlah File :</b> <code>{folders}</code>"
             if mime_type != 0:
-                msg += f"\n<b>└📕 File Rusak :</b> <code>{mime_type}</code>"
+                msg += f"\n\n<b>└📕 File Rusak :</b> <code>{mime_type}</code>"
             msg += f'\n\n<b>👤 Tugas Oleh :</b> {self.tag}\n\n'
             if not files:
                 await sendMessage(self.message, msg)
@@ -255,7 +263,7 @@ class TaskListener(TaskConfig):
                 await start_from_queued()
                 return
         else:
-            msg += f"\n<b>└🗂Tipe :</b> <code>{mime_type}</code>\n"
+            msg += f"\n\n<b>└🗂Tipe :</b> <code>{mime_type}</code>"
             if mime_type == "Folder":
                 msg += f"\n<b>┌📂 Jumlah Folder :</b> <code>{folders}</code>"
                 msg += f"\n<b>└📄 Jumlah File :</b> <code>{files}</code>"
@@ -269,7 +277,7 @@ class TaskListener(TaskConfig):
                 if link:
                     buttons.ubutton("☁️ Cloud Link", link)
                 if rclonePath:
-                    msg += f"\n\n<b>📁 Path :</b> <code>{rclonePath}</code>"
+                    msg += f"\n\n<b>Path :</b> <code>{rclonePath}</code>"
                 if (
                     rclonePath
                     and (RCLONE_SERVE_URL := config_dict["RCLONE_SERVE_URL"])
@@ -284,11 +292,7 @@ class TaskListener(TaskConfig):
                 if not rclonePath and dir_id:
                     INDEX_URL = ""
                     if self.privateLink:
-                        INDEX_URL = (
-                            self.user_dict["index_url"]
-                            if self.user_dict.get("index_url")
-                            else ""
-                        )
+                        INDEX_URL = self.userDict.get("index_url", "") or ""
                     elif config_dict["INDEX_URL"]:
                         INDEX_URL = config_dict["INDEX_URL"]
                     if INDEX_URL:
@@ -296,10 +300,10 @@ class TaskListener(TaskConfig):
                         buttons.ubutton("⚡ Index Link", share_url)
                         if mime_type.startswith(("image", "video", "audio")):
                             share_urls = f"{INDEX_URL}findpath?id={dir_id}&view=true"
-                            buttons.ubutton("📺 Streaming Link", share_urls)
+                            buttons.ubutton("📺 Media Link", share_urls)
                 button = buttons.build_menu(2)
             else:
-                msg += f"\n\n<b>📁 Path :</b> <code>{rclonePath}</code>"
+                msg += f"\n\n<b>Path :</b> <code>{rclonePath}</code>"
                 button = None
             msg += f"\n\n<b>👤 Tugas Oleh :</b> {self.tag}"
             await sendMessage(self.message, msg, button)
