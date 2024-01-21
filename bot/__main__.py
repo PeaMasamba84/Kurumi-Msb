@@ -98,53 +98,53 @@ async def stats(_, message):
         
     stats = f"""
 
-<b>Status Bot:</b>
-<b>Bot ID       :</b> <code>{bot.me.id}</code>
-<b>Bot Name     :</b> <code>{bot.me.first_name}</code>
-<b>Bot Username :</b> <code>@{bot.me.username}</code>
-<b>User Status  :</b> <code>{'PREMIUM' if IS_PREMIUM_USER else 'FREE'}</code>
-<b>Uptime Bot   :</b> <code>{bot_uptime}</code>
-<b>Uptime Mesin :</b> <code>{machine_uptime}</code>
-<b>Diperbarui   :</b> <code>{commit_time}</code>
-<b>Pembaruan    :</b> <code>{commit_message}</code>
+<b>┌┤📱 Status Bot:</b>
+<b>├Bot ID       :</b> <code>{bot.me.id}</code>
+<b>├Bot Name     :</b> <code>{bot.me.first_name}</code>
+<b>├Bot Username :</b> <code>@{bot.me.username}</code>
+<b>├User Status  :</b> <code>{'PREMIUM' if IS_PREMIUM_USER else 'FREE'}</code>
+<b>├Uptime Bot   :</b> <code>{bot_uptime}</code>
+<b>├Uptime Mesin :</b> <code>{machine_uptime}</code>
+<b>├Diperbarui   :</b> <code>{commit_time}</code>
+<b>└Pembaruan    :</b> <code>{commit_message}</code>
 
-<b>CPU</b>
-<b>Cores        :</b> <code>{cpu_count(logical=False)}</code>
-<b>Logical      :</b> <code>{cpu_count(logical=True)}</code>
-<b>Frequency    :</b> <code>{round(cpu.current)}</code>
-<code>{get_progress_bar_string(cpu_percent(interval=0.5))} - {cpu_percent(interval=0.5)}%</code>
+<b>┌┤🖥 CPU:</b>
+<b>├Cores        :</b> <code>{cpu_count(logical=False)}</code>
+<b>├Logical      :</b> <code>{cpu_count(logical=True)}</code>
+<b>├Frequency    :</b> <code>{round(cpu.current)}</code>
+└┤<code>{get_progress_bar_string(cpu_percent(interval=0.5))} - {cpu_percent(interval=0.5)}%</code>
 
-<b>RAM</b> 
-<b>Terpakai     :</b> <code>{get_readable_file_size(memory.used)}</code>
-<b>Tersedia     :</b> <code>{get_readable_file_size(memory.available)}</code>
-<b>Total        :</b> <code>{get_readable_file_size(memory.total)}</code>
-<code>{get_progress_bar_string(memory.percent)} - {memory.percent}%</code>
+<b>┌┤💽 RAM:</b> 
+<b>├Terpakai     :</b> <code>{get_readable_file_size(memory.used)}</code>
+<b>├Tersedia     :</b> <code>{get_readable_file_size(memory.available)}</code>
+<b>├Total        :</b> <code>{get_readable_file_size(memory.total)}</code>
+└┤<code>{get_progress_bar_string(memory.percent)} - {memory.percent}%</code>
 
-<b>Pemakaian RAM</b>
-<b>Python       :</b> <code>{get_readable_file_size(Process(getpid()).memory_info().rss)}</code>
+<b>┌┤🪫 Pemakaian RAM:</b>
+<b>└┤Python       :</b> <code>{get_readable_file_size(Process(getpid()).memory_info().rss)}</code>
 
-<b>Penyimpanan</b> 
-<b>Terpakai     :</b> <code>{get_readable_file_size(used)}</code>
-<b>Tersedia     :</b> <code>{get_readable_file_size(free)}</code>
-<b>Total        :</b> <code>{get_readable_file_size(total)}</code>
-<code>{get_progress_bar_string(disk)} - {disk}%</code>
+<b>┌┤💾 Penyimpanan:</b> 
+<b>├Terpakai     :</b> <code>{get_readable_file_size(used)}</code>
+<b>├Tersedia     :</b> <code>{get_readable_file_size(free)}</code>
+<b>├Total        :</b> <code>{get_readable_file_size(total)}</code>
+└┤<code>{get_progress_bar_string(disk)} - {disk}%</code>
 
-<b>Jaringan</b>
-<b>Total Unduh  :</b> <code>{get_readable_file_size(network.bytes_recv)}</code>
-<b>Total Unggah :</b> <code>{get_readable_file_size(network.bytes_sent)}</code>
+<b>┌┤📶 Jaringan:</b>
+<b>├Total Unduh  :</b> <code>{get_readable_file_size(network.bytes_recv)}</code>
+<b>└┤Total Unggah :</b> <code>{get_readable_file_size(network.bytes_sent)}</code>
 
-<b>Versi</b>
-<b>Aria2c       :</b> <code>v{Version.ar}</code>
-<b>FFMPEG       :</b> <code>v{Version.ff}</code>
-<b>Google       :</b> <code>v{Version.ga}</code>
-<b>Java         :</b> <code>v{Version.jv}</code>
-<b>MyJD         :</b> <code>v{Version.jd}</code>
-<b>P7Zip        :</b> <code>v{Version.p7}</code>
-<b>Pyro         :</b> <code>v{Version.pr}</code>
-<b>Python       :</b> <code>v{Version.py}</code>
-<b>Qbittorrent  :</b> <code>{Version.qb}</code>
-<b>Rclone       :</b> <code>{Version.rc}</code>
-<b>YT-DLP       :</b> <code>v{Version.yt}</code>
+<b>┌┤📦 Versi Package:</b>
+<b>├Aria2c       :</b> <code>v{Version.ar}</code>
+<b>├FFMPEG       :</b> <code>v{Version.ff}</code>
+<b>├Google       :</b> <code>v{Version.ga}</code>
+<b>├Java         :</b> <code>v{Version.jv}</code>
+<b>├MyJD         :</b> <code>v{Version.jd}</code>
+<b>├P7Zip        :</b> <code>v{Version.p7}</code>
+<b>├Pyro         :</b> <code>v{Version.pr}</code>
+<b>├Python       :</b> <code>v{Version.py}</code>
+<b>├Qbittorrent  :</b> <code>{Version.qb}</code>
+<b>├Rclone       :</b> <code>{Version.rc}</code>
+<b>└┤YT-DLP       :</b> <code>v{Version.yt}</code>
 
 <b>Kutipan      :</b> 
 <code>{get_quotes()}</code>
