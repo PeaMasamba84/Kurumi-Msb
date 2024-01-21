@@ -94,6 +94,7 @@ async def stats(_, message):
     else:
         commit_time = "UPSTREAM_REPO tidak ditemukan!"
         commit_message = "-"
+<pre languange='bash'><code>{neofetch}</code>
         
     stats = f"𝐏𝐄𝐀 𝐌𝐀𝐒𝐀𝐌𝐁𝐀 𝐒𝐓𝐀𝐓𝐒"
     
@@ -144,8 +145,6 @@ async def stats(_, message):
 <b>Qbittorrent  :</b> <code>{Version.qb}</code>
 <b>Rclone       :</b> <code>{Version.rc}</code>
 <b>YT-DLP       :</b> <code>v{Version.yt}</code>
-
-<pre languange='bash'><code>{neofetch}</code>
 
 <b>Kutipan      :</b> 
 <code>{get_quotes()}</code>
