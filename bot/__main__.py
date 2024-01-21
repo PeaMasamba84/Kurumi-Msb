@@ -97,7 +97,8 @@ async def stats(_, message):
 
         
     stats = f"""
-<b>🄿🄴🄰 🄼🄰🅂🄰🄼🄱🄰</b>\n
+<b>🄿🄴🄰 🄼🄰🅂🄰🄼🄱🄰</b>
+
 <b>┌┤📱 Status Bot:</b>
 <b>├Bot ID       :</b> <code>{bot.me.id}</code>
 <b>├Bot Name     :</b> <code>{bot.me.first_name}</code>
