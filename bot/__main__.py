@@ -96,7 +96,7 @@ async def stats(_, message):
         commit_message = "-"
 
         
-    stats = f"PEA MASAMBA"
+    stats = f"""
 
 <b>┌┤📱 Status Bot:</b>
 <b>├Bot ID       :</b> <code>{bot.me.id}</code>
@@ -148,7 +148,7 @@ async def stats(_, message):
 
 <b><blockquote>Kutipan      :</b> 
 <code>{get_quotes()}</code></blockquote>
-</pre>"PEA MASAMBA"
+</pre>"""
 
     await sendMessage(
         message, 
@@ -341,7 +341,7 @@ async def restart_notification():
 <b>Kutipan   :</b>
 <code>{get_quotes()}</code>
 </pre>           
-"PEA MASAMBA"
+"""
                 if data.items():
                     msg += f"<b>Tugas yang belum selesai :</b>"
                 for tag, links in data.items():
@@ -364,7 +364,7 @@ async def restart_notification():
 <b>Kutipan   :</b>
 <code>{get_quotes()}</code>
 </pre>           
-"PEA MASAMBA"
+"""
             await bot.edit_message_text(
                 chat_id=chat_id, 
                 message_id=msg_id, 
