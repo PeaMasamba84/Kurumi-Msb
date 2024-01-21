@@ -36,7 +36,7 @@ async def remove_from_queue(_, message):
             return
     elif len(msg) in {1, 2}:
         msg = (
-            "<b>Balas ke pesan perintah saat digunakan untuk memulai Tugas</b>" \
+            "<b>Balas pesan Perintah aktif yang digunakan untuk memulai pengunduhan</b>" \
             f" <b>atau kirim</b> <code>/{BotCommands.ForceStartCommand[0]} atau /{BotCommands.ForceStartCommand[1]} [GID]</code> <b>untuk memulai Tugas secara paksa!</b>" \
             f" <b>Kamu dapat menambahkan</b> <code>fd/fu</code> <b>setelah perintah untuk memulai Tugas secara paksa untuk Unduh/Unggah!</b>"
         )
