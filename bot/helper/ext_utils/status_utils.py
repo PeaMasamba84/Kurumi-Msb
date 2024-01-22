@@ -179,7 +179,7 @@ def get_readable_message(sid, is_user, page_no=1, status="All", page_step=1):
         else:
             msg += f"\n<b>├🔖 ID :</b> <code>{task.listener.userId}</code>"
             msg += f"\n<b>├🦹 User :</b> <code>{task.listener.user.first_name}</code>"
-        msg += f"\n<b>└📵 GID :</b> <code>{task.gid()}</code>\n\n"
+        msg += f"\n<b>└┤📵 GID :</b> <code>{task.gid()}</code>\n\n"
 
     if len(msg) == 0 and status == "All":
         return None, None
