@@ -38,21 +38,26 @@ async def speedtest(_, message):
 """
 
 <b>Informasi Client</b>
+<pre languange='bash'>
 <b>IP           :</b> <code>{result['client']['ip']}</code>
 <b>Nama         :</b> <code>{result['client']['isp']}</code>
 <b>Rating       :</b> <code>{result['client']['isprating']}</code>
 <b>Negara       :</b> <code>{result['client']['country']}</code>
 <b>Latitude     :</b> <code>{result['client']['lat']}</code>
 <b>Longitude    :</b> <code>{result['client']['lon']}</code>
+</pre>
+"""
 
 <b>Informasi Server</b>
+<pre languange='bash'>
 <b>Nama         :</b> <code>{result['server']['name']}</code>
 <b>Sponsor      :</b> <code>{result['server']['sponsor']}</code>
 <b>Latency      :</b> <code>{result['server']['latency']}</code>
 <b>Negara       :</b> <code>{result['server']['country']} ({result['server']['cc']})</code>
 <b>Latitude     :</b> <code>{result['server']['lat']}</code>
 <b>Longitude    :</b> <code>{result['server']['lon']}</code>
-
+</pre>
+"""
     try:
         await sendPhoto(
             message, 
