@@ -118,30 +118,30 @@ async def stats(_, message):
 <b>├Frequency    :</b> <code>{round(cpu.current)}</code>
 └<code>{get_progress_bar_string(cpu_percent(interval=0.5))} - {cpu_percent(interval=0.5)}%</code>
 </pre>
-<b>💽𝗥𝗔𝗠:</b> 
+<b>💽𝗥𝗔𝗠</b> 
 <pre languange='bash'>
 <b>┌Terpakai     :</b> <code>{get_readable_file_size(memory.used)}</code>
 <b>├Tersedia     :</b> <code>{get_readable_file_size(memory.available)}</code>
 <b>├Total        :</b> <code>{get_readable_file_size(memory.total)}</code>
 └<code>{get_progress_bar_string(memory.percent)} - {memory.percent}%</code>
 </pre>
-<b>🪫 𝗣𝗲𝗺𝗮𝗸𝗮𝗶𝗮𝗻 𝗥𝗔𝗠:</b>
+<b>🪫 𝗣𝗲𝗺𝗮𝗸𝗮𝗶𝗮𝗻 𝗥𝗔𝗠</b>
 <pre languange='bash'>
 <b>Python        :</b> <code>{get_readable_file_size(Process(getpid()).memory_info().rss)}</code>
 </pre>
-<b>💾 𝗣𝗲𝗻𝘆𝗶𝗺𝗽𝗮𝗻𝗮𝗻:</b> 
+<b>💾 𝗣𝗲𝗻𝘆𝗶𝗺𝗽𝗮𝗻𝗮𝗻</b> 
 <pre languange='bash'>
 <b>┌Terpakai     :</b> <code>{get_readable_file_size(used)}</code>
 <b>├Tersedia     :</b> <code>{get_readable_file_size(free)}</code>
 <b>├Total        :</b> <code>{get_readable_file_size(total)}</code>
 └<code>{get_progress_bar_string(disk)} - {disk}%</code>
 </pre>
-<b>📶 𝗝𝗮𝗿𝗶𝗻𝗴𝗮𝗻:</b>
+<b>📶 𝗝𝗮𝗿𝗶𝗻𝗴𝗮𝗻</b>
 <pre languange='bash'>
 <b>┌Total Unduh  :</b> <code>{get_readable_file_size(network.bytes_recv)}</code>
 <b>└Total Unggah :</b> <code>{get_readable_file_size(network.bytes_sent)}</code>
 </pre>
-<b>📦 𝗩𝗲𝗿𝘀𝗶 𝗣𝗮𝗰𝗸𝗮𝗴𝗲:</b>
+<b>📦 𝗩𝗲𝗿𝘀𝗶 𝗣𝗮𝗰𝗸𝗮𝗴𝗲</b>
 <pre languange='bash'>
 <b>┌Aria2c       :</b> <code>v{Version.ar}</code>
 <b>├FFMPEG       :</b> <code>v{Version.ff}</code>
