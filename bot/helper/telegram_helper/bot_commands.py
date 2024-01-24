@@ -8,12 +8,12 @@ class _BotCommands:
         self.QbMirrorCommand = [f"peaqb{CMD_SUFFIX}", f"peaqm{CMD_SUFFIX}"]
         self.JdMirrorCommand = [f"peajd{CMD_SUFFIX}", f"peajm{CMD_SUFFIX}"]
         self.YtdlCommand = [
-            f"peaytdlleech{CMD_SUFFIX}", f"peay{CMD_SUFFIX}", f"peawatch{CMD_SUFFIX}", f"peaw{CMD_SUFFIX}"]
+            f"peaytdl{CMD_SUFFIX}", f"peay{CMD_SUFFIX}", f"peawatch{CMD_SUFFIX}", f"peaw{CMD_SUFFIX}"]
         self.LeechCommand = [f"pealeech{CMD_SUFFIX}", f"peal{CMD_SUFFIX}"]
         self.QbLeechCommand = [f"peaqbleech{CMD_SUFFIX}", f"peaql{CMD_SUFFIX}"]
         self.JdLeechCommand = [f"peajdleech{CMD_SUFFIX}", f"peajl{CMD_SUFFIX}"]
         self.YtdlLeechCommand = [
-            f"ytdlleech{CMD_SUFFIX}", f"peayl{CMD_SUFFIX}", f"watchleech{CMD_SUFFIX}", f"peawl{CMD_SUFFIX}"]
+            f"peaytdlleech{CMD_SUFFIX}", f"peayl{CMD_SUFFIX}", f"watchleech{CMD_SUFFIX}", f"peawl{CMD_SUFFIX}"]
         self.CloneCommand = [f"peaclone{CMD_SUFFIX}", f"peacl{CMD_SUFFIX}"]
         self.CountCommand = [f"peacount{CMD_SUFFIX}", f"peaco{CMD_SUFFIX}"]
         self.DeleteCommand = [f"peadelete{CMD_SUFFIX}", f"peadel{CMD_SUFFIX}"]
