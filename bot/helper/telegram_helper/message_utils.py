@@ -361,10 +361,16 @@ async def customSendRss(text, image=None, image_caption=None, reply_markup=None)
                 message_thread_id = chat_id.split(":")[1]
                 chat_id = chat_id.split(":")[0]
         
-        if chat_id.isdigit():
+        if (
+            chat_id is not None
+            and chat_id.isdigit()   
+        ):
             chat_id = int(chat_id)
         
-        if message_thread_id.isdigit():
+        if (
+            message_thread_id is not None
+            and message_thread_id.isdigit()
+        ):
             message_thread_id = int(message_thread_id)
     else:
         return "RSS_CHAT_ID tidak ditemukan!"
