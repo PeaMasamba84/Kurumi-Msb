@@ -109,7 +109,7 @@ async def stats(_, message):
 <b>├Uptime Mesin :</b> <code>{machine_uptime}</code>
 <b>├Diperbarui   :</b> <code>{commit_time}</code>
 <b>└Pembaruan    :</b> <code>{commit_message}</code>
-
+</pre>
 <b>🖥 CPU:</b>
 <pre languange='bash'>
 <b>┌┤Cores        :</b> <code>{cpu_count(logical=False)}</code>
@@ -117,7 +117,6 @@ async def stats(_, message):
 <b>├Frequency    :</b> <code>{round(cpu.current)}</code>
 └┤<code>{get_progress_bar_string(cpu_percent(interval=0.5))} - {cpu_percent(interval=0.5)}%</code>
 </pre>
-
 <b>💽 RAM:</b> 
 <pre languange='bash'>
 <b>┌┤Terpakai     :</b> <code>{get_readable_file_size(memory.used)}</code>
@@ -130,7 +129,6 @@ async def stats(_, message):
 <pre languange='bash'>
 <b>Python       :</b> <code>{get_readable_file_size(Process(getpid()).memory_info().rss)}</code>
 </pre>
-
 <b>💾 Penyimpanan:</b> 
 <pre languange='bash'>
 <b>┌┤Terpakai     :</b> <code>{get_readable_file_size(used)}</code>
@@ -138,13 +136,11 @@ async def stats(_, message):
 <b>├Total        :</b> <code>{get_readable_file_size(total)}</code>
 └┤<code>{get_progress_bar_string(disk)} - {disk}%</code>
 </pre>
-
 <b>📶 Jaringan:</b>
 <pre languange='bash'>
 <b>┌┤Total Unduh  :</b> <code>{get_readable_file_size(network.bytes_recv)}</code>
 <b>└┤Total Unggah :</b> <code>{get_readable_file_size(network.bytes_sent)}</code>
 </pre>
-
 <b>📦 Versi Package:</b>
 <pre languange='bash'>
 <b>┌┤Aria2c       :</b> <code>v{Version.ar}</code>
@@ -159,7 +155,6 @@ async def stats(_, message):
 <b>├Rclone       :</b> <code>{Version.rc}</code>
 <b>└┤YT-DLP       :</b> <code>v{Version.yt}</code>
 </pre>
-
 <b><blockquote>Kutipan      :</b> 
 <code>{get_quotes()}</code></blockquote>
 </pre>"""
