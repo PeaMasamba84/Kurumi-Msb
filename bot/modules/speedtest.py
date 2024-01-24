@@ -26,7 +26,7 @@ async def speedtest(_, message):
     result = test.results.dict()
     caption = f"""
 
-<b>Hasil SpeedTest</b>
+<b>🆂🅿🅴🅴🅳🆃🅴🆂🆃</b>
 <pre languange='bash'>
 <b>Ping         :</b> <code>{result['ping']} ms</code>
 <b>Waktu        :</b> <code>{result['timestamp']}</code>
@@ -36,8 +36,7 @@ async def speedtest(_, message):
 <b>Diterima     :</b> <code>{get_readable_file_size(int(result['bytes_received']))}</code>
 </pre>
 
-
-<b>Informasi Client</b>
+<b>🅸🅽🅵🅾 🅲🅻🅸🅴🅽🆃</b>
 <pre languange='bash'>
 <b>IP           :</b> <code>{result['client']['ip']}</code>
 <b>Nama         :</b> <code>{result['client']['isp']}</code>
@@ -47,8 +46,7 @@ async def speedtest(_, message):
 <b>Longitude    :</b> <code>{result['client']['lon']}</code>
 </pre>
 
-
-<b>Informasi Server</b>
+<b>🅸🅽🅵🅾 🆂🅴🆁🆅🅴🆁</b>
 <pre languange='bash'>
 <b>Nama         :</b> <code>{result['server']['name']}</code>
 <b>Sponsor      :</b> <code>{result['server']['sponsor']}</code>
