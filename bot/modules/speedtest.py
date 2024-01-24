@@ -34,6 +34,8 @@ async def speedtest(_, message):
 <b>Upload       :</b> <code>{get_readable_file_size(result['download'] / 8)}/s</code>
 <b>Terkirim     :</b> <code>{get_readable_file_size(int(result['bytes_sent']))}</code>
 <b>Diterima     :</b> <code>{get_readable_file_size(int(result['bytes_received']))}</code>
+</pre>
+"""
 
 <b>Informasi Client</b>
 <b>IP           :</b> <code>{result['client']['ip']}</code>
@@ -50,8 +52,7 @@ async def speedtest(_, message):
 <b>Negara       :</b> <code>{result['server']['country']} ({result['server']['cc']})</code>
 <b>Latitude     :</b> <code>{result['server']['lat']}</code>
 <b>Longitude    :</b> <code>{result['server']['lon']}</code>
-</pre>
-"""
+
     try:
         await sendPhoto(
             message, 
