@@ -74,7 +74,7 @@ def get_quotes():
         oleh = quotez.split(":")[0]
         quotes = f"{quote}\n- {oleh}"
     except:
-        quotes = "Ngga ada Quote bijak buatmu wahai Tuan yang bijaksana :D"
+        quotes = "Gunakan dengan bijak ya :D"
     return quotes
 
 
@@ -96,58 +96,58 @@ async def stats(_, message):
         commit_message = "-"
         
     stats = f"""
-<pre languange='bash'><code>{neofetch}</code>
+<b>🄿🄴🄰 🄼🄰🅂🄰🄼🄱🄰</b>\n
 
-<b>CPU</b>
-<b>Cores        :</b> <code>{cpu_count(logical=False)}</code>
-<b>Logical      :</b> <code>{cpu_count(logical=True)}</code>
-<b>Frequency    :</b> <code>{round(cpu.current)}</code>
-<code>{get_progress_bar_string(cpu_percent(interval=0.5))} - {cpu_percent(interval=0.5)}%</code>
+<b>┌┤📱 Status Bot:</b>
+<b>├Bot ID       :</b> <code>{bot.me.id}</code>
+<b>├Bot Name     :</b> <code>{bot.me.first_name}</code>
+<b>├Bot Username :</b> <code>@{bot.me.username}</code>
+<b>├User Status  :</b> <code>{'PREMIUM' if IS_PREMIUM_USER else 'FREE'}</code>
+<b>├Uptime Bot   :</b> <code>{bot_uptime}</code>
+<b>├Uptime Mesin :</b> <code>{machine_uptime}</code>
+<b>├Diperbarui   :</b> <code>{commit_time}</code>
+<b>└Pembaruan    :</b> <code>{commit_message}</code>
 
-<b>RAM</b> 
-<b>Terpakai     :</b> <code>{get_readable_file_size(memory.used)}</code>
-<b>Tersedia     :</b> <code>{get_readable_file_size(memory.available)}</code>
-<b>Total        :</b> <code>{get_readable_file_size(memory.total)}</code>
-<code>{get_progress_bar_string(memory.percent)} - {memory.percent}%</code>
+<b>┌┤🖥 CPU:</b>
+<b>├Cores        :</b> <code>{cpu_count(logical=False)}</code>
+<b>├Logical      :</b> <code>{cpu_count(logical=True)}</code>
+<b>├Frequency    :</b> <code>{round(cpu.current)}</code>
+└┤<code>{get_progress_bar_string(cpu_percent(interval=0.5))} - {cpu_percent(interval=0.5)}%</code>
 
-<b>Pemakaian RAM</b>
-<b>Python       :</b> <code>{get_readable_file_size(Process(getpid()).memory_info().rss)}</code>
+<b>┌┤💽 RAM:</b> 
+<b>├Terpakai     :</b> <code>{get_readable_file_size(memory.used)}</code>
+<b>├Tersedia     :</b> <code>{get_readable_file_size(memory.available)}</code>
+<b>├Total        :</b> <code>{get_readable_file_size(memory.total)}</code>
+└┤<code>{get_progress_bar_string(memory.percent)} - {memory.percent}%</code>
 
-<b>Penyimpanan</b> 
-<b>Terpakai     :</b> <code>{get_readable_file_size(used)}</code>
-<b>Tersedia     :</b> <code>{get_readable_file_size(free)}</code>
-<b>Total        :</b> <code>{get_readable_file_size(total)}</code>
-<code>{get_progress_bar_string(disk)} - {disk}%</code>
+<b>┌┤🪫 Pemakaian RAM:</b>
+<b>└┤Python       :</b> <code>{get_readable_file_size(Process(getpid()).memory_info().rss)}</code>
 
-<b>Jaringan</b>
-<b>Total Unduh  :</b> <code>{get_readable_file_size(network.bytes_recv)}</code>
-<b>Total Unggah :</b> <code>{get_readable_file_size(network.bytes_sent)}</code>
+<b>┌┤💾 Penyimpanan:</b> 
+<b>├Terpakai     :</b> <code>{get_readable_file_size(used)}</code>
+<b>├Tersedia     :</b> <code>{get_readable_file_size(free)}</code>
+<b>├Total        :</b> <code>{get_readable_file_size(total)}</code>
+└┤<code>{get_progress_bar_string(disk)} - {disk}%</code>
 
-<b>Versi</b>
-<b>Aria2c       :</b> <code>v{Version.ar}</code>
-<b>FFMPEG       :</b> <code>v{Version.ff}</code>
-<b>Google       :</b> <code>v{Version.ga}</code>
-<b>Java         :</b> <code>v{Version.jv}</code>
-<b>MyJD         :</b> <code>v{Version.jd}</code>
-<b>P7Zip        :</b> <code>v{Version.p7}</code>
-<b>Pyro         :</b> <code>v{Version.pr}</code>
-<b>Python       :</b> <code>v{Version.py}</code>
-<b>Qbittorrent  :</b> <code>{Version.qb}</code>
-<b>Rclone       :</b> <code>{Version.rc}</code>
-<b>YT-DLP       :</b> <code>v{Version.yt}</code>
+<b>┌┤📶 Jaringan:</b>
+<b>├Total Unduh  :</b> <code>{get_readable_file_size(network.bytes_recv)}</code>
+<b>└┤Total Unggah :</b> <code>{get_readable_file_size(network.bytes_sent)}</code>
 
-<b>Lainnya</b>
-<b>Bot ID       :</b> <code>{bot.me.id}</code>
-<b>Bot Name     :</b> <code>{bot.me.first_name}</code>
-<b>Bot Username :</b> <code>@{bot.me.username}</code>
-<b>User Status  :</b> <code>{'PREMIUM' if IS_PREMIUM_USER else 'FREE'}</code>
-<b>Uptime Bot   :</b> <code>{bot_uptime}</code>
-<b>Uptime Mesin :</b> <code>{machine_uptime}</code>
-<b>Diperbarui   :</b> <code>{commit_time}</code>
-<b>Pembaruan    :</b> <code>{commit_message}</code>
+<b>┌┤📦 Versi Package:</b>
+<b>├Aria2c       :</b> <code>v{Version.ar}</code>
+<b>├FFMPEG       :</b> <code>v{Version.ff}</code>
+<b>├Google       :</b> <code>v{Version.ga}</code>
+<b>├Java         :</b> <code>v{Version.jv}</code>
+<b>├MyJD         :</b> <code>v{Version.jd}</code>
+<b>├P7Zip        :</b> <code>v{Version.p7}</code>
+<b>├Pyro         :</b> <code>v{Version.pr}</code>
+<b>├Python       :</b> <code>v{Version.py}</code>
+<b>├Qbittorrent  :</b> <code>{Version.qb}</code>
+<b>├Rclone       :</b> <code>{Version.rc}</code>
+<b>└┤YT-DLP       :</b> <code>v{Version.yt}</code>
 
-<b>Quotes       :</b> 
-<code>{get_quotes()}</code>
+<b><blockquote>Kutipan      :</b> 
+<code>{get_quotes()}</code></blockquote>
 </pre>"""
 
     await sendMessage(
@@ -159,8 +159,8 @@ async def stats(_, message):
 async def start(client, message):
     buttons = ButtonMaker()
     buttons.ubutton(
-        "Owner", "https://t.me/save_usdt")
-    buttons.ubutton("Channel", "https://t.me/arakurumi")
+        "Website", "https://www.comelmuewa84.eu.org")
+    buttons.ubutton("Channel", "https://t.me/+LUX4Ppe0-YI4NTk1")
     reply_markup = buttons.build_menu(2)
     if await CustomFilters.authorized(client, message):
         start_string = f"""
@@ -221,7 +221,7 @@ async def ping(_, message):
     end_time = int(round(time() * 1000))
     await editMessage(
         reply, 
-        f"🤖 <b>Respon Bot :</b> <code>{end_time - start_time} ms</code>"
+        f"<b>Respon Bot :</b> <code>{end_time - start_time} ms</code>"
     )
 
 
@@ -338,7 +338,7 @@ async def restart_notification():
 <pre languange="bash"><b>Hari      :</b> <code>{now.strftime('%A')}</code>
 <b>Tanggal   :</b> <code>{now.strftime('%d %B %Y')}</code>
 <b>Waktu     :</b> <code>{now.strftime('%H:%M:%S WIB')}</code>
-<b>Quotes    :</b>
+<b>Kutipan  :</b>
 <code>{get_quotes()}</code>
 </pre>           
 """
@@ -361,7 +361,7 @@ async def restart_notification():
 <pre languange="bash"><b>Hari      :</b> <code>{now.strftime('%A')}</code>
 <b>Tanggal   :</b> <code>{now.strftime('%d %B %Y')}</code>
 <b>Waktu     :</b> <code>{now.strftime('%H:%M:%S WIB')}</code>
-<b>Quotes    :</b>
+<b>Kutipan  :</b>
 <code>{get_quotes()}</code>
 </pre>           
 """
