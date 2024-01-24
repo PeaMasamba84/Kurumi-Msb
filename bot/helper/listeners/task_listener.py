@@ -250,7 +250,7 @@ class TaskListener(TaskConfig):
         msg += f"\n<b>┌📦 Ukuran :</b> <code>{get_readable_file_size(self.size)}</code>"
         LOGGER.info(f"Task Done: {self.name}")
         if self.isLeech:
-            msg += f"\n\n<b>├🗄 Jumlah File :</b> <code>{folders}</code>"
+            msg += f"\n<b>└🗄 Jumlah File :</b> <code>{folders}</code>"
             if mime_type != 0:
                 msg += f"\n<b>└📕 File Rusak :</b> <code>{mime_type}</code>"
             msg += f'\n\n<b>👤 Tugas Oleh :</b> {self.tag}\n\n'
