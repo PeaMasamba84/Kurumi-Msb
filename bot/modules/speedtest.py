@@ -25,8 +25,9 @@ async def speedtest(_, message):
     test.results.share()
     result = test.results.dict()
     caption = f"""
-<pre languange='bash'>
+
 <b>Hasil SpeedTest</b>
+<languange='bash'>
 <b>Ping         :</b> <code>{result['ping']} ms</code>
 <b>Waktu        :</b> <code>{result['timestamp']}</code>
 <b>Unggah       :</b> <code>{get_readable_file_size(result['upload'] / 8)}/s</code>
