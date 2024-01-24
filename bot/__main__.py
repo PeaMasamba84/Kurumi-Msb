@@ -96,11 +96,12 @@ async def stats(_, message):
         commit_message = "-"
         
     stats = f"""
-
+<pre languange='bash'><code>{neofetch}</code>
+</pre>
 <b>🄿🄴🄰 🄼🄰🅂🄰🄼🄱🄰</b>\n
 
 <b>📱 Status Bot:</b>
-<pre languange='bash'><code>{neofetch}</code>
+<pre languange='bash'>
 <b>┌┤Bot ID       :</b> <code>{bot.me.id}</code>
 <b>├Bot Name     :</b> <code>{bot.me.first_name}</code>
 <b>├Bot Username :</b> <code>@{bot.me.username}</code>
