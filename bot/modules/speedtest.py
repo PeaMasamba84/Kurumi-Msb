@@ -27,7 +27,7 @@ async def speedtest(_, message):
     caption = f"""
 
 <b>Hasil SpeedTest</b>
-<languange='bash'>
+<pre languange='bash'>
 <b>Ping         :</b> <code>{result['ping']} ms</code>
 <b>Waktu        :</b> <code>{result['timestamp']}</code>
 <b>Unggah       :</b> <code>{get_readable_file_size(result['upload'] / 8)}/s</code>
