@@ -144,8 +144,8 @@ def get_readable_message(sid, is_user, page_no=1, status="All", page_step=1):
         if task.listener.isPrivateChat: 
             msg += f"\n💾 File :<blockquote><code>PRIVATE</code></blockquote></b>"
         else: 
-            msg += f"\n💾 File :<blockquote><code>{escape(f'{task.name()}')
-        msg += f"\n<b>┌┤{get_progress_bar_string(task.progress())} <code>»{task.progress()
+            msg += f"\n💾 File :<blockquote><code>{escape(f'{task.name()}')}</code></blockquote>\n"
+        msg += f"\n<b>┌┤{get_progress_bar_string(task.progress())} <code>»{task.progress()}</code></b>"
         if task.listener.isSuperChat:
             msg += f"\n<b>├📲 Status :</b> <a href='{task.listener.message.link}'>{tstatus}</a>"
         else:
@@ -177,7 +177,7 @@ def get_readable_message(sid, is_user, page_no=1, status="All", page_step=1):
             msg += f"\n<b>├🔖 ID :</b> <code>PRIVATE</code>"
             msg += f"\n<b>├🦹 User :</b> <code>PRIVATE</code>" 
         else:
-            msg += f"\n<b>├🦹 ID :</b> <code>{task.listener.userId}</code>"
+            msg += f"\n<b>├🔖 ID :</b> <code>{task.listener.userId}</code>"
             msg += f"\n<b>├🦹 User :</b> <code>{task.listener.user.first_name}</code>"
         tgid = task.gid()
         msg += f"\n<b>├📵 GID :</b> <code>{tgid}</code>"
