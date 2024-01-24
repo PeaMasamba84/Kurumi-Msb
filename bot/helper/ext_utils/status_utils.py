@@ -15,19 +15,19 @@ from bot.helper.telegram_helper.button_build import ButtonMaker
 SIZE_UNITS = ["B", "KB", "MB", "GB", "TB", "PB"]
 
 class MirrorStatus:
-    STATUS_DOWNLOADING = "Unduh"
-    STATUS_UPLOADING = "Unggah"
-    STATUS_QUEUEDL = "AntriDownload"
-    STATUS_QUEUEUP = "AntriUpload"
-    STATUS_PAUSED = "Henti"
-    STATUS_ARCHIVING = "Arsip"
-    STATUS_EXTRACTING = "Ekstrak"
-    STATUS_CLONING = "Clone"
-    STATUS_SEEDING = "Seed"
-    STATUS_SPLITTING = "Bagi"
-    STATUS_CHECKING = "Cek"
-    STATUS_SAMVID = "SampelVideo"
-    STATUS_CONVERTING = "Konversi"
+    STATUS_DOWNLOADING = "📤𝑼𝒏𝒅𝒖𝒉"
+    STATUS_UPLOADING = "📥𝑼𝒏𝒈𝒈𝒂𝒉"
+    STATUS_QUEUEDL = "⌚️𝑨𝒏𝒕𝒓𝒊𝑫𝒐𝒘𝒏"
+    STATUS_QUEUEUP = "⌚️𝑨𝒏𝒕𝒓𝒊𝑼𝒑"
+    STATUS_PAUSED = "💤𝑱𝒆𝒅𝒂"
+    STATUS_ARCHIVING = "📚𝑨𝒓𝒔𝒊𝒑"
+    STATUS_EXTRACTING = "🔄𝑬𝒌𝒔𝒕𝒓𝒂𝒌"
+    STATUS_CLONING = "🧬𝑪𝒍𝒐𝒏𝒆"
+    STATUS_SEEDING = "🌱𝑺𝒆𝒆𝒅"
+    STATUS_SPLITTING = "✂𝑴𝒆𝒎𝒃𝒂𝒈𝒊"
+    STATUS_CHECKING = "📝𝑪𝒆𝒌"
+    STATUS_SAMVID = "🎞𝑺𝒂𝒎𝒑𝒍𝒆𝑽𝒊𝒅𝒆𝒐"
+    STATUS_CONVERTING = "🖲𝑲𝒐𝒏𝒗𝒆𝒓𝒔𝒊"
      
 STATUS_DICT = {
     "ALL": "All",
@@ -110,7 +110,7 @@ def get_progress_bar_string(pct) -> str:
 
 
 def get_readable_message(sid, is_user, page_no=1, status="All", page_step=1):
-    msg = ""
+    msg = "<a href='https://subscene.com/u/1271292'>𝐒𝐔𝐁𝐓𝐈𝐓𝐋𝐄 𝐏𝐄𝐀 𝐌𝐀𝐒𝐀𝐌𝐁𝐀</a>\n"
     button = None
 
     if status == "All":
