@@ -275,7 +275,7 @@ class TaskListener(TaskConfig):
                 await start_from_queued()
                 return
         else:
-            msg += f"\n<b>└🗂Tipe :</b> <code>{mime_type}</code>"
+            msg += f"\n<b>└🗂Tipe :</b> <code>{mime_type}</code>\n"
             if mime_type == "Folder":
                 msg += f"\n<b>┌📂 Jumlah Folder :</b> <code>{folders}</code>"
                 msg += f"\n<b>└📄 Jumlah File :</b> <code>{files}</code>"
