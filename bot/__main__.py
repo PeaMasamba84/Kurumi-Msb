@@ -99,7 +99,6 @@ async def stats(_, message):
 <pre languange='bash'><code>{neofetch}</code>
 </pre>
 <b>🄿🄴🄰 🄼🄰🅂🄰🄼🄱🄰</b>\n
-
 <b>📱 Status Bot:</b>
 <pre languange='bash'>
 <b>┌┤Bot ID       :</b> <code>{bot.me.id}</code>
