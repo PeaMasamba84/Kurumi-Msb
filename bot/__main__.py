@@ -124,7 +124,6 @@ async def stats(_, message):
 <b>├Total        :</b> <code>{get_readable_file_size(memory.total)}</code>
 └┤<code>{get_progress_bar_string(memory.percent)} - {memory.percent}%</code>
 </pre>
-
 <b>🪫 Pemakaian RAM:</b>
 <pre languange='bash'>
 <b>Python       :</b> <code>{get_readable_file_size(Process(getpid()).memory_info().rss)}</code>
