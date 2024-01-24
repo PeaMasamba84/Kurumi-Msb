@@ -8,7 +8,7 @@ class _BotCommands:
         self.QbMirrorCommand = [f"peaqb{CMD_SUFFIX}", f"peaqm{CMD_SUFFIX}"]
         self.JdMirrorCommand = [f"peajd{CMD_SUFFIX}", f"peajm{CMD_SUFFIX}"]
         self.YtdlCommand = [
-            f"ytdl{CMD_SUFFIX}", f"peay{CMD_SUFFIX}", f"peawatch{CMD_SUFFIX}", f"peaw{CMD_SUFFIX}"]
+            f"peaytdl{CMD_SUFFIX}", f"peay{CMD_SUFFIX}", f"peawatch{CMD_SUFFIX}", f"peaw{CMD_SUFFIX}"]
         self.LeechCommand = [f"pealeech{CMD_SUFFIX}", f"peal{CMD_SUFFIX}"]
         self.QbLeechCommand = [f"peaqbleech{CMD_SUFFIX}", f"peaql{CMD_SUFFIX}"]
         self.JdLeechCommand = [f"peajdleech{CMD_SUFFIX}", f"peajl{CMD_SUFFIX}"]
