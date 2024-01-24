@@ -35,7 +35,7 @@ async def speedtest(_, message):
 <b>Terkirim     :</b> <code>{get_readable_file_size(int(result['bytes_sent']))}</code>
 <b>Diterima     :</b> <code>{get_readable_file_size(int(result['bytes_received']))}</code>
 </pre>
-"""
+
 
 <b>Informasi Client</b>
 <pre languange='bash'>
@@ -46,7 +46,7 @@ async def speedtest(_, message):
 <b>Latitude     :</b> <code>{result['client']['lat']}</code>
 <b>Longitude    :</b> <code>{result['client']['lon']}</code>
 </pre>
-"""
+
 
 <b>Informasi Server</b>
 <pre languange='bash'>
