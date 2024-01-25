@@ -126,7 +126,7 @@ class RcloneTransferHelper:
             if not error and remote_type == "drive" and self._use_service_accounts:
                 error = "Terjadi kesalahan, Kemungkinan karena SAccounts tidak mempunyai akses ke Cloud!"
             elif not error:
-                error = "Kirim perintah <code>/shell cat rlog.txt</code> untuk melihat Informasi Error!"
+                error = "Kirim perintah /shell cat rlog.txt untuk melihat Informasi Error!"
             LOGGER.error(error)
 
             if (
@@ -222,7 +222,7 @@ class RcloneTransferHelper:
             )
         elif code != -9:
             if not err:
-                err = "Kirim perintah <code>/shell cat rlog.txt</code> untuk melihat Informasi Error!"
+                err = "Kirim perintah /shell cat rlog.txt untuk melihat Informasi Error!"
             LOGGER.error(
                 f"while getting drive link. Path: {destination}. Stderr: {err}"
             )
@@ -243,7 +243,7 @@ class RcloneTransferHelper:
             if not error and remote_type == "drive" and self._use_service_accounts:
                 error = "Terjadi kesalahan, Kemungkinan karena SAccounts tidak mempunyai akses ke Cloud atau RATE_LIMIT_EXCEEDED!"
             elif not error:
-                error = "Kirim perintah <code>/shell cat rlog.txt</code> untuk melihat Informasi Error!"
+                error = "Kirim perintah /shell cat rlog.txt untuk melihat Informasi Error!"
             LOGGER.error(error)
             if (
                 self._sa_number != 0
@@ -356,7 +356,7 @@ class RcloneTransferHelper:
                 link = res
             elif code != -9:
                 if not err:
-                    err = "Kirim perintah <code>/shell cat rlog.txt</code> untuk melihat Informasi Error!"
+                    err = "Kirim perintah /shell cat rlog.txt untuk melihat Informasi Error!"
                 LOGGER.error(f"while getting link. Path: {destination} | Stderr: {err}")
                 link = ""
         if self._is_cancelled:
@@ -406,7 +406,7 @@ class RcloneTransferHelper:
         elif return_code != 0:
             error = (await self._proc.stderr.read()).decode().strip()
             if not error:
-                error = "Kirim perintah <code>/shell cat rlog.txt</code> untuk melihat Informasi Error!"
+                error = "Kirim perintah /shell cat rlog.txt untuk melihat Informasi Error!"
             LOGGER.error(error)
             await self._listener.onUploadError(error[:4000])
             return None, None
@@ -432,7 +432,7 @@ class RcloneTransferHelper:
                     return res, destination
                 elif code != -9:
                     if not err:
-                        err = "Kirim perintah <code>/shell cat rlog.txt</code> untuk melihat Informasi Error!"
+                        err = "Kirim perintah /shell cat rlog.txt untuk melihat Informasi Error!"
                     LOGGER.error(
                         f"while getting link. Path: {destination} | Stderr: {err}"
                     )
