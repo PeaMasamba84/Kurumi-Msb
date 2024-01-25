@@ -140,7 +140,7 @@ async def rssSub(_, message, pre_event):
             msg += f"\n<b>Link :</b> <code>{last_link}</code>"
             msg += f"\n<b>Perintah :</b> <code>{cmd}</code>"
             msg += (
-                f"\n<b>Filter:</b>\n<b>Inf :</b> <code>{inf}</code>\n<b>Exf :</b> <code>{exf}<code/>"
+                f"\n<b>Filter:</b>\n<b>Inf :</b> <code>{inf}</code>\n<b>Exf :</b> <code>{exf}</code>"
             )
             async with rss_dict_lock:
                 if rss_dict.get(user_id, False):
