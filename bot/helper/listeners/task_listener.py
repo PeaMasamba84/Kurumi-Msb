@@ -253,7 +253,7 @@ class TaskListener(TaskConfig):
             msg += f"\n<b>└🗄 Jumlah File :</b> <code>{folders}</code>"
             if mime_type != 0:
                 msg += f"\n<b>└📕 File Rusak :</b> <code>{mime_type}</code>"
-            msg += f'\n\n<b>👤 Tugas Oleh :</b> {self.tag}\n\n'
+            msg += f'\n\n<b>💂‍♂️ Pemirror :</b> {self.tag}\n\n'
             if not files:
                 await sendMessage(self.message, msg)
             else:
@@ -317,7 +317,7 @@ class TaskListener(TaskConfig):
             else:
                 msg += f"\n\n<b>Path :</b> <code>{rclonePath}</code>"
                 button = None
-            msg += f"\n\n<b>👤 Tugas Oleh :</b> {self.tag}"
+            msg += f"\n\n<b>💂‍♂️ Pemirror :</b> {self.tag}"
             await sendMessage(self.message, msg, button)
             # Log Chat
             LOG_CHAT_ID = None
