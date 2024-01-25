@@ -141,11 +141,13 @@ class gdUpload(GoogleDriveHelper):
         stop=stop_after_attempt(3),
         retry=(retry_if_exception_type(Exception)),
     )
-    def _upload_file(self, file_path, file_name, mime_type, dest_id, ft_delete, in_dir=True):
+    def _upload_file(
+        self, file_path, file_name, mime_type, dest_id, ft_delete, in_dir=True
+    ):
         # File body description
         file_metadata = {
             "name": file_name,
-            "description": "Uploaded by Pea Masamba",
+            "description": "Uploaded by KQRM",
             "mimeType": mime_type,
         }
         if dest_id is not None:
@@ -207,7 +209,12 @@ class gdUpload(GoogleDriveHelper):
                             self.switchServiceAccount()
                             LOGGER.info(f"Got: {reason}, Trying Again.")
                             return self._upload_file(
-                                file_path, file_name, mime_type, dest_id
+                                file_path,
+                                file_name,
+                                mime_type,
+                                dest_id,
+                                ft_delete,
+                                in_dir,
                             )
                     else:
                         LOGGER.error(f"Got: {reason}")
