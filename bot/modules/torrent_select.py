@@ -57,7 +57,7 @@ async def select(_, message):
     ):
         await sendMessage(message, "<b>Bukan tugas darimu!</b>")
         return
-    if task.status() not in [
+    if await sync_to_async(task.status) not in [
         MirrorStatus.STATUS_DOWNLOADING,
         MirrorStatus.STATUS_PAUSED,
         MirrorStatus.STATUS_QUEUEDL,
