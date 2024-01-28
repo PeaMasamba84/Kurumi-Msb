@@ -96,7 +96,7 @@ class TelegramDownloadHelper:
         if (
             self._listener.session not in ["user", "bot"]
             and self._listener.userTransmission
-            and self._listener.isPrivateChat
+            and not self._listener.isPrivateChat
         ):
             self._listener.session = "user"
             message = await user.get_messages(
