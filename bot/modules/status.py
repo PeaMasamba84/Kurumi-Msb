@@ -101,6 +101,7 @@ async def status_pages(_, query):
             "CheckUp": 0,
             "Pause": 0,
             "SamVid": 0,
+            "ConvertMedia": 0,
         }
         dl_speed = 0
         up_speed = 0
@@ -135,6 +136,8 @@ async def status_pages(_, query):
                         tasks["Pause"] += 1
                     case MirrorStatus.STATUS_SAMVID:
                         tasks["SamVid"] += 1
+                    case MirrorStatus.STATUS_CONVERTING:
+                        tasks["ConvertMedia"] += 1
                     case _:
                         tasks["Download"] += 1
                         dl_speed += speed_string_to_bytes(download.speed())
@@ -142,6 +145,7 @@ async def status_pages(_, query):
         msg = f"""DL : {tasks['Download']} | UP : {tasks['Upload']} | SD : {tasks['Seed']} | AR : {tasks['Archive']}
 EX : {tasks['Extract']} | SP : {tasks['Split']} | QD : {tasks['QueueDl']} | QU : {tasks['QueueUp']}
 CL : {tasks['Clone']} | CH : {tasks['CheckUp']} | PA : {tasks['Pause']} | SV : {tasks['SamVid']}
+CM : {tasks['ConvertMedia']}
 
 🌾𝑺𝒑𝒆𝒆𝒅 𝑺𝒆𝒆𝒅 : {get_readable_file_size(seed_speed)}/s
 📤𝑺𝒑𝒆𝒆𝒅 𝑼𝒏𝒅𝒖𝒉 : {get_readable_file_size(dl_speed)}/s
