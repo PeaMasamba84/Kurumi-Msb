@@ -173,7 +173,9 @@ class TaskListener(TaskConfig):
             self.size = await get_path_size(up_dir)
 
         if self.compress:
-            up_path = await self.proceedCompress(up_path, gid, unwanted_files, files_to_delete)
+            up_path = await self.proceedCompress(
+                up_path, gid, unwanted_files, files_to_delete
+            )
             if self.cancelled:
                 return
 
@@ -198,6 +200,8 @@ class TaskListener(TaskConfig):
                         return
                 LOGGER.info(f"Start from Queued/Upload: {self.name}")
         async with queue_dict_lock:
+            if self.mid in non_queued_dl:
+                non_queued_dl.remove(self.mid)
             non_queued_up.add(self.mid)
 
         if self.isLeech:
@@ -315,7 +319,7 @@ class TaskListener(TaskConfig):
                             buttons.ubutton("📺 Media Link", share_urls)
                 button = buttons.build_menu(2)
             else:
-                msg += f"\n\n<b>Path :</b> <code>{rclonePath}</code>"
+                msg += f"\n\n<b>📙 Path :</b> <code>{rclonePath}</code>"
                 button = None
             msg += f"\n\n<b>💂‍♂️ Pemirror :</b> {self.tag}"
             await sendMessage(self.message, msg, button)
@@ -354,7 +358,7 @@ class TaskListener(TaskConfig):
                         buttons=button
                     )
                 except Exception as e:
-                    LOGGER.error(f"Failed when forward message => {e}")
+                    LOGGER.error(f"Failed to forward Message! ERROR: {e}")
             if self.seed:
                 if self.newDir:
                     await clean_target(self.newDir)
