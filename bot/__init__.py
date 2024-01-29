@@ -48,14 +48,6 @@ basicConfig(
 
 LOGGER = getLogger(__name__)
 
-aria2 = ariaAPI(
-    ariaClient(
-        host="http://localhost", 
-        port=6800, 
-        secret=""
-    )
-)
-
 load_dotenv("config.env", override=True)
 
 Intervals = {"status": {}, "qb": "", "jd": ""}
@@ -100,7 +92,7 @@ try:
     Version.rc = check_output(["edge --version"], shell=True).decode().split("\n")[0].split(" ")[1]
     Version.yt = check_output(["yt-dlp --version"], shell=True).decode().split("\n")[0]
 except Exception as e:
-    LOGGER.warning(f"Failed when get apps version! : {e}")
+    LOGGER.warning(f"Failed to get Apps version! ERROR: {e}")
 
 try:
     if bool(environ.get("_____REMOVE_THIS_LINE_____")):
@@ -176,6 +168,16 @@ if DATABASE_URL:
 else:
     config_dict = {}
 
+if not ospath.exists(".netrc"):
+    with open(".netrc", "w"):
+        pass
+    
+log_info("Set up Aria2c & QBittorrent...")
+run(
+    "chmod 600 .netrc && cp .netrc /root/.netrc && chmod +x aria-nox.sh && ./aria-nox.sh",
+    shell=True,
+)
+
 OWNER_ID = environ.get("OWNER_ID", "")
 if len(OWNER_ID) == 0:
     log_error("OWNER_ID variable is missing! Exiting now")
@@ -197,7 +199,6 @@ if len(TELEGRAM_HASH) == 0:
 
 # Using different TELEGRAM_API  & TELEGRAM_HASH for USER_SESSION_STRING
 TELEGRAM_API_PREMIUM = environ.get("TELEGRAM_API_PREMIUM", "")
-
 TELEGRAM_HASH_PREMIUM = environ.get("TELEGRAM_HASH_PREMIUM", "")
 
 GDRIVE_ID = environ.get("GDRIVE_ID", "")
@@ -407,18 +408,24 @@ if not BASE_URL_PORT:
     BASE_URL_PORT = 80 if len(BASE_URL_PORT) == 0 else int(BASE_URL_PORT)
 
 BASE_URL = environ.get("BASE_URL", "").rstrip("/")
+IS_HEROKU = False
+IS_RENDER = False
+HEROKU_APP_NAME = environ.get("HEROKU_APP_NAME", "")
+RENDER_APP_NAME = environ.get("RENDER_APP_NAME", "")
 if len(BASE_URL) == 0:
-    HEROKU_APP_NAME = environ.get("HEROKU_APP_NAME", "")
-    RENDER_APP_NAME = environ.get("RENDER_APP_NAME", "")
-    if not len(HEROKU_APP_NAME) == 0:
+    if len(HEROKU_APP_NAME) != 0:
+        IS_HEROKU = True
+        BASE_URL = f"https://{HEROKU_APP_NAME}.herokuapp.com"
         log_info("Using HEROKU_APP_NAME as BASE_URL!")
-        BASE_URL = "https://{HEROKU_APP_NAME}.herokuapp.com"
-    elif not len(RENDER_APP_NAME) == 0:
+        
+    elif len(RENDER_APP_NAME) != 0:
+        IS_RENDER = True
+        BASE_URL = f"https://{RENDER_APP_NAME}.onrender.com"   
         log_info("Using RENDER_APP_NAME as BASE_URL!")
-        BASE_URL = "https://{RENDER_APP_NAME}.onrender.com"     
+        
     else:
-        log_warning("BASE_URL not provided!")
         BASE_URL = ""
+        log_warning("BASE_URL is not provided!")
 
 UPSTREAM_REPO = environ.get("UPSTREAM_REPO", "")
 if len(UPSTREAM_REPO) == 0:
@@ -528,18 +535,6 @@ Popen(
     shell=True
     )
 
-log_info("Set up QBittorrent...")
-run(["firefox", "-d", f"--profile={getcwd()}"])
-if not ospath.exists(".netrc"):
-    with open(".netrc", "w"):
-        pass
-
-log_info("Set up Netrc...")
-run("chmod 600 .netrc && cp .netrc /root/.netrc", shell=True)
-
-log_info("Set up Aria2...")
-run("chmod +x aria.sh && ./aria.sh", shell=True)
-
 log_info("Set up Service Accounts...")
 if ospath.exists("accounts.zip"):
     if ospath.exists("accounts"):
@@ -551,10 +546,7 @@ if not ospath.exists("accounts"):
     log_warning("Service Accounts not found!")
     config_dict["USE_SERVICE_ACCOUNTS"] = False
 
-log_info("Set up auto Alive...")
-Popen(["python3", "alive.py"])
-
-def get_client():
+def get_qb_client():
     return qbClient(
         host="localhost", 
         port=8090, 
@@ -581,21 +573,6 @@ aria2c_global = [
     "server-stat-of"
 ]
 
-sleep(10)
-qb_client = get_client()
-if not qbit_options:
-    qbit_options = dict(qb_client.app_preferences())
-    del qbit_options["listen_port"]
-    for k in list(qbit_options.keys()):
-        if k.startswith("rss"):
-            del qbit_options[k]
-else:
-    qb_opt = {**qbit_options}
-    for k, v in list(qb_opt.items()):
-        if v in ["", "*"]:
-            del qb_opt[k]
-    qb_client.app_set_preferences(qb_opt)
-
 log_info("Creating client from BOT_TOKEN...")
 bot = tgClient(
     "bot", 
@@ -612,8 +589,25 @@ bot_loop = bot.loop
 scheduler = AsyncIOScheduler(timezone=str(
     get_localzone()), event_loop=bot_loop)
 
+if not qbit_options:
+    qbit_options = dict(get_qb_client().app_preferences())
+    del qbit_options["listen_port"]
+    for k in list(qbit_options.keys()):
+        if k.startswith("rss"):
+            del qbit_options[k]
+else:
+    qb_opt = {**qbit_options}
+    for k, v in list(qb_opt.items()):
+        if v in ["", "*"]:
+            del qb_opt[k]
+    get_qb_client().app_set_preferences(qb_opt)
+
+aria2 = ariaAPI(ariaClient(host="http://localhost", port=6800, secret=""))
 if not aria2_options:
     aria2_options = aria2.client.get_global_option()
 else:
     a2c_glo = {op: aria2_options[op] for op in aria2c_global if op in aria2_options}
     aria2.set_global_options(a2c_glo)
+    
+log_info("Set up auto Alive...")
+Popen(["python3", "alive.py"])
