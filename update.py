@@ -37,7 +37,7 @@ if not path.exists("config.env"):
             with open("config.env", "wb+") as f:
                 f.write(res)
         except Exception as e:
-            log_error(f"Failed when download config.env => {e}")
+            log_error(f"Failed to download config.env! ERROR: {e}")
 
 load_dotenv("config.env", override=True)
 
