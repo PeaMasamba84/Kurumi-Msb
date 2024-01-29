@@ -156,6 +156,7 @@ def get_readable_message(sid, is_user, page_no=1, status="All", page_step=1):
             MirrorStatus.STATUS_SEEDING,
             MirrorStatus.STATUS_SAMVID,
             MirrorStatus.STATUS_CONVERTING,
+            MirrorStatus.STATUS_QUEUEUP,
         ]:
             msg += f"\n<b>├🔄 Proses :</b> <code>{task.processed_bytes()}</code> dari <code>{task.size()}</code>"
             msg += f"\n<b>├🕰 Estimasi :</b> <code>{task.eta()}</code>"
