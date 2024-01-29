@@ -26,7 +26,7 @@ from bot.helper.ext_utils.status_utils import speed_string_to_bytes, get_readabl
 
 _caches = {}
 
-userAgent  = "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:122.0) Gecko/20100101 Firefox/122.0"
+userAgent  = "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:123.0) Gecko/20100101 Firefox/123.0"
 
 def direct_link_generator(link: str):
     """ direct links generator """
@@ -1196,6 +1196,7 @@ def gofile(url):
             raise e
 
     def __fetch_links(session, _id, folderPath=""):
+        # _url = f"https://api.gofile.io/getContent?contentId={_id}&token={token}&websiteToken=7fd94ds12fds4&cache=true"
         _url = f"https://api.gofile.io/getContent?contentId={_id}&token={token}&wt=4fd6sg89d7s6&cache=true"
         if _password:
             _url += f"&password={_password}"
@@ -1388,11 +1389,11 @@ def send_cm(url):
 
 def tmpsend(url):
     parsed_url = urlparse(url)
-    if any(x in parsed_url.path for x in ['thank-you','download']):
+    if any(x in parsed_url.path for x in ["thank-you", "download"]):
         query_params = parse_qs(parsed_url.query)
-        if file_id := query_params.get('d'):
+        if file_id := query_params.get("d"):
             file_id = file_id[0]
-    elif not (file_id := parsed_url.path.strip('/')):
+    elif not (file_id := parsed_url.path.strip("/")):
         raise DirectDownloadLinkException("ERROR: Direct Link tidak ditemukan!")
     referer_url = f"https://tmpsend.com/thank-you?d={file_id}"
     header = f"Referer: {referer_url}"
@@ -1995,7 +1996,7 @@ def hexupload(url: str):
             session.close()
             raise DirectDownloadLinkException(f"ERROR: Link File tidak ditemukan!")
         
- 
+
 def bigota(url):
     direct_link = sub(r"https?://(bigota|hugeota)\.d\.miui\.com", "https://cdn-ota.azureedge.net", url)
     return direct_link
