@@ -74,7 +74,7 @@ def get_quotes():
         oleh = quotez.split(":")[0]
         quotes = f"{quote}\n- {oleh}"
     except:
-        quotes = "Gunakan dengan bijak ya :D"
+        quotes = "Ngga ada Quote bijak buatmu wahai Tuan yang bijaksana :D"
     return quotes
 
 
@@ -347,7 +347,7 @@ async def restart_notification():
 <pre languange="bash"><b>Hari      :</b> <code>{now.strftime('%A')}</code>
 <b>Tanggal   :</b> <code>{now.strftime('%d %B %Y')}</code>
 <b>Waktu     :</b> <code>{now.strftime('%H:%M:%S WIB')}</code>
-<b>Kutipan  :</b>
+<b>Kutipan   :</b>
 <code>{get_quotes()}</code>
 </pre>           
 """
@@ -370,7 +370,7 @@ async def restart_notification():
 <pre languange="bash"><b>Hari      :</b> <code>{now.strftime('%A')}</code>
 <b>Tanggal   :</b> <code>{now.strftime('%d %B %Y')}</code>
 <b>Waktu     :</b> <code>{now.strftime('%H:%M:%S WIB')}</code>
-<b>Kutipan  :</b>
+<b>Kutipan   :</b>
 <code>{get_quotes()}</code>
 </pre>           
 """
@@ -444,7 +444,7 @@ async def main():
             ) & CustomFilters.authorized
         )
     )
-    LOGGER.info(f"Bot Started! => @{bot.me.username}")
+    LOGGER.info(f"Bot Started! -> @{bot.me.username}")
     signal(SIGINT, exit_clean_up)
 
 bot.loop.run_until_complete(main())
