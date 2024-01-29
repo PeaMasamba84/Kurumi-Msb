@@ -61,6 +61,7 @@ class TgUploader:
         self._is_corrupted = False
         self._media_dict = {"videos": {}, "documents": {}}
         self._last_msg_in_group = False
+        self._session = ""
         self._up_path = ""
         self._lprefix = ""
         self._media_group = False
@@ -71,7 +72,7 @@ class TgUploader:
         if self._is_cancelled:
             if (
                 self._listener.userTransmission
-                or self._listener.session == "user"
+                or self._session == "user"
             ):
                 user.stop_transmission()
             else:
@@ -134,7 +135,7 @@ class TgUploader:
             try:
                 if (
                     self._listener.userTransmission
-                    and self._listener.session == "user"
+                    and self._session == "user"
                 ):
                     client = user
                 else:
@@ -151,7 +152,7 @@ class TgUploader:
                 return False
         elif (
             self._listener.userTransmission
-            and self._listener.session == "user"
+            and self._session == "user"
         ):
             self._sent_msg = await user.get_messages(
                 chat_id=self._listener.message.chat.id, 
@@ -267,7 +268,7 @@ class TgUploader:
                         reply_to_message_id=self._listener.mid
                     )
             except Exception as e:
-                LOGGER.error(f"Failed when forward message => {e}")
+                LOGGER.error(f"Failed to forward Message! ERROR: {e}")
             for m in outputs:
                 await remove(m)
 
@@ -310,9 +311,9 @@ class TgUploader:
                     f_size = await aiopath.getsize(self._up_path)
                     # Force uploads below 2GB using Bot session and above 2GB using User session
                     if f_size < 2097152000:
-                        self._listener.session = "bot"
+                        self._session = "bot"
                     else:
-                        self._listener.session = "user"
+                        self._session = "user"
                     res = await self._msg_to_reply()
                     if not res:
                         return
@@ -340,7 +341,7 @@ class TgUploader:
                                         await self._send_media_group(subkey, key, msgs)
                     self._last_msg_in_group = False
                     self._last_uploaded = 0
-                    LOGGER.info(f"Leech Started: {self._listener.name} | Using: {self._listener.session.upper()} Session")
+                    LOGGER.info(f"Leech Started: {self._listener.name} | Using: {self._session.upper()} Session")
                     await self._upload_file(cap_mono, file_)
                     if self._is_cancelled:
                         return
@@ -586,7 +587,7 @@ class TgUploader:
                             message_thread_id=self._forwardThreadId
                         )
                 except Exception as e:
-                    LOGGER.error(f"Failed when forward message => {e}")
+                    LOGGER.error(f"Failed to forward Message! ERROR: {e}")
         except FloodWait as f:
             LOGGER.warning(str(f))
             await sleep(f.value)
