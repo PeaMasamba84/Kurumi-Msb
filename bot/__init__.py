@@ -50,7 +50,7 @@ LOGGER = getLogger(__name__)
 
 load_dotenv("config.env", override=True)
 
-Intervals = {"status": {}, "qb": "", "jd": ""}
+Intervals = {"status": {}, "qb": "", "jd": "", "stopAll": False}
 QbTorrents = {}
 jd_downloads = {}
 DRIVES_NAMES = []
@@ -96,7 +96,7 @@ except Exception as e:
 
 try:
     if bool(environ.get("_____REMOVE_THIS_LINE_____")):
-        log_error("The README.md file there to be read! Exiting now!")
+        log_error("The README.md file there to be read!")
         exit(1)
 except:
     pass
@@ -113,7 +113,7 @@ rss_dict = {}
 
 BOT_TOKEN = environ.get("BOT_TOKEN", "")
 if len(BOT_TOKEN) == 0:
-    log_error("BOT_TOKEN variable is missing! Exiting now")
+    log_error("BOT_TOKEN is not found!")
     exit(1)
 
 bot_id = BOT_TOKEN.split(":", 1)[0]
@@ -180,21 +180,21 @@ run(
 
 OWNER_ID = environ.get("OWNER_ID", "")
 if len(OWNER_ID) == 0:
-    log_error("OWNER_ID variable is missing! Exiting now")
+    log_error("OWNER_ID is not found!")
     exit(1)
 else:
     OWNER_ID = int(OWNER_ID)
 
 TELEGRAM_API = environ.get("TELEGRAM_API", "")
 if len(TELEGRAM_API) == 0:
-    log_error("TELEGRAM_API variable is missing! Exiting now")
+    log_error("TELEGRAM_API is not found!")
     exit(1)
 else:
     TELEGRAM_API = int(TELEGRAM_API)
 
 TELEGRAM_HASH = environ.get("TELEGRAM_HASH", "")
 if len(TELEGRAM_HASH) == 0:
-    log_error("TELEGRAM_HASH variable is missing! Exiting now")
+    log_error("TELEGRAM_HASH is not found!")
     exit(1)
 
 # Using different TELEGRAM_API  & TELEGRAM_HASH for USER_SESSION_STRING
@@ -279,23 +279,19 @@ else:
 JD_EMAIL = environ.get("JD_EMAIL", "")
 JD_PASS = environ.get("JD_PASS", "")
 if len(JD_EMAIL) == 0 or len(JD_PASS) == 0:
-    log_warning("JDownloader Credentials not provided!")
     JD_EMAIL = ""
     JD_PASS = ""
 
 UPTOBOX_TOKEN = environ.get("UPTOBOX_TOKEN", "")
 if len(UPTOBOX_TOKEN) == 0:
-    log_warning("UPTOBOX Credentials not provided!")
     UPTOBOX_TOKEN = ""
 
 FILELION_API = environ.get("FILELION_API", "")
 if len(FILELION_API) == 0:
-    log_warning("FILELION Credentials not provided!")
     FILELION_API = ""
 
 STREAMWISH_API = environ.get("STREAMWISH_API", "")
 if len(STREAMWISH_API) == 0:
-    log_warning("STREAMWISH Credentials not provided!")
     STREAMWISH_API = ""
 
 ALLDEBRID_API = environ.get("ALLDEBRID_API", "")
@@ -347,18 +343,21 @@ SEARCH_LIMIT = environ.get("SEARCH_LIMIT", "")
 SEARCH_LIMIT = 0 if len(SEARCH_LIMIT) == 0 else int(SEARCH_LIMIT)
 
 LEECH_CHAT_ID = environ.get("LEECH_CHAT_ID", "")
-LEECH_CHAT_ID = "" if len(LEECH_CHAT_ID) == 0 else LEECH_CHAT_ID
+if len(LEECH_CHAT_ID) == 0:
+    LEECH_CHAT_ID = ""
 
 LOG_CHAT_ID = environ.get("LOG_CHAT_ID", "")
-LOG_CHAT_ID = "" if len(LOG_CHAT_ID) == 0 else LOG_CHAT_ID
+if len(LOG_CHAT_ID) == 0:
+    LOG_CHAT_ID = ""
+
+RSS_CHAT_ID = environ.get("RSS_CHAT_ID", "")
+if len(RSS_CHAT_ID) == 0:
+    RSS_CHAT_ID = ""
 
 STATUS_LIMIT = environ.get("STATUS_LIMIT", "")
 STATUS_LIMIT = 10 if len(STATUS_LIMIT) == 0 else int(STATUS_LIMIT)
 
 CMD_SUFFIX = environ.get("CMD_SUFFIX", "")
-
-RSS_CHAT_ID = environ.get("RSS_CHAT_ID", "")
-RSS_CHAT_ID = "" if len(RSS_CHAT_ID) == 0 else RSS_CHAT_ID
 
 RSS_DELAY = environ.get("RSS_DELAY", "")
 RSS_DELAY = 600 if len(RSS_DELAY) == 0 else int(RSS_DELAY)
@@ -402,10 +401,14 @@ MEDIA_GROUP = MEDIA_GROUP.lower() == "true"
 USER_TRANSMISSION = environ.get("USER_TRANSMISSION", "")
 USER_TRANSMISSION = USER_TRANSMISSION.lower() == "true" and IS_PREMIUM_USER
 
-BASE_URL_PORT = environ.get("PORT")
-if not BASE_URL_PORT:
+BASE_URL_PORT = environ.get("PORT", "")
+if len(BASE_URL_PORT) == 0:
     BASE_URL_PORT = environ.get("BASE_URL_PORT", "")
-    BASE_URL_PORT = 80 if len(BASE_URL_PORT) == 0 else int(BASE_URL_PORT)
+    if len(BASE_URL_PORT) == 0:
+        BASE_URL_PORT = 80
+        
+if len(BASE_URL_PORT) != 0:
+    BASE_URL_PORT = int(BASE_URL_PORT)
 
 BASE_URL = environ.get("BASE_URL", "").rstrip("/")
 IS_HEROKU = False
@@ -425,7 +428,6 @@ if len(BASE_URL) == 0:
         
     else:
         BASE_URL = ""
-        log_warning("BASE_URL is not provided!")
 
 UPSTREAM_REPO = environ.get("UPSTREAM_REPO", "")
 if len(UPSTREAM_REPO) == 0:
@@ -450,7 +452,6 @@ if len(RCLONE_SERVE_USER) == 0:
 RCLONE_SERVE_PASS = environ.get("RCLONE_SERVE_PASS", "")
 if len(RCLONE_SERVE_PASS) == 0:
     RCLONE_SERVE_PASS = ""
-
 
 config_dict = {
     "ALLDEBRID_API": ALLDEBRID_API,
@@ -512,6 +513,14 @@ config_dict = {
     "YT_DLP_OPTIONS": YT_DLP_OPTIONS
 }
 
+# Reminder if forgot set something ^^
+for item, value in config_dict.items():
+    if (
+        isinstance(value, str)
+        and len(value) == 0
+    ):
+        log_warning(f"{item} is not found!")
+
 if GDRIVE_ID:
     DRIVES_NAMES.append("Main")
     DRIVES_IDS.append(GDRIVE_ID)
@@ -543,7 +552,7 @@ if ospath.exists("accounts.zip"):
     run(["chmod", "-R", "777", "accounts"])
     remove("accounts.zip")
 if not ospath.exists("accounts"):
-    log_warning("Service Accounts not found!")
+    log_warning("Service Accounts is not found!")
     config_dict["USE_SERVICE_ACCOUNTS"] = False
 
 def get_qb_client():
@@ -608,6 +617,6 @@ if not aria2_options:
 else:
     a2c_glo = {op: aria2_options[op] for op in aria2c_global if op in aria2_options}
     aria2.set_global_options(a2c_glo)
-    
+
 log_info("Set up auto Alive...")
 Popen(["python3", "alive.py"])
