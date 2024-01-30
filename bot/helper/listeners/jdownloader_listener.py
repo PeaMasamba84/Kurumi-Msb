@@ -19,6 +19,8 @@ async def _onDownloadComplete(gid):
             package_ids=jd_downloads[gid]["ids"],
         )
     await task.listener.onDownloadComplete()
+    if Intervals["stopAll"]:
+        return
     await retry_function(
         jdownloader.device.downloads.remove_links,
         package_ids=jd_downloads[gid]["ids"],
