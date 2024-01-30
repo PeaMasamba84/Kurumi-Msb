@@ -1,6 +1,6 @@
 from aiofiles import open as aiopen
 from aiofiles.os import path as aiopath, remove
-from asyncio import gather, create_subprocess_exec
+from asyncio import gather, create_subprocess_exec, sleep
 from datetime import datetime
 from os import execl as osexecl, getpid
 from psutil import (
@@ -74,7 +74,7 @@ def get_quotes():
         oleh = quotez.split(":")[0]
         quotes = f"{quote}\n- {oleh}"
     except:
-        quotes = "Ngga ada Quote bijak buatmu wahai Tuan yang bijaksana :D"
+        quotes = "Gunakan dengan bijak ya :D"
     return quotes
 
 
@@ -199,6 +199,7 @@ Jika Group ini mengaktifkan Topik, Kirim perintah di Topik yang diizinkan!
 
 
 async def restart(_, message):
+    Intervals["stopAll"] = True
     restart_message = await sendMessage(
         message, 
         "<b>Restarting...</b>"
@@ -212,7 +213,9 @@ async def restart(_, message):
     if st := Intervals["status"]:
         for intvl in list(st.values()):
             intvl.cancel()
+    await sleep(1)
     await sync_to_async(clean_all)
+    await sleep(1)
     proc1 = await create_subprocess_exec("pkill", "-9", "-f", "gunicorn|chrome|firefox|opera|edge|safari")
     proc2 = await create_subprocess_exec("python3", "update.py")
     await gather(proc1.wait(), proc2.wait())
@@ -230,7 +233,7 @@ async def ping(_, message):
     end_time = int(round(time() * 1000))
     await editMessage(
         reply, 
-        f"<b>Respon Bot :</b> <code>{end_time - start_time} ms</code>"
+        f"🤖 <b>Respon Bot :</b> <code>{end_time - start_time} ms</code>"
     )
 
 
