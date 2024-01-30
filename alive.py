@@ -27,7 +27,7 @@ def send_request(url: str) -> None:
     )
 
 try:
-    PORT = os.environ.get("PORT", None)
+    BASE_URL_PORT = os.environ.get("PORT", "")
     HEROKU_APP_NAME = os.environ.get("HEROKU_APP_NAME", "")
     RENDER_APP_NAME = os.environ.get("RENDER_APP_NAME", "")
     if len(HEROKU_APP_NAME) != 0:
@@ -39,7 +39,7 @@ try:
         
     if (
         BASE_URL 
-        and PORT is not None
+        and len(BASE_URL_PORT) != 0
     ):
         while True:
             try:
