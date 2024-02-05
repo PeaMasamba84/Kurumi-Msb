@@ -159,7 +159,7 @@ class TelegramDownloadHelper:
                 await self._onDownloadStart(gid, add_to_queue)
                 await self._download(message, path)
             else:
-                await self._onDownloadError("File ini sudah ditambahkan di tugas unduh!")
+                await self._onDownloadError("File ini sudah ditambahkan di Tugas unduh!")
         else:
             await self._onDownloadError(
                 "Tidak ada dokumen/media di pesan yang dibalas!"
