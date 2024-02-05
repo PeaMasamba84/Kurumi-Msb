@@ -97,6 +97,7 @@ async def stats(_, message):
 </pre>
 <b>🄿🄴🄰 🄼🄰🅂🄰🄼🄱🄰</b>\n
 <b>📱 𝗦𝘁𝗮𝘁𝘂𝘀 𝗕𝗼𝘁</b>
+<pre languange='bash'>
 <b>┌Bot DC       :</b> <code>{bot.me.dc_id} ({DC_ID.get(bot.me.dc_id)})</code>
 <b>├Bot ID       :</b> <code>{bot.me.id}</code>
 <b>├Bot Name     :</b> <code>{bot.me.first_name} {(bot.me.last_name or '')}</code>
