@@ -248,7 +248,7 @@ if len(EXTENSION_FILTER) > 0:
 
 USER_SESSION_STRING = environ.get("USER_SESSION_STRING", "")
 if len(USER_SESSION_STRING) != 0:
-    log_info("Creating client from USER_SESSION_STRING")
+    log_info(f"Creating client from USER_SESSION_STRING ({USER_SESSION_STRING[:10]}***{USER_SESSION_STRING[-10:]})...")
     if len(TELEGRAM_API_PREMIUM) != 0 and len(TELEGRAM_HASH_PREMIUM) != 0:
         log_info("Using another Telegram Api & Telegram Hash for User Session...")
         TELEGRAM_API_PREMIUM = int(TELEGRAM_API_PREMIUM)
@@ -386,6 +386,9 @@ IS_TEAM_DRIVE = IS_TEAM_DRIVE.lower() == "true"
 USE_SERVICE_ACCOUNTS = environ.get("USE_SERVICE_ACCOUNTS", "")
 USE_SERVICE_ACCOUNTS = USE_SERVICE_ACCOUNTS.lower() == "true"
 
+USE_TELEGRAPH = environ.get("USE_TELEGRAPH", "")
+USE_TELEGRAPH = USE_TELEGRAPH.lower() == "true"
+
 WEB_PINCODE = environ.get("WEB_PINCODE", "")
 WEB_PINCODE = WEB_PINCODE.lower() == "true"
 
@@ -509,6 +512,7 @@ config_dict = {
     "UPTOBOX_TOKEN": UPTOBOX_TOKEN,
     "USER_SESSION_STRING": USER_SESSION_STRING,
     "USE_SERVICE_ACCOUNTS": USE_SERVICE_ACCOUNTS,
+    "USE_TELEGRAPH": USE_TELEGRAPH,
     "WEB_PINCODE": WEB_PINCODE,
     "YT_DLP_OPTIONS": YT_DLP_OPTIONS
 }
@@ -582,7 +586,7 @@ aria2c_global = [
     "server-stat-of"
 ]
 
-log_info("Creating client from BOT_TOKEN...")
+log_info(f"Creating client from BOT_TOKEN ({BOT_TOKEN[:10]}***{BOT_TOKEN[-10:]})...")
 bot = tgClient(
     "bot", 
     TELEGRAM_API, 
