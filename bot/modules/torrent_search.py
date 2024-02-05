@@ -1,11 +1,13 @@
 from aiohttp import ClientSession
+from asyncio import Lock
 from html import escape
+from math import ceil
 from pyrogram.filters import command, regex
 from pyrogram.handlers import MessageHandler, CallbackQueryHandler
 from urllib.parse import quote
 
-from bot import bot, LOGGER, config_dict, get_qb_client
-from bot.helper.ext_utils.bot_utils import sync_to_async, new_task
+from bot import bot, LOGGER, USE_TELEGRAPH, config_dict, get_qb_client
+from bot.helper.ext_utils.bot_utils import sync_to_async, new_task, get_telegraph_list
 from bot.helper.ext_utils.status_utils import get_readable_file_size
 from bot.helper.ext_utils.telegraph_helper import telegraph
 from bot.helper.telegram_helper.bot_commands import BotCommands
@@ -16,7 +18,12 @@ from bot.helper.telegram_helper.message_utils import editMessage, sendMessage
 
 PLUGINS = []
 SITES = None
+MAX_LIMIT = 500
 TELEGRAPH_LIMIT = 300
+
+msg_dict = {}
+max_total = 5
+torrent_search_lock = Lock()
 
 
 async def initiate_search_tools():
@@ -57,19 +64,19 @@ async def _search(key, site, message, method):
         SEARCH_API_LINK = config_dict["SEARCH_API_LINK"]
         SEARCH_LIMIT = config_dict["SEARCH_LIMIT"]
         if method == "apisearch":
-            LOGGER.info(f"API Searching: {key} from {site}")
+            LOGGER.info(f"Searching (Api) : {key} from {site}")
             if site == "all":
                 api = f"{SEARCH_API_LINK}/api/v1/all/search?query={key}&limit={SEARCH_LIMIT}"
             else:
                 api = f"{SEARCH_API_LINK}/api/v1/search?site={site}&query={key}&limit={SEARCH_LIMIT}"
         elif method == "apitrend":
-            LOGGER.info(f"API Trending from {site}")
+            LOGGER.info(f"Api Trending from {site}")
             if site == "all":
                 api = f"{SEARCH_API_LINK}/api/v1/all/trending?limit={SEARCH_LIMIT}"
             else:
                 api = f"{SEARCH_API_LINK}/api/v1/trending?site={site}&limit={SEARCH_LIMIT}"
         elif method == "apirecent":
-            LOGGER.info(f"API Recent from {site}")
+            LOGGER.info(f"Api Recent from {site}")
             if site == "all":
                 api = f"{SEARCH_API_LINK}/api/v1/all/recent?limit={SEARCH_LIMIT}"
             else:
@@ -83,24 +90,26 @@ async def _search(key, site, message, method):
             if "error" in search_results or search_results["total"] == 0:
                 await editMessage(
                     message,
-                    f"<b>Pencarian dengan kata kunci</b> <code>{key}</code> <b>tidak ditemukan</b>\n<b>Situs Torrent :</b>\n<code>{SITES.get(site)}</code>",
+                    f"<b>Pencarian tidak ditemukan!</b>\n╾────────────╼\n<b>Situs :</b> <code>{SITES.get(site)}</code>\n<b>Kata Kunci :</b> <code>{key.title()}</code>\n╾────────────╼\n",
                 )
                 return
-            msg = f"<b>Found {min(search_results['total'], TELEGRAPH_LIMIT)}</b>"
+            msg = f"<b>Menemukan</b> <code>{min(search_results['total'], MAX_LIMIT)}</code> <b>hasil pencarian!</b>"
+            msg += "\n╾────────────╼\n"
+            msg += f"<b>Situs :</b> <code>{SITES.get(site)}</code>"
             if method == "apitrend":
-                msg += f" <b>Trending Torrent</b>\n<b>Situs Torrent :</b>\n<code>{SITES.get(site)}</code>"
+                msg += f"\n<b>Metode :</b> <code>Api Trending</code>"
             elif method == "apirecent":
-                msg += (
-                    f" <b>Recent Torrent\n<b>Situs Torrent :</b>\n<code>{SITES.get(site)}</code>"
-                )
+                msg += f"\n<b>Metode :</b> <code>Api Trending</code>"
             else:
-                msg += f" <b>hasil pencarian kata kunci :</b>/\n<code>{key}</code>\n<b>Situs Torrent :</b>\n<code>{SITES.get(site)}</code>"
+                msg += f"\n<b>Metode :</b> <code>Api Search</code>"
+                msg += f"\n<b>Kata Kunci :</b> <code>{key.title()}</code>"
+            msg += "\n╾────────────╼\n"
             search_results = search_results["data"]
         except Exception as e:
             await editMessage(message, str(e))
             return
     else:
-        LOGGER.info(f"PLUGINS Searching: {key} from {site}")
+        LOGGER.info(f"Searching (Plugins) : {key} from {site}")
         client = await sync_to_async(get_qb_client)
         search = await sync_to_async(
             client.search_start, pattern=key, plugins=site, category="all"
@@ -114,104 +123,232 @@ async def _search(key, site, message, method):
             if status != "Running":
                 break
         dict_search_results = await sync_to_async(
-            client.search_results, search_id=search_id, limit=TELEGRAPH_LIMIT
+            client.search_results, search_id=search_id, limit=MAX_LIMIT
         )
         search_results = dict_search_results.results
         total_results = dict_search_results.total
         if total_results == 0:
             await editMessage(
                 message,
-                f"<b>Pencarian dengan kata kunci</b> <code>{key}</code> <b>tidak ditemukan</b>\n<b>Situs Torrent :</b>\n<code>{site.capitalize()}</code>",
+                f"<b>Pencarian tidak ditemukan!</b>\n╾────────────╼\n<b>Situs :</b> <code>{site.capitalize()}</code>\n<b>Metode :</b> <code>Plugins Search</code>\n<b>Kata Kunci :</b> <code>{key.title()}</code>\n╾────────────╼\n",
             )
             return
-        msg = f"<b>Menemukan {min(total_results, TELEGRAPH_LIMIT)}</b>"
-        msg += f" <b>hasil pencarian dengan kata kunci :</b>\n<code>{key}</code>\n<b>Situs Torrent :</b>\n<code>{site.capitalize()}</code>"
+        msg = f"<b>Menemukan</b> <code>{min(total_results, MAX_LIMIT)}</code> <b>hasil pencarian!</b>\n╾────────────╼\n<b>Situs :</b>{site.capitalize()}\n<b>Metode :</b> <code>Plugins Search</code>\n<b>Kata Kunci :</b> <code>{key.title()}</code>\n╾────────────╼\n"
         await sync_to_async(client.search_delete, search_id=search_id)
         await sync_to_async(client.auth_log_out)
-    link = await _getResult(search_results, key, message, method)
-    buttons = ButtonMaker()
-    buttons.ubutton("🔎 VIEW", link)
-    button = buttons.build_menu(1)
-    await editMessage(message, msg, button)
-
-
-async def _getResult(search_results, key, message, method):
-    telegraph_content = []
-    if method == "apirecent":
-        msg = "<h4>API Recent Results</h4>"
-    elif method == "apisearch":
-        msg = f"<h4>API Search Result(s) For {key}</h4>"
-    elif method == "apitrend":
-        msg = "<h4>API Trending Results</h4>"
+    
+    content = await _getResult(search_results, key, method)
+    
+    if USE_TELEGRAPH:
+        try:
+            button = await get_telegraph_list(content)
+        except Exception as e:
+            await editMessage(message, e)
+            return
+        
+        await editMessage(message, msg, button)
+    
     else:
-        msg = f"<h4>PLUGINS Search Result(s) For {key}</h4>"
+        msg = ""
+        button = None
+        
+        page = 0
+        page_no = 1 
+        page_cur = None
+        
+        pages = [content for content in content for content in content.split("\n\n")]
+        
+        msgId = message.reply_to_message.id
+        userId = message.reply_to_message.from_user.id 
+        
+        msg_dict[msgId] = [page, pages, page_no, page_cur, key, msgId]
+        
+        async with torrent_search_lock:
+            page_cur = ceil(len(pages) / max_total)
+            msg_dict[msgId][3] = page_cur
+
+            if (
+                page_no > page_cur 
+                and page_cur != 0
+            ):
+                page -= max_total
+                page_no -= 1
+
+            buttons = ButtonMaker()
+            
+            for no, data in enumerate(pages[page:], start=1):
+                msg += "\n\n" + data
+                
+                if no == max_total:
+                    break
+
+            if len(pages) > max_total:
+                buttons.ibutton("⏪", f"tg_search {userId} pre {msgId}")
+                buttons.ibutton(f"{page_no}/{page_cur}", f"tg_search {userId} ref {msgId}")
+                buttons.ibutton("⏩", f"tg_search {userId} nex {msgId}")
+
+            if len(pages) <= max_total:
+                buttons.ibutton(f"{page_no}/{page_cur}", f"tg_search {userId} ref {msgId}")
+
+        buttons.ibutton("Close", f"tg_search {userId} close {msgId}", position="footer")
+        await editMessage(message, msg, buttons.build_menu(3))
+
+
+async def _getResult(search_results, key, method):
+    msg = ""
+    content = []
+    
+    Torrent = False
+
+    if USE_TELEGRAPH:
+        msg += f"<h4>Hasil pencarian Torrent</h4>"
+    else:
+        msg += f"<b>Hasil pencarian Torrent</b>"
+
+    msg += "\n╾────────────╼\n"
+    
+    if method == "apirecent":
+        msg += "<b>Metode :</b> <code>Api Recent</code>"
+        
+    elif method == "apisearch":
+        msg += "<b>Metode :</b> <code>Api Search</code>"
+        if USE_TELEGRAPH:
+            msg += "<br>"
+        else:
+            msg += "\n"
+        msg += f"<b>Kata Kunci :</b> <code>{key.title()}</code>"
+        
+    elif method == "apitrend":
+        msg += "<b>Metode :</b> <code>Api Trending</code>"
+        
+    else:
+        msg += "<b>Metode :</b> <code>Plugins Search</code>"
+        if USE_TELEGRAPH:
+            msg += "<br>"
+        else:
+            msg += "\n"
+        msg += f"<b>Kata Kunci :</b> <code>{key.title()}</code>"
+        
+    msg += "\n╾────────────╼\n"
+        
     for index, result in enumerate(search_results, start=1):
         if method.startswith("api"):
             try:
                 if "name" in result.keys():
-                    msg += f"<code><a href='{result['url']}'>{escape(result['name'])}</a></code><br>"
+                    msg += f"<code><a href='{result['url']}'>{escape(result['name'])}</a></code>"
+                    
+                    if USE_TELEGRAPH:
+                        msg += "<br>"
+                    else:
+                        msg += "\n"
+                        
                 if "torrents" in result.keys():
                     for subres in result["torrents"]:
-                        msg += f"<b>Quality: </b>{subres['quality']} | <b>Type: </b>{subres['type']} | "
-                        msg += f"<b>Size: </b>{subres['size']}<br>"
+                        msg += f"<b>Type :</b> <code>{subres['type']}</code>"
+                        msg += f"<b> | Size :</b> <code>{subres['size']}</code>"
+                        msg += f"<b> | Quality :</b> <code>{subres['quality']}</code>"
+
+                        if USE_TELEGRAPH:
+                            msg += "<br>"
+                        else:
+                            msg += "\n"
+                            
                         if "torrent" in subres.keys():
-                            msg += f"<a href='{subres['torrent']}'>Direct Link</a><br>"
-                        elif "magnet" in subres.keys():
-                            msg += "<b>Share Magnet to</b> "
-                            msg += f"<a href='http://t.me/share/url?url={subres['magnet']}'>Telegram</a><br>"
-                    msg += "<br>"
+                            Torrent = True
+                            msg += f"<a href='{subres['torrent']}'>🦠 Unduh</a>"
+                            msg += f"<b> | <a href='http://t.me/share/url?url={subres['torrent']}'>⚡ Direct</a></b>"
+                            
+                        if "magnet" in subres.keys():
+                            if Torrent:
+                                msg += f"<b> | <a href='http://t.me/share/url?url={subres['magnet']}'>🧲 Magnet</a></b>"
+                            else:
+                                msg += f"<b><a href='http://t.me/share/url?url={subres['magnet']}'>🧲 Magnet</a></b>"
+                    
                 else:
-                    msg += f"<b>Size: </b>{result['size']}<br>"
+                    msg += f"<b>Size :</b> <code>{result['size']}</code>"
+
+                    if USE_TELEGRAPH:
+                        msg += "<br>"
+                    else:
+                        msg += "\n"
+                        
                     try:
-                        msg += f"<b>Seeders: </b>{result['seeders']} | <b>Leechers: </b>{result['leechers']}<br>"
+                        msg += f"<b>Seeders :</b> <code>{result['seeders']}</code>"
+                        msg += f"<b> | Leechers :</b> <code>{result['leechers']}</code>"
+                        if USE_TELEGRAPH:
+                            msg += "<br>"
+                        else:
+                            msg += "\n"
                     except:
                         pass
+                    
                     if "torrent" in result.keys():
-                        msg += f"<a href='{result['torrent']}'>Direct Link</a><br><br>"
+                        Torrent = True
+                        msg += f"<b><a href='{result['torrent']}'>🦠 Unduh</a></b>"
+                        msg += f"<b> | <a href='http://t.me/share/url?url={result['torrent']}'>⚡ Direct</a></b>"
+                        
                     elif "magnet" in result.keys():
-                        msg += "<b>Share Magnet to</b> "
-                        msg += f"<a href='http://t.me/share/url?url={quote(result['magnet'])}'>Telegram</a><br><br>"
+                        if Torrent:
+                            msg += f"<b> | <a href='http://t.me/share/url?url={result['magnet']}'>🧲 Magnet</a></b>"
+                        else:
+                            msg += f"<b><a href='http://t.me/share/url?url={result['magnet']}'>🧲 Magnet</a></b>"
+                            
                     else:
-                        msg += "<br>"
+                        if USE_TELEGRAPH:
+                            msg += "<br>"
+                        else:
+                            msg += "\n"
+                        
             except:
                 continue
+            
         else:
-            msg += f"<a href='{result.descrLink}'>{escape(result.fileName)}</a><br>"
-            msg += f"<b>Size: </b>{get_readable_file_size(result.fileSize)}<br>"
-            msg += f"<b>Seeders: </b>{result.nbSeeders} | <b>Leechers: </b>{result.nbLeechers}<br>"
-            link = result.fileUrl
-            if link.startswith("magnet:"):
-                msg += f"<b>Share Magnet to</b> <a href='http://t.me/share/url?url={quote(link)}'>Telegram</a><br><br>"
+            msg += f"<code><a href='{result.descrLink}'>{escape(result.fileName)}</a></code>"
+            if USE_TELEGRAPH:
+                msg += "<br>"
             else:
-                msg += f"<a href='{link}'>Direct Link</a><br><br>"
+                msg += "\n"
+                
+            msg += f"<b>Size :</b> <code>{get_readable_file_size(result.fileSize)}</code>"
+            if USE_TELEGRAPH:
+                msg += "<br>"
+            else:
+                msg += "\n"
+                
+            msg += f"<b>Seeders :</b> <code>{result.nbSeeders}</code>"
+            msg += f"<b> | Leechers :</b> <code>{result.nbLeechers}</code>"
+            if USE_TELEGRAPH:
+                msg += "<br>"
+            else:
+                msg += "\n"
+                
+            link = result.fileUrl
+            
+            if link.startswith("magnet:"):
+                msg += f"<b><a href='http://t.me/share/url?url={link}'>🧲 Magnet</a></b>"
+            else:
+                msg += f"<b><a href='{link}'>🦠 Unduh</a></b>"
+                msg += f"<b> | <a href='http://t.me/share/url?url={link}'>⚡ Direct</a></b>"
+
+        if USE_TELEGRAPH:
+            msg += "<br><br>"
+        else:
+            msg += "\n\n"
 
         if len(msg.encode("utf-8")) > 39000:
-            telegraph_content.append(msg)
+            content.append(msg)
             msg = ""
 
-        if index == TELEGRAPH_LIMIT:
+        if (
+            USE_TELEGRAPH
+            and index == TELEGRAPH_LIMIT
+        ):
             break
 
     if msg != "":
-        telegraph_content.append(msg)
-
-    await editMessage(
-        message, f"<b>Membuat</b> <code>{len(telegraph_content)}</code> <b>Halaman telegraph</b>"
-    )
-    path = [
-        (
-            await telegraph.create_page(
-                title="Pencari KQRM Bot", content=content
-            )
-        )["path"]
-        for content in telegraph_content
-    ]
-    if len(path) > 1:
-        await editMessage(
-            message, f"<b>Mengedit</b> <code>{len(telegraph_content)}</code> <b>Halaman telegraph</b>"
-        )
-        await telegraph.edit_telegraph(path, telegraph_content)
-    return f"https://telegra.ph/{path[0]}"
+        content.append(msg)
+    
+    return content
 
 
 def _api_buttons(user_id, method):
@@ -247,25 +384,25 @@ async def torrentSearch(_, message):
             message, "<b>Api atau Plugin tidak tersedia!</b>"
         )
     elif len(key) == 1 and SITES is None:
-        await sendMessage(message, "<b>Kirim perintah disertai dengan kata kunci!</b>")
+        await sendMessage(message, "<b>Kirim perintah disertai dengan Kata Kunci!</b>")
     elif len(key) == 1:
         buttons.ibutton("Trending", f"torser {user_id} apitrend")
         buttons.ibutton("Recent", f"torser {user_id} apirecent")
         buttons.ibutton("Cancel", f"torser {user_id} cancel")
         button = buttons.build_menu(2)
-        await sendMessage(message, "<b>Kirim perintah disertai dengan kata kunci!</b>", button)
+        await sendMessage(message, "<b>Kirim perintah disertai dengan Kata Kunci!</b>", button)
     elif SITES is not None and SEARCH_PLUGINS:
         buttons.ibutton("Api", f"torser {user_id} apisearch")
         buttons.ibutton("Plugins", f"torser {user_id} plugin")
         buttons.ibutton("Cancel", f"torser {user_id} cancel")
         button = buttons.build_menu(2)
-        await sendMessage(message, "<b>Pilih alat untuk mencari :</b>", button)
+        await sendMessage(message, "<b>Pilih Alat untuk mencari :</b>", button)
     elif SITES is not None:
         button = _api_buttons(user_id, "apisearch")
-        await sendMessage(message, "<b>Pilih situs untuk dicari | API :</b>", button)
+        await sendMessage(message, "<b>Pilih Situs untuk dicari | Api :</b>", button)
     else:
         button = await _plugin_buttons(user_id)
-        await sendMessage(message, "<b>Pilih situs untuk dicari | Plugins :</b>", button)
+        await sendMessage(message, "<b>Pilih Situs untuk dicari | Plugins :</b>", button)
 
 
 @new_task
@@ -276,7 +413,7 @@ async def torrentSearchUpdate(_, query):
     key = key[1].strip() if len(key) > 1 else None
     data = query.data.split()
     if user_id != int(data[1]):
-        await query.answer("Bukan tugas darimu!", show_alert=True)
+        await query.answer("Bukan Tugas darimu!", show_alert=True)
     elif data[2].startswith("api"):
         await query.answer()
         button = _api_buttons(user_id, data[2])
@@ -289,30 +426,149 @@ async def torrentSearchUpdate(_, query):
         await query.answer()
         site = data[2]
         method = data[3]
+        msg = "<b>Mencari Torrent...</b>"
+        msg += "\n╾────────────╼\n"
         if method.startswith("api"):
+            msg += f"<b>Situs :</b> <code>{SITES.get(site)}</code>"
             if key is None:
                 if method == "apirecent":
-                    endpoint = "Recent"
+                    endpoint = "Api Recent"
                 elif method == "apitrend":
-                    endpoint = "Trending"
+                    endpoint = "Api Trending"
+                msg += f"\n<b>Metode :</b> <code>{endpoint}</code>"
+                msg += "\n╾────────────╼\n"
                 await editMessage(
                     message,
-                    f"<b>Mencari {endpoint} Torrent...</b>\n<b>Situs Torrent:</b>\n<code>{SITES.get(site)}</code>",
+                    msg,
                 )
             else:
+                msg += f"<b>Situs :</b> <code>{SITES.get(site)}</code>"
+                msg += f"\n<b>Metode :</b> <code>Api Search</code>"
+                msg += f"\n<b>Kata Kunci :</b> <code>{key.title()}</code>"
+                msg += "\n╾────────────╼\n"
                 await editMessage(
                     message,
-                    f"<b>Mencari torrent dengan kata kunci:\n</b><code>{key}</code>\n<b>Situs Torrent:</b>\n<code>{SITES.get(site)}</code>",
+                    f"<b>Situs :</b> <code>{SITES.get(site)}</code>\n\n╾────────────╼\n",
                 )
         else:
+            msg += f"<b>Situs :</b> <code>{site.capitalize()}</code>"
+            msg += f"\n<b>Metode :</b> <code>Plugins Search</code>"
+            msg += f"\n<b>Kata Kunci :</b> <code>{key.title()}</code>"
+            msg += "\n╾────────────╼\n"
             await editMessage(
                 message,
-                f"<b>Mencari torrent dengan kata kunci:\n</b><code>{key}</code>\n<b>Situs Torrent:</b>\n<code>{site.capitalize()}</code>",
+                msg,
             )
         await _search(key, site, message, method)
     else:
         await query.answer()
         await editMessage(message, "<b>Pencarian dibatalkan!</b>")
+
+
+@new_task
+async def telegram_search(_, query):
+    data = query.data.split()
+    user_id = query.from_user.id
+    
+    userId = int(data[1])
+    buttons = ButtonMaker()
+    
+    if user_id != userId:
+        return await query.answer(text="Bukan Tugas darimu!", show_alert=True)
+
+    try:
+        msgs = msg_dict[int(data[3])]
+    except:
+        await query.message.delete()
+        await query.message.reply_to_message.delete()
+        return await query.answer(text="Waktu query pencarian habis!", show_alert=True)
+    
+    if data[2] == "pre":
+        if msgs[2] == 1:
+            msgs[0] = max_total * (msgs[3] - 1)
+            msgs[2] = msgs[3]
+        else:
+            msgs[0] -= max_total
+            msgs[2] -= 1
+            
+        msg = ""
+        page_cur = ceil(len(msgs[1]) / max_total)
+        
+        if (
+            page_cur != 0 
+            and msgs[2] > page_cur
+        ):
+            msgs[0] -= max_total
+            msgs[2] -= 1
+            
+        for no, data in enumerate(msgs[1][msgs[0]:], start=1):
+            msg += "\n\n" + data
+            if no == max_total:
+                break
+            
+        if len(msgs[1]) > max_total:
+            buttons.ibutton("⏪", f"tg_search {userId} pre {msgs[5]}")
+            buttons.ibutton(f"{msgs[2]}/{page_cur}", f"tg_search {userId} ref {msgs[5]}")
+            buttons.ibutton("⏩", f"tg_search {userId} nex {msgs[5]}")
+            
+        if len(msgs[1]) <= max_total:
+            buttons.ibutton(f"{msgs[2]}/{page_cur}", f"tg_search {userId} ref {msgs[5]}")
+            
+        buttons.ibutton("Close", f"tg_search {userId} close {msgs[5]}", position="footer")
+        await editMessage(query.message, msg, buttons.build_menu(3))
+        
+    elif data[2] == "nex":
+        if msgs[2] == msgs[3]:
+            msgs[0] = 0
+            msgs[2] = 1
+        else:
+            msgs[0] += max_total
+            msgs[2] += 1
+            
+        msg = ""
+        page_cur = ceil(len(msgs[1]) / max_total)
+        
+        if (
+            page_cur != 0 
+            and msgs[2] > page_cur
+        ):
+            msgs[0] -= max_total
+            msgs[2] -= 1
+            
+        for no, data in enumerate(msgs[1][msgs[0]:], start=1):
+            msg += "\n\n" + data
+            
+            if no == max_total:
+                break
+        
+        if len(msgs[1]) > max_total:
+            buttons.ibutton("⏪", f"tg_search {userId} pre {msgs[5]}")
+            buttons.ibutton(f"{msgs[2]}/{page_cur}", f"tg_search {userId} ref {msgs[5]}")
+            buttons.ibutton("⏩", f"tg_search {userId} nex {msgs[5]}")
+            
+        if len(msgs[1]) <= max_total:
+            buttons.ibutton(f"{msgs[2]}/{page_cur}", f"tg_search {userId} ref {msgs[5]}")
+        
+        buttons.ibutton("Close", f"tg_search {userId} close {msgs[5]}", position="footer")
+        await editMessage(query.message, msg, buttons.build_menu(3))
+    
+    elif data[2] == "ref":
+        await query.answer()
+    
+    elif data[2] == "close":
+        await query.answer()
+        await query.message.delete()
+        await query.message.reply_to_message.delete()
+        try:
+            del msgs[5]
+        except:
+            pass
+        
+    else:
+        await query.answer()
+        for no, _ in enumerate(msgs[1], start=1):
+            if no == max_total:
+                break
 
 
 bot.add_handler(
@@ -329,5 +585,12 @@ bot.add_handler(
         filters=regex(
             "^torser"
         )
+    )
+)
+bot.add_handler(
+    CallbackQueryHandler(
+        telegram_search, 
+        filters=regex(
+            "^tg_search")
     )
 )
