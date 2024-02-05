@@ -921,6 +921,9 @@ async def load_config():
 
     USE_SERVICE_ACCOUNTS = environ.get("USE_SERVICE_ACCOUNTS", "")
     USE_SERVICE_ACCOUNTS = USE_SERVICE_ACCOUNTS.lower() == "true"
+    
+    USE_TELEGRAPH = environ.get("USE_TELEGRAPH", "")
+    USE_TELEGRAPH = USE_TELEGRAPH.lower() == "true"
 
     WEB_PINCODE = environ.get("WEB_PINCODE", "")
     WEB_PINCODE = WEB_PINCODE.lower() == "true"
@@ -1049,6 +1052,7 @@ async def load_config():
             "UPSTREAM_BRANCH": UPSTREAM_BRANCH,
             "USER_SESSION_STRING": USER_SESSION_STRING,
             "USE_SERVICE_ACCOUNTS": USE_SERVICE_ACCOUNTS,
+            "USE_TELEGRAPH": USE_TELEGRAPH,
             "WEB_PINCODE": WEB_PINCODE,
             "YT_DLP_OPTIONS": YT_DLP_OPTIONS,
         }
