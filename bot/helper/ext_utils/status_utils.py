@@ -148,9 +148,9 @@ def get_readable_message(sid, is_user, page_no=1, status="All", page_step=1):
             msg += f"\n💾 File :<blockquote><code>{escape(f'{task.name()}')}</code></blockquote>\n"
         msg += f"\n<b>┌┤{get_progress_bar_string(task.progress())} <code>»{task.progress()}</code></b>"
         if task.listener.isSuperChat:
-            msg += f"\n<b>├📲 Status :</b> <a href='{task.listener.message.link}'>{tstatus}</a>"
+            msg += f"\n<b>├📲 Status:</b> <a href='{task.listener.message.link}'>{tstatus}</a>"
         else:
-            msg += f"\n<b>├📲 Status :</b> <code>{tstatus}</code>"
+            msg += f"\n<b>├📲 Status:</b> <code>{tstatus}</code>"
         if tstatus not in [
             MirrorStatus.STATUS_SPLITTING,
             MirrorStatus.STATUS_SEEDING,
@@ -158,9 +158,9 @@ def get_readable_message(sid, is_user, page_no=1, status="All", page_step=1):
             MirrorStatus.STATUS_CONVERTING,
             MirrorStatus.STATUS_QUEUEUP,
         ]:
-            msg += f"\n<b>├🔄 Proses :</b> <code>{task.processed_bytes()}</code> dari <code>{task.size()}</code>"
-            msg += f"\n<b>├🕰 Estimasi :</b> <code>{task.eta()}</code>"
-            msg += f"\n<b>├🛸 Kecepatan :</b> <code>{task.speed()}</code>"
+            msg += f"\n<b>├🔄 Proses:</b> <code>{task.processed_bytes()}</code> dari <code>{task.size()}</code>"
+            msg += f"\n<b>├🕰 Estimasi:</b> <code>{task.eta()}</code>"
+            msg += f"\n<b>├🛜 Kecepatan:</b> <code>{task.speed()}</code>"
             if hasattr(task, "seeders_num"):
                 try:
                     msg += f"\n<b>├🌱 Seeders :</b> <code>{task.seeders_num()}</code>"
@@ -168,36 +168,37 @@ def get_readable_message(sid, is_user, page_no=1, status="All", page_step=1):
                 except:
                     pass
         elif tstatus == MirrorStatus.STATUS_SEEDING:
-            msg += f"\n<b>├🚦 Rasio : </b> <code>{task.ratio()}</code>"
-            msg += f"\n<b>├⏰ Waktu : </b> <code>{task.seeding_time()}</code>"
-            msg += f"\n<b>├📦 Ukuran : </b> <code>{task.size()}</code>"
-            msg += f"\n<b>├◭ Diupload : </b> <code>{task.uploaded_bytes()}</code>"
-            msg += f"\n<b>├🛸 Kecepatan : </b> <code>{task.seed_speed()}</code>"
+            msg += f"\n<b>├🚦 Rasio: </b> <code>{task.ratio()}</code>"
+            msg += f"\n<b>├⏰ Waktu: </b> <code>{task.seeding_time()}</code>"
+            msg += f"\n<b>├📦 Ukuran: </b> <code>{task.size()}</code>"
+            msg += f"\n<b>├◭ Diupload: </b> <code>{task.uploaded_bytes()}</code>"
+            msg += f"\n<b>├🛸 Kecepatan: </b> <code>{task.seed_speed()}</code>"
         else:
-            msg += f"\n<b>├📦 Ukuran : </b> <code>{task.size()}</code>"
+            msg += f"\n<b>├📦 Ukuran: </b> <code>{task.size()}</code>"
             
         tgid = task.gid()
-        msg += f"\n<b>├📟 GID :</b> <code>{tgid}</code>"
+        msg += f"\n<b>├📟 GID:</b> <code>{tgid}</code>"
         
         if task.listener.isPrivateChat: 
-            msg += f"\n<b>├🔖 UID :</b> <code>PRIVATE</code>"
-            msg += f"\n<b>├🦹 User :</b> <code>PRIVATE</code>" 
+            msg += f"\n<b>├🆔 UID:</b> <code>PRIVATE</code>"
+            msg += f"\n<b>├🦹 User:</b> <code>PRIVATE</code>" 
         else:
-            msg += f"\n<b>├🔖 UID :</b> <code>{task.listener.userId}</code>"
-            msg += f"\n<b>├🦹 User :</b> <code>{task.listener.user.first_name} {(task.listener.user.last_name or '')}</code>"            
-        
-        msg += f"\n<b>└┤📵 Stop :</b> <code>/{BotCommands.CancelTaskCommand[1]} {tgid}</code>\n\n"
+            msg += f"\n<b>├🆔 UID:</b> <code>{task.listener.userId}</code>"
+            msg += f"\n<b>├🦹 User:</b> <code>{task.listener.user.first_name} {(task.listener.user.last_name or '')}</code>"
+            
+        msg += f"\n<b>├📵 Stop:</b> <code>/{BotCommands.CancelTaskCommand[1]} {tgid}</code>"
+        msg += f"\n└┤<code>/{BotCommands.ForceStartCommand[1]} {tgid}</code>\n\n"
 
     if len(msg) == 0 and status == "All":
         return None, None
     elif len(msg) == 0:
-        msg = f"<b>Tidak ada tugas</b> <code>{status}</code>!\n\n"
+        msg = f"<b>Tidak ada Tugas</b> <code>{status}</code>!\n\n"
     buttons = ButtonMaker()
     if not is_user:
         buttons.ibutton("Stats", "status 0 ov", position="header")
     if len(tasks) > STATUS_LIMIT:
-        msg += f"<b>Step :</b> <code>{page_step}</code>"
-        msg += f"\n<b>Halaman :</b> <code>{page_no}/{pages}</code>"
+        # msg += f"<b>Step :</b> <code>{page_step}</code>"
+        msg += f"<b>Halaman :</b> <code>{page_no}/{pages}</code>"
         msg += f"\n<b>Total Tugas :</b> <code>{tasks_no}</code>\n\n"
         buttons.ibutton("⫷", f"status {sid} pre", position="header")
         buttons.ibutton("⫸", f"status {sid} nex", position="header")
