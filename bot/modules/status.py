@@ -41,8 +41,8 @@ async def mirror_status(_, message):
         count = len(task_dict)
     if count == 0:
         msg = "<b>Kosong bro!</b>"
-        msg += f"\n<b>Tambahkan</b> <code>me/userId</code> <b>setelah perintah untuk menampilkan Tugas secara spesifik!</b>"
-        msg += "\n\n___________________________"
+        msg += f"\n\n<b>Note :</b>\nTambahkan <code>me</code> atau <code>userId</code> setelah perintah untuk menampilkan Tugas secara spesifik!"
+        msg += "\n___________________________"
         msg += (
             f"\n<b>CPU :</b> <code>{cpu_percent()}%</code> | <b>FREE :</b> <code>{get_readable_file_size(disk_usage(DOWNLOAD_DIR).free)}</code>" \
             f"\n<b>RAM :</b> <code>{virtual_memory().percent}%</code> | <b>UPTIME :</b> <code>{get_readable_time(time() - botStartTime)}</code>" \
