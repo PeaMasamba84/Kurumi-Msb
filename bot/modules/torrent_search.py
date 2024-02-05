@@ -436,25 +436,25 @@ async def torrentSearchUpdate(_, query):
                 elif method == "apitrend":
                     endpoint = "Api Trending"
                 msg += f"\n<b>Metode :</b> <code>{endpoint}</code>"
-                msg += "\n╾────────────╼\n"
+                msg += "\n╾────────────╼╼\n"
                 await editMessage(
                     message,
                     msg,
                 )
             else:
-                msg += f"<b>Situs :</b> <code>{SITES.get(site)}</code>"
+                msg += f"<b>Website :</b> <code>{SITES.get(site)}</code>"
                 msg += f"\n<b>Metode :</b> <code>Api Search</code>"
                 msg += f"\n<b>Kata Kunci :</b> <code>{key.title()}</code>"
-                msg += "\n╾────────────╼\n"
+                msg += "\n╾────────────╼╼\n"
                 await editMessage(
                     message,
-                    f"<b>Situs :</b> <code>{SITES.get(site)}</code>\n\n╾────────────╼\n",
+                    f"<b>Website :</b> <code>{SITES.get(site)}</code>\n\n╾────────────╼╼\n",
                 )
         else:
-            msg += f"<b>Situs :</b> <code>{site.capitalize()}</code>"
+            msg += f"<b>Website :</b> <code>{site.capitalize()}</code>"
             msg += f"\n<b>Metode :</b> <code>Plugins Search</code>"
             msg += f"\n<b>Kata Kunci :</b> <code>{key.title()}</code>"
-            msg += "\n╾────────────╼\n"
+            msg += "\n╾────────────╼╼\n"
             await editMessage(
                 message,
                 msg,
