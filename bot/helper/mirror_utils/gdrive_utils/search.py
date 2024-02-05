@@ -1,6 +1,6 @@
 from logging import getLogger
 
-from bot import DRIVES_NAMES, DRIVES_IDS, INDEX_URLS, user_data
+from bot import DRIVES_NAMES, DRIVES_IDS, INDEX_URLS, USE_TELEGRAPH, user_data
 from bot.helper.ext_utils.status_utils import get_readable_file_size
 from bot.helper.mirror_utils.gdrive_utils.helper import GoogleDriveHelper
 
@@ -96,9 +96,9 @@ class gdSearch(GoogleDriveHelper):
     def drive_list(self, fileName, target_id="", user_id=""):
         msg = ""
         fileName = self.escapes(str(fileName))
-        contents_no = 0
-        telegraph_content = []
         Title = False
+        content = []
+        contents_no = 0
 
         if target_id.startswith("mtp:"):
             drives = self.get_user_drive(target_id, user_id)
@@ -132,47 +132,69 @@ class gdSearch(GoogleDriveHelper):
                 else:
                     continue
             if not Title:
-                msg += f"<h4>Hasil pencarian dengan kata kunci {fileName}</h4>"
+                if USE_TELEGRAPH:
+                    msg += f"<h4>Hasil pencarian Google Drive</h4>"
+                else:
+                    msg += f"<b>Hasil pencarian Google Drive</b>"
                 Title = True
             if drive_name:
-                msg += f"╾────────────╼<br><b>{drive_name}</b><br>╾────────────╼<br>"
+                if USE_TELEGRAPH:
+                    msg += f"╾────────────╼<br><b>Drive : {drive_name}</b><br><b>Kata Kunci : {fileName.title()}<br><br>╾────────────╼<br>"
+                else:
+                    msg += f"\n╾────────────╼\n<b>Drive :</b> <code>{drive_name}</code>\n<b>Kata Kunci :</b> <code>{fileName.title()}</code>\n╾────────────╼\n"
+            num = 0
             for file in response.get("files", []):
+                num += 1
                 mime_type = file.get("mimeType")
                 if mime_type == self.G_DRIVE_DIR_MIME_TYPE:
                     furl = self.G_DRIVE_DIR_BASE_DOWNLOAD_URL.format(file.get("id"))
-                    msg += f"📁 <code>{file.get('name')}<br>(folder)</code><br>"
-                    msg += f"<b><a href={furl}>Drive Link</a></b>"
+                    if USE_TELEGRAPH:
+                        msg += f"📁 <code>{file.get('name')} (Folder)</code><br>"
+                    else:
+                        msg += f"<b>{num}</b>. <code>{file.get('name')} (Folder)</code>\n"
+                    msg += f"<b><a href={furl}>☁️ Drive</a></b>"
                     if index_url:
                         url = f'{index_url}findpath?id={file.get("id")}'
-                        msg += f' <b>| <a href="{url}">Index Link</a></b>'
+                        msg += f' <b>| <a href="{url}">⚡ Index</a></b>'
+                        
                 elif mime_type == "application/vnd.google-apps.shortcut":
                     furl = self.G_DRIVE_DIR_BASE_DOWNLOAD_URL.format(file.get("id"))
                     msg += (
                         f"⁍<a href='{self.G_DRIVE_DIR_BASE_DOWNLOAD_URL.format(file.get('id'))}'>{file.get('name')}"
-                        f"</a> (shortcut)"
+                        f"</a> (ShortCut)"
                     )
+                    
                 else:
                     furl = self.G_DRIVE_BASE_DOWNLOAD_URL.format(file.get("id"))
-                    msg += f"📄 <code>{file.get('name')}<br>({get_readable_file_size(int(file.get('size', 0)))})</code><br>"
-                    msg += f"<b><a href={furl}>Drive Link</a></b>"
+                    if USE_TELEGRAPH:
+                        msg += f"📄 <code>{file.get('name')} ({get_readable_file_size(int(file.get('size', 0)))})</code><br>"
+                    else:
+                        msg += f"<b>{num}</b>. <code>{file.get('name')} ({get_readable_file_size(int(file.get('size', 0)))})</code>\n"
+                    msg += f"<b><a href={furl}>☁️ Drive</a></b>"
                     if index_url:
                         url = f'{index_url}findpath?id={file.get("id")}'
-                        msg += f' <b>| <a href="{url}">Index Link</a></b>'
+                        msg += f' <b>| <a href="{url}">⚡ Index</a></b>'
                         if mime_type.startswith(("image", "video", "audio")):
                             urlv = f'{index_url}findpath?id={file.get("id")}&view=true'
-                            msg += f' <b>| <a href="{urlv}">View Link</a></b>'
-                msg += "<br><br>"
+                            msg += f' <b>| <a href="{urlv}">🎬 View</a></b>'
+
+                if USE_TELEGRAPH:
+                    msg += "<br><br>"
+                else:
+                    msg += "\n\n"
+                    
                 contents_no += 1
                 if len(msg.encode("utf-8")) > 39000:
-                    telegraph_content.append(msg)
+                    content.append(msg)
                     msg = ""
+                    
             if self._noMulti:
                 break
 
         if msg != "":
-            telegraph_content.append(msg)
+            content.append(msg)
 
-        return telegraph_content, contents_no
+        return content, contents_no
 
     def get_user_drive(self, target_id, user_id):
         dest_id = target_id.replace("mtp:", "", 1)
