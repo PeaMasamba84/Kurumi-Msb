@@ -255,7 +255,7 @@ async def _getResult(search_results, key, method):
                             
                         if "torrent" in subres.keys():
                             Torrent = True
-                            msg += f"<a href='{subres['torrent']}'>🦠 Unduh</a>"
+                            msg += f"<a href='{subres['torrent']}'>📲 Unduh</a>"
                             msg += f"<b> | <a href='http://t.me/share/url?url={subres['torrent']}'>⚡ Direct</a></b>"
                             
                         if "magnet" in subres.keys():
@@ -284,7 +284,7 @@ async def _getResult(search_results, key, method):
                     
                     if "torrent" in result.keys():
                         Torrent = True
-                        msg += f"<b><a href='{result['torrent']}'>🦠 Unduh</a></b>"
+                        msg += f"<b><a href='{result['torrent']}'>📲 Unduh</a></b>"
                         msg += f"<b> | <a href='http://t.me/share/url?url={result['torrent']}'>⚡ Direct</a></b>"
                         
                     elif "magnet" in result.keys():
@@ -327,7 +327,7 @@ async def _getResult(search_results, key, method):
             if link.startswith("magnet:"):
                 msg += f"<b><a href='http://t.me/share/url?url={link}'>🧲 Magnet</a></b>"
             else:
-                msg += f"<b><a href='{link}'>🦠 Unduh</a></b>"
+                msg += f"<b><a href='{link}'>📲 Unduh</a></b>"
                 msg += f"<b> | <a href='http://t.me/share/url?url={link}'>⚡ Direct</a></b>"
 
         if USE_TELEGRAPH:
