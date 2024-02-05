@@ -611,6 +611,8 @@ class TaskConfig:
         for dirpath, _, files in await sync_to_async(walk, up_dir, topdown=False):
             for file_ in files:
                 f_path = ospath.join(dirpath, file_)
+                if f_path in o_files:
+                    continue
                 f_size = await aiopath.getsize(f_path)
                 if f_size > self.splitSize:
                     if not checked:
@@ -766,6 +768,7 @@ class TaskConfig:
                 return False if self.cancelled else res
             elif (
                 is_audio
+                and aext
                 and not is_video
                 and not m_path.endswith(f".{aext}")
                 and (
