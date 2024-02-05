@@ -92,69 +92,59 @@ async def stats(_, message):
     }
         
     stats = f"""
-🄾🄿🄴🅁🄰🅂🄸 🅂🄸🅂🅃🄴🄼 
 <pre languange='bash'><code>{neofetch}</code>
-</pre>
-<b>🄿🄴🄰 🄼🄰🅂🄰🄼🄱🄰</b>\n
-<b>📱 𝗦𝘁𝗮𝘁𝘂𝘀 𝗕𝗼𝘁</b>
-<pre languange='bash'>
-<b>┌Bot DC       :</b> <code>{bot.me.dc_id} ({DC_ID.get(bot.me.dc_id)})</code>
-<b>├Bot ID       :</b> <code>{bot.me.id}</code>
-<b>├Bot Name     :</b> <code>{bot.me.first_name} {(bot.me.last_name or '')}</code>
-<b>├Bot Username :</b> <code>@{bot.me.username}</code>
-<b>├User DC      :</b> <code>{user.me.dc_id if user else '-'} {('(' + DC_ID.get(user.me.dc_id) + ')' if user else '')}</code>
-<b>├User ID      :</b> <code>{user.me.id if user else '-'}</code>
-<b>├User Name    :</b> <code>{(user.me.first_name if user else '-')} {((user.me.last_name if user else '') or '')}</code>
-<b>├User Status  :</b> <code>{'PREMIUM' if IS_PREMIUM_USER else 'FREE'}</code>
-<b>├Uptime Bot   :</b> <code>{bot_uptime}</code>
-<b>├Uptime Mesin :</b> <code>{machine_uptime}</code>
-<b>├Diperbarui   :</b> <code>{commit_time}</code>
-<b>└Pembaruan    :</b> <code>{commit_message}</code>
-</pre>
-<b>🖥 𝗖𝗣𝗨</b>
-<pre languange='bash'>
-<b>┌Cores        :</b> <code>{cpu_count(logical=False)}</code>
-<b>├Logical      :</b> <code>{cpu_count(logical=True)}</code>
-<b>├Frequency    :</b> <code>{round(cpu.current)}</code>
-└<code>{get_progress_bar_string(cpu_percent(interval=0.5))} - {cpu_percent(interval=0.5)}%</code>
-</pre>
-<b>💽𝗥𝗔𝗠</b> 
-<pre languange='bash'>
-<b>┌Terpakai     :</b> <code>{get_readable_file_size(memory.used)}</code>
-<b>├Tersedia     :</b> <code>{get_readable_file_size(memory.available)}</code>
-<b>├Total        :</b> <code>{get_readable_file_size(memory.total)}</code>
-└<code>{get_progress_bar_string(memory.percent)} - {memory.percent}%</code>
-</pre>
-<b>🪫 𝗣𝗲𝗺𝗮𝗸𝗮𝗶𝗮𝗻 𝗥𝗔𝗠</b>
-<pre languange='bash'>
-<b>Python        :</b> <code>{get_readable_file_size(Process(getpid()).memory_info().rss)}</code>
-</pre>
-<b>💾 𝗣𝗲𝗻𝘆𝗶𝗺𝗽𝗮𝗻𝗮𝗻</b> 
-<pre languange='bash'>
-<b>┌Terpakai     :</b> <code>{get_readable_file_size(used)}</code>
-<b>├Tersedia     :</b> <code>{get_readable_file_size(free)}</code>
-<b>├Total        :</b> <code>{get_readable_file_size(total)}</code>
-└<code>{get_progress_bar_string(disk)} - {disk}%</code>
-</pre>
-<b>📶 𝗝𝗮𝗿𝗶𝗻𝗴𝗮𝗻</b>
-<pre languange='bash'>
-<b>┌Total Unduh  :</b> <code>{get_readable_file_size(network.bytes_recv)}</code>
-<b>└Total Unggah :</b> <code>{get_readable_file_size(network.bytes_sent)}</code>
-</pre>
-<b>📦 𝗩𝗲𝗿𝘀𝗶 𝗣𝗮𝗰𝗸𝗮𝗴𝗲</b>
-<pre languange='bash'>
-<b>┌Aria2c       :</b> <code>v{Version.ar}</code>
-<b>├FFMPEG       :</b> <code>v{Version.ff}</code>
-<b>├Google       :</b> <code>v{Version.ga}</code>
-<b>├Java         :</b> <code>v{Version.jv}</code>
-<b>├MyJD         :</b> <code>v{Version.jd}</code>
-<b>├P7Zip        :</b> <code>v{Version.p7}</code>
-<b>├Pyro         :</b> <code>v{Version.pr}</code>
-<b>├Python       :</b> <code>v{Version.py}</code>
-<b>├Qbittorrent  :</b> <code>{Version.qb}</code>
-<b>├Rclone       :</b> <code>{Version.rc}</code>
-<b>└YT-DLP       :</b> <code>v{Version.yt}</code>
-</pre>
+
+<b>CPU</b>
+<b>Cores        :</b> <code>{cpu_count(logical=False)}</code>
+<b>Logical      :</b> <code>{cpu_count(logical=True)}</code>
+<b>Frequency    :</b> <code>{round(cpu.current)}</code>
+<code>{get_progress_bar_string(cpu_percent(interval=0.5))} - {cpu_percent(interval=0.5)}%</code>
+
+<b>RAM</b> 
+<b>Terpakai     :</b> <code>{get_readable_file_size(memory.used)}</code>
+<b>Tersedia     :</b> <code>{get_readable_file_size(memory.available)}</code>
+<b>Total        :</b> <code>{get_readable_file_size(memory.total)}</code>
+<code>{get_progress_bar_string(memory.percent)} - {memory.percent}%</code>
+
+<b>Pemakaian RAM</b>
+<b>Python       :</b> <code>{get_readable_file_size(Process(getpid()).memory_info().rss)}</code>
+
+<b>Penyimpanan</b> 
+<b>Terpakai     :</b> <code>{get_readable_file_size(used)}</code>
+<b>Tersedia     :</b> <code>{get_readable_file_size(free)}</code>
+<b>Total        :</b> <code>{get_readable_file_size(total)}</code>
+<code>{get_progress_bar_string(disk)} - {disk}%</code>
+
+<b>Jaringan</b>
+<b>Total Unduh  :</b> <code>{get_readable_file_size(network.bytes_recv)}</code>
+<b>Total Unggah :</b> <code>{get_readable_file_size(network.bytes_sent)}</code>
+
+<b>Versi</b>
+<b>Aria2c       :</b> <code>v{Version.ar}</code>
+<b>FFMPEG       :</b> <code>v{Version.ff}</code>
+<b>Google       :</b> <code>v{Version.ga}</code>
+<b>Java         :</b> <code>v{Version.jv}</code>
+<b>MyJD         :</b> <code>v{Version.jd}</code>
+<b>P7Zip        :</b> <code>v{Version.p7}</code> 
+<b>Pyro         :</b> <code>v{Version.pr}</code>
+<b>Python       :</b> <code>v{Version.py}</code>
+<b>Qbittorrent  :</b> <code>{Version.qb}</code>
+<b>Rclone       :</b> <code>{Version.rc}</code>
+<b>YT-DLP       :</b> <code>v{Version.yt}</code>
+
+<b>Lainnya</b>
+<b>Bot DC       :</b> <code>{bot.me.dc_id} ({DC_ID.get(bot.me.dc_id)})</code>
+<b>Bot ID       :</b> <code>{bot.me.id}</code>
+<b>Bot Name     :</b> <code>{bot.me.first_name} {(bot.me.last_name or '')}</code>
+<b>Bot Username :</b> <code>@{bot.me.username}</code>
+<b>User DC      :</b> <code>{user.me.dc_id if user else '-'} {('(' + DC_ID.get(user.me.dc_id) + ')' if user else '')}</code>
+<b>User ID      :</b> <code>{user.me.id if user else '-'}</code>
+<b>User Name    :</b> <code>{(user.me.first_name if user else '-')} {((user.me.last_name if user else '') or '')}</code>
+<b>User Status  :</b> <code>{'PREMIUM' if IS_PREMIUM_USER else 'FREE'}</code>
+<b>Uptime Bot   :</b> <code>{bot_uptime}</code>
+<b>Uptime Mesin :</b> <code>{machine_uptime}</code>
+<b>Diperbarui   :</b> <code>{commit_time}</code>
+<b>Pembaruan    :</b> <code>{commit_message}</code>
 </pre>"""
 
     await sendMessage(
@@ -166,8 +156,8 @@ async def stats(_, message):
 async def start(client, message):
     buttons = ButtonMaker()
     buttons.ubutton(
-        "Website", "https://www.comelmuewa84.eu.org")
-    buttons.ubutton("Channel", "https://t.me/+LUX4Ppe0-YI4NTk1")
+        "Owner", "https://t.me/save_usdt")
+    buttons.ubutton("Channel", "https://t.me/arakurumi")
     reply_markup = buttons.build_menu(2)
     if await CustomFilters.authorized(client, message):
         start_string = f"""
