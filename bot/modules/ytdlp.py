@@ -397,7 +397,7 @@ class YtDlp(TaskListener):
         if not is_url(self.link):
             await sendMessage(
                 self.message, 
-                f"<b>Hai {self.tag} !</b>\n<b>Sepertinya perintah yang kamu gunakan tidak tepat!</b>\n\n<a href='https://github.com/yt-dlp/yt-dlp/blob/master/supportedsites.md'>Link yang disupport YT-DLP.</a>", 
+                f"<b>Hai {self.tag} !</b>\n<b>Sepertinya perintah yang kamu gunakan tidak tepat!</b>\n\n<b>Note :</b>\n<a href='https://github.com/yt-dlp/yt-dlp/blob/master/supportedsites.md'>Link yang disupport YT-DLP!</a>", 
                 COMMAND_USAGE["yt"][1]
             )
             self.removeFromSameDir()
@@ -457,7 +457,7 @@ class YtDlp(TaskListener):
             LOGGER.error(error)
             await sendMessage(
                 self.message,
-                f"<b>Terjadi kesalahan!</b>\n<code>{error[:4000]}</code>\n\n<b>Bantuan :</b>\n<a href='https://github.com/yt-dlp/yt-dlp/blob/master/supportedsites.md'>Link yang disupport YT-DLP.</a>",
+                f"<b>Terjadi kesalahan!</b>\n<code>{error[:4000]}</code>\n\n<b>Note :</b>\n<a href='https://github.com/yt-dlp/yt-dlp/blob/master/supportedsites.md'>Link yang disupport YT-DLP!</a>",
                 COMMAND_USAGE["yt"][1]
             )
             self.removeFromSameDir()
