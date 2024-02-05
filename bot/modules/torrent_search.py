@@ -426,10 +426,10 @@ async def torrentSearchUpdate(_, query):
         await query.answer()
         site = data[2]
         method = data[3]
-        msg = "<b>Mencari Torrent...</b>"
-        msg += "\n╾────────────╼\n"
+        msg = "<b><i>Sedang mencari Torrent...</b></i>"
+        msg += "\n╾────────────╼╼\n"
         if method.startswith("api"):
-            msg += f"<b>Situs :</b> <code>{SITES.get(site)}</code>"
+            msg += f"<b>Website :</b> <code>{SITES.get(site)}</code>"
             if key is None:
                 if method == "apirecent":
                     endpoint = "Api Recent"
