@@ -55,7 +55,7 @@ async def select(_, message):
         and task.listener.userId != user_id
         and (user_id not in user_data or not user_data[user_id].get("is_sudo"))
     ):
-        await sendMessage(message, "<b>Bukan tugas darimu!</b>")
+        await sendMessage(message, "<b>Bukan Tugas darimu!</b>")
         return
     if await sync_to_async(task.status) not in [
         MirrorStatus.STATUS_DOWNLOADING,
@@ -87,7 +87,7 @@ async def select(_, message):
                     )
         task.listener.select = True
     except:
-        await sendMessage(message, "<b>Bukan tugas bittorrent!</b>")
+        await sendMessage(message, "<b>Bukan Tugas bittorrent!</b>")
         return
 
     SBUTTONS = bt_selection_buttons(id_)
@@ -105,7 +105,7 @@ async def get_confirm(_, query):
         await deleteMessage(message)
         return
     if user_id != task.listener.userId:
-        await query.answer("Bukan tugas darimu!", show_alert=True)
+        await query.answer("Bukan Tugas darimu!", show_alert=True)
     elif data[1] == "pin":
         await query.answer(data[3], show_alert=True)
     elif data[1] == "done":
