@@ -2,12 +2,13 @@ from asyncio import Event, sleep
 
 from bot import (
     config_dict,
+    LOGGER,
+    non_queued_dl,
+    non_queued_up,
+    queue_dict_lock,
     queued_dl,
     queued_up,
-    non_queued_up,
-    non_queued_dl,
-    queue_dict_lock,
-    LOGGER
+    USE_TELEGRAPH,
 )
 from bot.helper.ext_utils.bot_utils import (
     sync_to_async,
@@ -43,15 +44,19 @@ async def stop_duplicate_check(listener):
             name = None
             
     if name is not None:
-        telegraph_content, contents_no = await sync_to_async(
+        content, contents_no = await sync_to_async(
             gdSearch(stopDup=True, noMulti=listener.isClone).drive_list,
             name,
             listener.upDest,
             listener.userId,
         )
-        if telegraph_content:
+        if content:
             msg = f"File/Folder ini sudah ada di Google Drive!\n{contents_no} hasil pencarian :"
-            button = await get_telegraph_list(telegraph_content)
+            if USE_TELEGRAPH:
+                button = await get_telegraph_list(content)
+            else:
+                button = content
+                
             return msg, button
         
     return False, None
