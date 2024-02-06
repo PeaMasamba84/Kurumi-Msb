@@ -5,20 +5,21 @@ from html import escape
 from requests import utils as rutils
 
 from bot import (
-    bot,
-    Intervals,
     aria2,
-    DOWNLOAD_DIR,
-    task_dict,
-    task_dict_lock,
-    LOGGER,
-    DATABASE_URL,
+    bot,
     config_dict,
-    non_queued_up,
+    DATABASE_URL,
+    DOWNLOAD_DIR,
+    Intervals,
+    LOGGER,
     non_queued_dl,
-    queued_up,
-    queued_dl,
+    non_queued_up,
     queue_dict_lock,
+    queued_dl,
+    queued_up,
+    task_dict_lock,
+    task_dict,
+    USE_TELEGRAPH,
 )
 from bot.helper.common import TaskConfig
 from bot.helper.ext_utils.bot_utils import sync_to_async
@@ -256,7 +257,7 @@ class TaskListener(TaskConfig):
             if not files:
                 await sendMessage(self.message, msg)
             else:
-                fmsg = ""
+                fmsg = "<b>List File</b>\n"
                 for index, (link, name) in enumerate(files.items(), start=1):
                     fmsg += f"<b>{index:02d}.</b> <a href='{link}'>{name}</a>\n"
                     if len(fmsg.encode() + msg.encode()) > 4000:
@@ -286,7 +287,7 @@ class TaskListener(TaskConfig):
             ):
                 buttons = ButtonMaker()
                 if link:
-                    buttons.ubutton("☁️ Cloud Link", link)
+                    buttons.ubutton("💭 Cloud Link", link)
                 if rclonePath:
                     msg += f"\n\n<b>📙 Path :</b> <code>{rclonePath}</code>"
                 if (
@@ -385,8 +386,32 @@ class TaskListener(TaskConfig):
                 del task_dict[self.mid]
             count = len(task_dict)
             self.removeFromSameDir()
-        msg = f"<b>Hai {self.tag} !</b>\n<b>Tugasmu dihentikan karena :</b>\n<code>{escape(error)}</code>"
+        
+        msg = f"<b>Hai {self.tag} !</b>"
+        msg += "\n<b>Tugasmu dihentikan karena :</b>"
+        msg += f"\n<code>{escape(error)}</code>"
+        
+        if (
+            not USE_TELEGRAPH
+            and "file/folder ini sudah ada di google drive!" in escape(error).lower()
+        ):
+            content = [content for content in button for content in content.split("\n\n")]
+            
+            for _, data in enumerate(content, start=1):
+                if "Hasil pencarian Google Drive" in data:
+                    data = data.replace("Hasil pencarian Google Drive", "")
+                    msg += data
+                    
+                else:
+                    msg += "\n\n" + data
+            
+            button = None
+            
+            if len(msg) > 4096:
+                msg = msg[:4090] + "\n..."
+            
         await sendMessage(self.message, msg, button)
+        
         if count == 0:
             await self.clean()
         else:
