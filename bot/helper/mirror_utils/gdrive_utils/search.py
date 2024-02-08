@@ -133,9 +133,9 @@ class gdSearch(GoogleDriveHelper):
                     continue
             if not Title:
                 if USE_TELEGRAPH:
-                    msg += f"<h4>Hasil pencarian Google Drive</h4>"
+                    msg += f"<h4>Hasil pencarian di Drive kami</h4>"
                 else:
-                    msg += f"<b>Hasil pencarian Google Drive</b>"
+                    msg += f"<b>Hasil pencarian di Drive kami</b>"
                 Title = True
             if drive_name:
                 if USE_TELEGRAPH:
@@ -176,7 +176,7 @@ class gdSearch(GoogleDriveHelper):
                         msg += f' <b>| <a href="{url}">⚡ Index</a></b>'
                         if mime_type.startswith(("image", "video", "audio")):
                             urlv = f'{index_url}findpath?id={file.get("id")}&view=true'
-                            msg += f' <b>| <a href="{urlv}">🎬 View</a></b>'
+                            msg += f' <b>| <a href="{urlv}">📺 Media Link</a></b>'
 
                 if USE_TELEGRAPH:
                     msg += "<br><br>"
