@@ -253,6 +253,8 @@ def direct_link_generator(link: str):
         return yandex_disk(link)
     elif "sfile.mobi" in domain:
         return sfile(link)
+    elif "qiwi.gg" in domain:
+        return qiwi(link)
     # Add AllDebrid supported link here
     elif any(
         x in domain
@@ -1643,11 +1645,11 @@ def alldebrid(url: str):
 def pake(url: str):
     """
     URL : 
-    https://api.pake.tk
+    https://api.pake.tk/
     
     Supported Sites :
-    - Dood
-    - Vidstream
+    - All sites based Dood
+    - All sites based Vidstream
     """
     with Session() as session:
         try:
@@ -2000,47 +2002,66 @@ def hexupload(url: str):
         
 
 def bigota(url):
-    direct_link = sub(r"https?://(bigota|hugeota)\.d\.miui\.com", "https://cdn-ota.azureedge.net", url)
-    return direct_link
+    """
+    URL : 
+    https://github.com/aenulrofik/pikabot_v2/ (Source)
+    
+    Supported Sites : 
+    https://bigota.d.miui.com/
+    """
+    return sub(r"https?://(bigota|hugeota)\.d\.miui\.com", "https://cdn-ota.azureedge.net", url)
 
 
 def yandex_disk(url):
-    try:
-        r = get(
-            "https://cloud-api.yandex.net/v1/disk/public/resources/download",
-            params={
-                "public_key": url,
+    """
+    URL : 
+    https://github.com/aenulrofik/pikabot_v2/ (Source)
+    
+    Supported Sites : 
+    - https://disk.yandex.ru/
+    - https://yadi.sk/
+    """
+    r = get(
+        "https://cloud-api.yandex.net/v1/disk/public/resources/download",
+        params={
+            "public_key": url,
+        }
+    )
+    
+    if r.ok:
+        data = r.json()
+        return data["href"]
+    
+    else:
+        raise DirectDownloadLinkException(f"ERROR: [{r.status_code}] {r.text}")
+    
+
+def sfile(url):
+    """
+    URL : 
+    https://github.com/aenulrofik/pikabot_v2/ (Source)
+    
+    Supported Sites : 
+    https://sfile.mobi/
+    """
+    with Session() as session:
+        r = session.get(url).text
+        bs = BeautifulSoup(r, "html.parser")
+        download_link = bs.find("a", class_= "w3-button w3-blue w3-round").get("href")
+        
+        r = session.get(
+            download_link,
+            headers={
+                "Referer": url, 
+                "User-Agent": userAgent,
+                "Cache-Control": "max-age=0", 
+                "Upgrade-Insecure-Requests": "1", 
             }
         )
         
         if r.ok:
-            r = r.json()
-            return r["href"]
-        else:
-            raise DirectDownloadLinkException(f"ERROR: Link File tidak ditemukan!")
-    except Exception:
-        raise DirectDownloadLinkException(f"ERROR: Link File tidak ditemukan!")
-    
-
-def sfile(url):
-    with Session() as session:
-        try:
-            r = session.get(url).text
-            bs = BeautifulSoup(r, "html.parser")
-            download_link = bs.find("a", class_= "w3-button w3-blue w3-round").get("href")
-            
-            r = session.get(
-                download_link,
-                headers={
-                    "Referer": url, 
-                    "User-Agent": userAgent,
-                    "Cache-Control": "max-age=0", 
-                    "Upgrade-Insecure-Requests": "1", 
-                }
-            ).text
-            
             pattern = compile(r"location\.href=this\.href\+\'&k=\'\+\'([a-f0-9]{1,32})\'(?:;return\sfalse;)?")
-            pattern_match = pattern.search(r)
+            pattern_match = pattern.search(r.text)
             if pattern_match:
                 pattern_match = pattern_match.group(1)
             else:
@@ -2050,6 +2071,37 @@ def sfile(url):
             direct_link = bs.find("a", {"id": "download"}).get("href")
             session.close()
             return f"{direct_link}&k={pattern_match}", f"Referer: {download_link}"
-        except:
+        
+        else:
             session.close()
-            raise DirectDownloadLinkException(f"ERROR: Link File tidak ditemukan!")
+            raise DirectDownloadLinkException(f"ERROR: [{r.status_code}] {r.text}")
+
+
+def qiwi(url: str) -> str:
+    """
+    URL : 
+    https://github.com/aenulrofik/pikabot_v2/ (Source)
+    
+    Supported Sites : 
+    https://qiwi.gg/
+    """
+    with Session() as session:
+        ids = url.split("/")[-1]
+        
+        r = session.get(url)
+        if r.ok:
+            data = BeautifulSoup(r.text, "html.parser")
+            name = data.find("h1", class_="page_TextHeading__VsM7r")
+            
+            if name:
+                ext = name.text.split(".")[-1]
+                session.close()
+                return f"https://qiwi.lol/{ids}.{ext}"
+
+            else:
+                session.close()
+                raise DirectDownloadLinkException(f"ERROR: Link File tidak ditemukan!")
+        
+        else:
+            session.close()
+            raise DirectDownloadLinkException(f"ERROR: [{r.status_code}] {r.text}")
