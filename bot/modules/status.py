@@ -46,7 +46,7 @@ async def mirror_status(_, message):
         msg += (
             f"\n<b>CPU :</b> <code>{cpu_percent()}%</code> | <b>FREE :</b> <code>{get_readable_file_size(disk_usage(DOWNLOAD_DIR).free)}</code>" \
             f"\n<b>RAM :</b> <code>{virtual_memory().percent}%</code> | <b>UPTIME :</b> <code>{get_readable_time(time() - botStartTime)}</code>" \
-            f"\n<b>T.Unduh :</b> <code>{get_readable_file_size(net_io_counters().bytes_sent)}</code> | <b>T.Unggah :</b> <code>{get_readable_file_size(net_io_counters().bytes_recv)}</code>" 
+            f"\n<b>T.Unduh :</b> <code>{get_readable_file_size(net_io_counters().bytes_recv)}</code> | <b>T. Unggah :</b> <code>{get_readable_file_size(net_io_counters().bytes_sent)}</code>"  
         )
         reply_message = await sendMessage(message, msg)
         await auto_delete_message(message, reply_message)
@@ -147,7 +147,6 @@ EX : {tasks['Extract']} | SP : {tasks['Split']} | QD : {tasks['QueueDl']} | QU :
 CL : {tasks['Clone']} | CH : {tasks['CheckUp']} | PA : {tasks['Pause']} | SV : {tasks['SamVid']}
 CM : {tasks['ConvertMedia']}
 
-🌾𝑺𝒑𝒆𝒆𝒅 𝑺𝒆𝒆𝒅 : {get_readable_file_size(seed_speed)}/s
 📤𝑺𝒑𝒆𝒆𝒅 𝑼𝒏𝒅𝒖𝒉 : {get_readable_file_size(dl_speed)}/s
 📥𝑺𝒑𝒆𝒆𝒅 𝑼𝒏𝒈𝒈𝒂𝒉 : {get_readable_file_size(up_speed)}/s
 
