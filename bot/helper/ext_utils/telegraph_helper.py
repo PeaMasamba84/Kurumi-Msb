@@ -13,11 +13,14 @@ class TelegraphHelper:
         self._author_url = author_url
 
     async def create_account(self):
-        await self._telegraph.create_account(
-            short_name=token_urlsafe(8),
-            author_name=self._author_name,
-            author_url=self._author_url,
-        )
+        try:
+            await self._telegraph.create_account(
+                short_name=token_urlsafe(8),
+                author_name=self._author_name,
+                author_url=self._author_url,
+            )
+        except Exception as e:
+            LOGGER.error(f"Failed to create Telegraph Account: {e}")
         LOGGER.info("Creating Telegraph Account")
 
     async def create_page(self, title, content):
