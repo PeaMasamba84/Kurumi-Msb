@@ -139,6 +139,8 @@ def direct_link_generator(link: str):
             "dood.stream",
             "doods.pro",
             "ds2play.com",
+            "d0o0d.com",
+            "ds2video.com",
             "do0od.com",
         ]
     ):
@@ -193,7 +195,15 @@ def direct_link_generator(link: str):
         return filelions_and_streamwish(link)
     elif any(x in domain for x in ["streamhub.ink", "streamhub.to"]):
         return streamhub(link)
-    elif any(x in domain for x in ["linkbox.to", "lbx.to"]):
+    elif any(
+        x in domain
+        for x in [
+            "linkbox.to",
+            "lbx.to",
+            "teltobx.net",
+            "telbx.net",
+        ]
+    ):
         return linkBox(link)
     elif any(x in domain for x in ["teltobx.net", "telbx.net"]):
         return teltobx(link)
@@ -1065,8 +1075,11 @@ def linkBox(url:str):
             if "msg" in _json:
                 raise DirectDownloadLinkException(f"ERROR: {_json['msg']}")
             raise DirectDownloadLinkException("ERROR: Data tidak ditemukan!")
-        if data["shareType"] == "singleItem":
-            return __singleItem(session, data["itemId"])
+        try:
+            if data["shareType"] == "singleItem":
+                return __singleItem(session, data["itemId"])
+        except:
+            pass
         if not details["title"]:
             details["title"] = data["dirName"]
         contents = data["list"]
