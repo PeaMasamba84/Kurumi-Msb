@@ -287,7 +287,7 @@ class TaskListener(TaskConfig):
             ):
                 buttons = ButtonMaker()
                 if link:
-                    buttons.ubutton("🌩 Cloud Link", link)
+                    buttons.ubutton("🌩 Cloud", link)
                 if rclonePath:
                     msg += f"\n\n<b>📙 Path :</b> <code>{rclonePath}</code>"
                 if (
@@ -300,7 +300,7 @@ class TaskListener(TaskConfig):
                     share_url = f"{RCLONE_SERVE_URL}/{remote}/{url_path}"
                     if mime_type == "Folder":
                         share_url += "/"
-                    buttons.ubutton("🔗 Rclone Link", share_url)
+                    buttons.ubutton("🔗 Rclone", share_url)
                 if not rclonePath and dir_id:
                     INDEX_URL = ""
                     if self.privateLink:
@@ -309,7 +309,7 @@ class TaskListener(TaskConfig):
                         INDEX_URL = config_dict["INDEX_URL"]
                     if INDEX_URL:
                         share_url = f"{INDEX_URL}findpath?id={dir_id}"
-                        buttons.ubutton("⚡ Index Link", share_url)
+                        buttons.ubutton("⚡ Index", share_url)
                         if mime_type.startswith(("image", "video", "audio")):
                             share_urls = f"{INDEX_URL}findpath?id={dir_id}&view=true"
                             buttons.ubutton("📺 Media Link", share_urls)
