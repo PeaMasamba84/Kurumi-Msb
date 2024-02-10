@@ -20,15 +20,16 @@ from signal import signal, SIGINT
 from sys import executable
 from time import time
 from bot import (
-    bot, 
-    botStartTime, 
-    config_dict, 
-    DATABASE_URL, 
-    INCOMPLETE_TASK_NOTIFIER, 
-    Intervals, 
+    bot,
+    bot_name,
+    botStartTime,
+    config_dict,
+    DATABASE_URL,
+    INCOMPLETE_TASK_NOTIFIER,
+    Intervals,
     IS_PREMIUM_USER,
-    LOGGER, 
-    scheduler, 
+    LOGGER,
+    scheduler,
     user,
     Version,
 )
@@ -45,25 +46,25 @@ from .helper.telegram_helper.button_build import ButtonMaker
 from .helper.telegram_helper.filters import CustomFilters
 from .helper.telegram_helper.message_utils import sendMessage, editMessage, sendFile
 from .modules import (
-    authorize, 
-    bot_settings, 
-    cancel_task, 
-    clone, 
-    exec, 
+    authorize,
+    bot_settings,
+    cancel_task,
+    clone,
+    exec,
     force_start,
-    gd_count, 
-    gd_delete, 
-    gd_search, 
-    help, 
-    mirror_leech, 
-    rss, 
-    shell, 
+    gd_count,
+    gd_delete,
+    gd_search,
+    help,
+    mirror_leech,
+    rss,
+    shell,
     speedtest,
-    status, 
-    torrent_search, 
-    torrent_select, 
-    users_settings, 
-    ytdlp
+    status,
+    torrent_search,
+    torrent_select,
+    users_settings,
+    ytdlp,
 )
 
 
@@ -101,7 +102,7 @@ async def stats(_, message):
 <b>┌Bot DC       :</b> <code>{bot.me.dc_id} ({DC_ID.get(bot.me.dc_id)})</code>
 <b>├Bot ID       :</b> <code>{bot.me.id}</code>
 <b>├Bot Name     :</b> <code>{bot.me.first_name} {(bot.me.last_name or '')}</code>
-<b>├Bot Username :</b> <code>@{bot.me.username}</code>
+<b>├Bot Username :</b> <code>@{bot_name}</code>
 <b>├User DC      :</b> <code>{user.me.dc_id if user else '-'} {('(' + DC_ID.get(user.me.dc_id) + ')' if user else '')}</code>
 <b>├User ID      :</b> <code>{user.me.id if user else '-'}</code>
 <b>├User Name    :</b> <code>{(user.me.first_name if user else '-')} {((user.me.last_name if user else '') or '')}</code>
@@ -237,7 +238,7 @@ async def log(_, message):
 
 async def bot_help(_, message):
     help_string = f"""
-<b>Daftar Perintah</b> <code>@{bot.me.username}</code>
+<b>Daftar Perintah</b> <code>@{bot_name}</code>
 <code>/{BotCommands.StartCommand}</code> : Mulai Bot.
 <code>/{BotCommands.HelpCommand[0]}</code> atau <code>/{BotCommands.HelpCommand[1]}</code> : Cek semua perintah Bot.
 <code>/{BotCommands.MirrorCommand[0]}</code> atau <code>/{BotCommands.MirrorCommand[1]}</code> : Mirror ke Google Drive/Cloud menggunakan Aria2.
@@ -335,7 +336,7 @@ async def restart_notification():
         except Exception as e:
             LOGGER.error(e)
 
-    now = datetime.now(timezone(f"Asia/Makassar"))
+    now = datetime.now(timezone(f"Asia/Jakarta"))
     if INCOMPLETE_TASK_NOTIFIER and DATABASE_URL:
         if notifier_dict := await DbManager().get_incomplete_tasks():
             for cid, data in notifier_dict.items():
@@ -437,7 +438,7 @@ async def main():
             ) & CustomFilters.authorized
         )
     )
-    LOGGER.info(f"Bot Started! -> @{bot.me.username}")
+    LOGGER.info(f"Bot Started! -> @{bot_name}")
     signal(SIGINT, exit_clean_up)
 
 bot.loop.run_until_complete(main())
