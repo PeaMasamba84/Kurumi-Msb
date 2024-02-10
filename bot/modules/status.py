@@ -9,13 +9,14 @@ from pyrogram.handlers import MessageHandler, CallbackQueryHandler
 from time import time
 
 from bot import (
-    task_dict_lock,
-    status_dict,
-    task_dict,
+    bot,
+    bot_name,
     botStartTime,
     DOWNLOAD_DIR,
     Intervals,
-    bot,
+    status_dict,
+    task_dict_lock,
+    task_dict,
 )
 from bot.helper.ext_utils.bot_utils import new_task, sync_to_async
 from bot.helper.ext_utils.status_utils import (
@@ -40,13 +41,13 @@ async def mirror_status(_, message):
     async with task_dict_lock:
         count = len(task_dict)
     if count == 0:
-        msg = "<b>Kosong bro!</b>"
+        msg = "<b>Tidak ada Tugas AKTIF!</b>"
         msg += f"\n\n<b>Note :</b>\nTambahkan <code>me</code> atau <code>userId</code> setelah perintah untuk menampilkan Tugas secara spesifik!"
         msg += "\n___________________________"
         msg += (
-            f"\n<b>CPU :</b> <code>{cpu_percent()}%</code> | <b>FREE :</b> <code>{get_readable_file_size(disk_usage(DOWNLOAD_DIR).free)}</code>" \
-            f"\n<b>RAM :</b> <code>{virtual_memory().percent}%</code> | <b>UPTIME :</b> <code>{get_readable_time(time() - botStartTime)}</code>" \
-            f"\n<b>T.Unduh :</b> <code>{get_readable_file_size(net_io_counters().bytes_recv)}</code> | <b>T. Unggah :</b> <code>{get_readable_file_size(net_io_counters().bytes_sent)}</code>"  
+            f"\n<b>CPU :</b> <code>{cpu_percent()}%</code> | <b>RAM :</b> <code>{virtual_memory().percent}%</code>" \
+            f"\n<b>DISK :</b> <code>{get_readable_file_size(disk_usage(DOWNLOAD_DIR).free)}</code> | <b>UPTIME :</b> <code>{get_readable_time(time() - botStartTime)}</code>" \
+            f"\n<b>T.Unduh :</b> <code>{get_readable_file_size(net_io_counters().bytes_recv)}</code> | <b>T. Unggah :</b> <code>{get_readable_file_size(net_io_counters().bytes_sent)}</code>" 
         )
         reply_message = await sendMessage(message, msg)
         await auto_delete_message(message, reply_message)
