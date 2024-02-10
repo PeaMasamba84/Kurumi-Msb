@@ -8,20 +8,20 @@ from re import match as re_match
 
 from bot import bot, DOWNLOAD_DIR, LOGGER
 from bot.helper.ext_utils.bot_utils import (
+    arg_parser,
+    COMMAND_USAGE,
     get_content_type,
     new_task,
     sync_to_async,
-    arg_parser,
-    COMMAND_USAGE,
 )
 from bot.helper.ext_utils.exceptions import DirectDownloadLinkException
 from bot.helper.ext_utils.links_utils import (
-    is_url,
-    is_magnet,
+    is_gdrive_id,
     is_gdrive_link,
+    is_magnet,
     is_rclone_path,
     is_telegram_link,
-    is_gdrive_id,
+    is_url,
 )
 from bot.helper.listeners.task_listener import TaskListener
 from bot.helper.mirror_utils.download_utils.aria2_download import add_aria2c_download
@@ -38,7 +38,12 @@ from bot.helper.mirror_utils.download_utils.direct_link_generator import (
 )
 from bot.helper.telegram_helper.bot_commands import BotCommands
 from bot.helper.telegram_helper.filters import CustomFilters
-from bot.helper.telegram_helper.message_utils import editMessage, deleteMessage, sendMessage, get_tg_link_message
+from bot.helper.telegram_helper.message_utils import (
+    deleteMessage,
+    editMessage,
+    get_tg_link_message,
+    sendMessage,
+)
 
 
 class Mirror(TaskListener):
