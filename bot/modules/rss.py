@@ -24,7 +24,7 @@ from bot.helper.telegram_helper.message_utils import (
     editMessage,
     sendFile,
     deleteMessage,
-    customSendRss
+    customSendRss,
 )
 
 
