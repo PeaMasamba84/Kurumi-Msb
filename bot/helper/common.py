@@ -462,7 +462,10 @@ class TaskConfig:
                                 return False
                             code = self.suproc.returncode
                             if code != 0:
-                                stderr = stderr.decode().strip()
+                                try:
+                                    stderr = stderr.decode().strip()
+                                except:
+                                    stderr = "Unable to decode the error!"
                                 LOGGER.error(
                                     f"{stderr}. Unable to extract archive splits!. Path: {f_path}"
                                 )
@@ -515,7 +518,10 @@ class TaskConfig:
                             self.cancelled = True
                     return up_path
                 elif code != -9:
-                    stderr = stderr.decode().strip()
+                    try:
+                        stderr = stderr.decode().strip()
+                    except:
+                        stderr = "Unable to decode the error!"
                     LOGGER.error(
                         f"{stderr}. Unable to extract archive! Uploading anyway. Path: {dl_path}"
                     )
@@ -599,7 +605,10 @@ class TaskConfig:
             await clean_target(self.newDir)
             if not delete:
                 self.newDir = ""
-            stderr = stderr.decode().strip()
+            try:
+                stderr = stderr.decode().strip()
+            except:
+                stderr = "Unable to decode the error!"
             LOGGER.error(f"{stderr}. Unable to zip this path: {dl_path}")
             return dl_path
         else:
@@ -621,17 +630,21 @@ class TaskConfig:
                             task_dict[self.mid] = SplitStatus(self, gid)
                         LOGGER.info(f"Splitting: {self.name}")
                     res = await split_file(
-                        f_path, f_size, dirpath, self.splitSize, self
+                        f_path, f_size, dirpath, file_, self.splitSize, self
                     )
                     if self.cancelled:
                         return
                     if not res:
-                        if f_size <= self.maxSplitSize:
-                            continue
-                        try:
-                            await remove(f_path)
-                        except:
-                            return
+                        if f_size >= self.maxSplitSize:
+                            if self.seed and not self.newDir:
+                                m_size.append(f_size)
+                                o_files.append(f_path)
+                            else:
+                                try:
+                                    await remove(f_path)
+                                except:
+                                    return
+                        continue
                     elif not self.seed or self.newDir:
                         try:
                             await remove(f_path)
@@ -660,7 +673,7 @@ class TaskConfig:
                 await cpu_eater_lock.acquire()
                 LOGGER.info(f"Creating Sample video: {self.name}")
                 res = await createSampleVideo(
-                    self, dl_path, sample_duration, part_duration, True
+                    self, dl_path, sample_duration, part_duration
                 )
                 cpu_eater_lock.release()
                 if res:
