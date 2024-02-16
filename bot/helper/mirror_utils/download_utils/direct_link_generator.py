@@ -265,6 +265,10 @@ def direct_link_generator(link: str):
         return sfile(link)
     elif "qiwi.gg" in domain:
         return qiwi(link)
+    elif "sharepoint.com" in domain:
+        return sharepoint(link)
+    elif "berkasdrive.com" in domain:
+        return berkasdrive(link)
     # Add AllDebrid supported link here
     elif any(
         x in domain
@@ -1549,7 +1553,7 @@ def filelions_and_streamwish(url):
         apiKey = config_dict["STREAMWISH_API"]
         apiUrl = "https://api.streamwish.com"
     if not apiKey:
-        raise DirectDownloadLinkException(f"ERROR: Api Key tidak ditemukan! URL : {scheme}://{hostname}")
+        raise DirectDownloadLinkException(f"ERROR: Api Key tidak ditemukan! Source :{scheme}://{hostname}")
     file_code = url.split("/")[-1]
     quality = ""
     if bool(file_code.endswith(("_o", "_h", "_n", "_l"))):
@@ -1625,7 +1629,7 @@ def pcloud(url):
 # Added from other repositories
 def alldebrid(url: str):
     """
-    URL : 
+    Source :
     https://api.alldebrid.com/
     
     Documentation :
@@ -1646,18 +1650,16 @@ def alldebrid(url: str):
         if r.ok:
             r = r.json()
             if r["status"] == "success":
-                session.close()
                 if r["data"]["host"] == "stream":
                     raise DirectDownloadLinkException("ERROR: Tidak support stream. Gunakan perintah YT-DLP!")
                 return r["data"]["link"]
             else:
-                session.close()
                 raise DirectDownloadLinkException(f"ERROR: {r['error']['message']}")
         
 
 def pake(url: str):
     """
-    URL : 
+    Source :
     https://api.pake.tk/
     
     Supported Sites :
@@ -1680,13 +1682,10 @@ def pake(url: str):
             
                 details["contents"].append(item)
                 
-                session.close()
                 return details
             except ValueError:
-                session.close()
                 raise DirectDownloadLinkException(f"ERROR: Link File tidak ditemukan!")
         except:
-            session.close()
             raise DirectDownloadLinkException(f"ERROR: Link File tidak ditemukan!")
 
 
@@ -1699,7 +1698,6 @@ def mp4upload(url: str):
             inputs = soup.find_all("input")
             data = {input.get("name"): input.get("value") for input in inputs}
             if not data:
-                session.close()
                 raise DirectDownloadLinkException("ERROR: Link File tidak ditemukan!")
             post = session.post(
                 url, 
@@ -1712,7 +1710,6 @@ def mp4upload(url: str):
             inputs = soup.find_all("form", {"name": "F1"})[0].find_all("input")
             data = {input.get("name"): input.get("value").replace(" ", "") for input in inputs}
             if not data:
-                session.close()
                 raise DirectDownloadLinkException("ERROR: Link File tidak ditemukan!")
             data["referer"] = url
             urllib3.disable_warnings()
@@ -1721,10 +1718,8 @@ def mp4upload(url: str):
                 data=data, 
                 verify=False
             ).url
-            session.close()
             return direct_link
         except:
-            session.close()
             raise DirectDownloadLinkException("ERROR: Link File tidak ditemukan!")
     
 
@@ -1735,10 +1730,8 @@ def androiddatahost(url: str):
             soup = BeautifulSoup(req, "html.parser")
             link = soup.find("div", {"download2"})
             direct_link = link.find("a")["href"]
-            session.close()
             return direct_link
         except:
-            session.close()
             raise DirectDownloadLinkException(f"ERROR: Link File tidak ditemukan!")
     
 
@@ -1762,10 +1755,8 @@ def apkadmin(url: str):
             soup = BeautifulSoup(post, "lxml")
             link = soup.find("div", {"class": "text text-center"})
             direct_link = link.find("a")["href"]
-            session.close()
             return direct_link
         except:
-            session.close()
             raise DirectDownloadLinkException(f"ERROR: Link File tidak ditemukan!")
     
 
@@ -1779,7 +1770,6 @@ def sourceforge(url: str):
             try:
                 link = findall(r"\bhttps?://sourceforge\.net\S+", url)[0]
             except IndexError:
-                session.close()
                 raise DirectDownloadLinkException("ERROR: Link SourceForge tidak ditemukan!")
             file_id = findall(r"files(.*)", link)[0]
             project = findall(r"projects?/(.*?)/files", link)[0]
@@ -1788,10 +1778,8 @@ def sourceforge(url: str):
             mirror = soup.find("ul", {"id": "mirrorList"}).findAll("li")
             for i in mirror[1:]:
                 direct_link = f"https://{i['id']}.dl.sourceforge.net/project/{project}/{file_id}?viasf=1"
-            session.close()
             return direct_link
         except:
-            session.close()
             raise DirectDownloadLinkException(f"ERROR: Link File tidak ditemukan!")
 
 
@@ -1801,7 +1789,6 @@ def androidfilehost(url):
             try:
                 url = findall(r"\bhttps?://.*androidfilehost.*fid.*\S+", url)[0]
             except IndexError:
-                session.close()
                 raise DirectDownloadLinkException("ERROR: Link AndroidFileHost tidak ditemukan!")
             file_id = findall(r"\?fid=(.*)", url)[0]
             cookies = session.get(url).cookies
@@ -1823,13 +1810,10 @@ def androidfilehost(url):
             ).json()
             if link := post["MIRRORS"]:
                 direct_link = next(i for i in link if i["url"])["url"]
-                session.close()
                 return direct_link
             else:
-                session.close()
                 raise Exception(f"ERROR: Link File tidak ditemukan!")
         except:
-            session.close()
             raise DirectDownloadLinkException(f"ERROR: Link File tidak ditemukan!")
 
 
@@ -1854,13 +1838,10 @@ def tusfiles(url: str):
                 allow_redirects=False
             )
             if direct_link := post.headers["location"]:
-                session.close()
                 return direct_link
             else:
-                session.close()
                 raise DirectDownloadLinkException(f"ERROR: Link File tidak ditemukan!")  
         except:
-            session.close()
             raise DirectDownloadLinkException(f"ERROR: Link File tidak ditemukan!")
     
 
@@ -1882,10 +1863,8 @@ def pandafiles(url: str):
                 }).content
             soup = BeautifulSoup(post)
             direct_link = soup.find("div", {"id": "direct_link"}).find("a")["href"]
-            session.close()
             return direct_link
         except:
-            session.close()
             raise DirectDownloadLinkException(f"ERROR: Link File tidak ditemukan!")
     
 
@@ -1902,7 +1881,6 @@ def uploadhaven(url: str):
             if d is not None:
                 hot1 = soup.find("div", {"class": "alert alert-danger col-md-12"})
                 hot_text = hot1.text.strip()
-                session.close()
                 raise DirectDownloadLinkException(f"ERROR: {str(hot_text)}")
             else:
                 for _ in range(6, 0, -1):
@@ -1922,10 +1900,8 @@ def uploadhaven(url: str):
                 ).text
                 soup = BeautifulSoup(post, "lxml")
                 direct_link = soup.find("div", class_="alert alert-success mb-0").find("a")["href"]
-                session.close()
                 return direct_link
         except:
-            session.close()
             raise DirectDownloadLinkException(f"ERROR: Link File tidak ditemukan!")
 
 
@@ -1949,10 +1925,8 @@ def uploadrar(url: str):
             ).text
             soup = BeautifulSoup(post, "lxml")
             direct_link = soup.find("span", {"id": "direct_link"}).find("a").get("href")
-            session.close()
             return direct_link
         except:
-            session.close()
             raise DirectDownloadLinkException(f"ERROR: Link File tidak ditemukan!")
     
 
@@ -1976,10 +1950,8 @@ def romsget(url: str):
             udl = soup.find("form", {"name": "redirected"}).get("action")
             prm = soup.find("input", {"name": "attach"}).get("value")
             direct_link = f"{udl}?attach={prm}"
-            session.close()
             return direct_link
         except:
-            session.close()
             raise DirectDownloadLinkException(f"ERROR: Link File tidak ditemukan!")
 
 
@@ -2004,20 +1976,17 @@ def hexupload(url: str):
             ).text
             link = search(r"ldl.ld\('([^']+)", post)
             if direct_link := base64.b64decode(link.group(1)).decode("utf-8").replace(" ", "%20"):
-                session.close()
                 return direct_link
             else:
-                session.close()
                 raise DirectDownloadLinkException(f"ERROR: Link File tidak ditemukan!")
         except:
-            session.close()
             raise DirectDownloadLinkException(f"ERROR: Link File tidak ditemukan!")
         
 
 def bigota(url):
     """
-    URL : 
-    https://github.com/aenulrofik/pikabot_v2/ (Source)
+    Source :
+    https://github.com/aenulrofik/pikabot_v2/
     
     Supported Sites : 
     https://bigota.d.miui.com/
@@ -2027,8 +1996,8 @@ def bigota(url):
 
 def yandex_disk(url):
     """
-    URL : 
-    https://github.com/aenulrofik/pikabot_v2/ (Source)
+    Source :
+    https://github.com/aenulrofik/pikabot_v2/
     
     Supported Sites : 
     - https://disk.yandex.ru/
@@ -2040,27 +2009,30 @@ def yandex_disk(url):
             "public_key": url,
         }
     )
-    
-    if r.ok:
-        data = r.json()
-        return data["href"]
-    
-    else:
+
+    if not r.ok:
         raise DirectDownloadLinkException(f"ERROR: [{r.status_code}] {r.text}")
+    
+    data = r.json()
+    return data["href"]
+    
     
 
 def sfile(url):
     """
-    URL : 
-    https://github.com/aenulrofik/pikabot_v2/ (Source)
+    Source :
+    https://github.com/aenulrofik/pikabot_v2/
     
     Supported Sites : 
     https://sfile.mobi/
     """
     with Session() as session:
-        r = session.get(url).text
-        bs = BeautifulSoup(r, "html.parser")
-        download_link = bs.find("a", class_= "w3-button w3-blue w3-round").get("href")
+        r = session.get(url)
+        if not r.ok:
+            raise DirectDownloadLinkException(f"ERROR: [{r.status_code}] {r.text}")
+
+        html = BeautifulSoup(r.text, "html.parser")
+        download_link = html.find("a", class_= "w3-button w3-blue w3-round").get("href")
         
         r = session.get(
             download_link,
@@ -2071,29 +2043,29 @@ def sfile(url):
                 "Upgrade-Insecure-Requests": "1", 
             }
         )
+
+        if not r.ok:
+            raise DirectDownloadLinkException(f"ERROR: [{r.status_code}] {r.text}")
         
-        if r.ok:
-            pattern = compile(r"location\.href=this\.href\+\'&k=\'\+\'([a-f0-9]{1,32})\'(?:;return\sfalse;)?")
-            pattern_match = pattern.search(r.text)
-            if pattern_match:
-                pattern_match = pattern_match.group(1)
-            else:
-                pattern_match = ""
-            
-            bs = BeautifulSoup(r, "html.parser")
-            direct_link = bs.find("a", {"id": "download"}).get("href")
-            session.close()
+        pattern = compile(r"location\.href=this\.href\+\'&k=\'\+\'([a-f0-9]{1,32})\'(?:;return\sfalse;)?")
+        pattern_match = pattern.search(r.text)
+        if pattern_match:
+            pattern_match = pattern_match.group(1)
+        else:
+            pattern_match = ""
+        
+        html = BeautifulSoup(r, "html.parser")
+        if direct_link := html.find("a", {"id": "download"}).get("href"):
             return f"{direct_link}&k={pattern_match}", f"Referer: {download_link}"
         
         else:
-            session.close()
-            raise DirectDownloadLinkException(f"ERROR: [{r.status_code}] {r.text}")
+            raise DirectDownloadLinkException(f"ERROR: Link File tidak ditemukan!")
 
 
 def qiwi(url: str) -> str:
     """
-    URL : 
-    https://github.com/aenulrofik/pikabot_v2/ (Source)
+    Source :
+    https://github.com/aenulrofik/pikabot_v2/
     
     Supported Sites : 
     https://qiwi.gg/
@@ -2102,19 +2074,53 @@ def qiwi(url: str) -> str:
         ids = url.split("/")[-1]
         
         r = session.get(url)
-        if r.ok:
-            data = BeautifulSoup(r.text, "html.parser")
-            name = data.find("h1", class_="page_TextHeading__VsM7r")
-            
-            if name:
-                ext = name.text.split(".")[-1]
-                session.close()
-                return f"https://qiwi.lol/{ids}.{ext}"
+        if not r.ok:
+            raise DirectDownloadLinkException(f"ERROR: [{r.status_code}] {r.text}")
+        
+        html = BeautifulSoup(r.text, "html.parser")
+        if name := html.find("h1", class_="page_TextHeading__VsM7r"):
+            ext = name.text.split(".")[-1]
+            return f"https://qiwi.lol/{ids}.{ext}"
 
-            else:
-                session.close()
-                raise DirectDownloadLinkException(f"ERROR: Link File tidak ditemukan!")
+        else:
+            raise DirectDownloadLinkException(f"ERROR: Link File tidak ditemukan!")
+        
+
+def sharepoint(url: str) -> str:
+    """
+    Source :
+    https://github.com/aenulrofik/pikabot_v2/
+    
+    Supported Sites : 
+    https://www.microsoft.com/ (SharePoint)
+    """
+    url = sub("e=[\w]+", "", url)
+    url = url.replace("??", "?")
+    if not search(r"download=1", url):
+        if "?" in url:
+            url += "&"
+        else:
+            url += "?"
+        url += "download=1"
+    return url
+
+
+def berkasdrive(url: str) -> str:
+    """
+    Source :
+    https://github.com/aenulrofik/pikabot_v2/
+    
+    Supported Sites : 
+    https://berkasdrive.com/
+    """
+    with Session() as session:
+        r = session.get(url)
+        if not r.ok:
+            raise DirectDownloadLinkException(f"ERROR: [{r.status_code}] {r.text}")
+    
+        html = HTML(r.text)
+        if direct_link := html.xpath('//script')[0].text.split('"')[1]:
+            return base64.b64decode(direct_link).decode("UTF-8")
         
         else:
-            session.close()
-            raise DirectDownloadLinkException(f"ERROR: [{r.status_code}] {r.text}")
+            raise DirectDownloadLinkException(f"ERROR: Link File tidak ditemukan!")
