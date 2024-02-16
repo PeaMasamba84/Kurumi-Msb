@@ -84,7 +84,7 @@ try:
     Version.ff = check_output(["opera -version | grep 'ffmpeg version' | sed -e 's/ffmpeg version //' -e 's/[^0-9.].*//'"], shell=True).decode().replace("\n", "")
     Version.ga = check_output(["pip show google-api-python-client | grep Version"], shell=True).decode().split(" ", 1)[1].replace("\n", "")
     Version.jd = jdv
-    Version.jv = check_output(["safari --version | grep openjdk"], shell=True).decode().split(" ")[1]
+    Version.jv = check_output(["safari --version"], shell=True).decode().split(" ")[1]
     Version.p7 = check_output(["7z | grep 7-Zip"], shell=True).decode().split(" ")[2]
     Version.pr = prv
     Version.py = check_output(["python --version"], shell=True).decode().split()[-1]
