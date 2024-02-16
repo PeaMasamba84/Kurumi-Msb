@@ -45,21 +45,23 @@ async def editMessage(message, text, buttons=None, block=True):
         return str(e)
    
 
-async def copyMessage(chat_id:int, from_chat_id:int, message_id=int, message_thread_id=None, is_media_group=False):
+async def copyMessage(chat_id:int, from_chat_id:int, message_id=int, message_thread_id=None, reply_to_message_id=None, is_media_group=False):
     try:
         if is_media_group:
-            await bot.copy_media_group(
+            return await bot.copy_media_group(
                 chat_id=chat_id, 
                 from_chat_id=from_chat_id, 
                 message_id=message_id, 
-                message_thread_id=message_thread_id
+                message_thread_id=message_thread_id,
+                reply_to_message_id=reply_to_message_id
             )
         else:
-            await bot.copy_message(
+            return await bot.copy_message(
                 chat_id=chat_id, 
                 from_chat_id=from_chat_id, 
                 message_id=message_id, 
-                message_thread_id=message_thread_id
+                message_thread_id=message_thread_id,
+                reply_to_message_id=reply_to_message_id
             )
     except FloodWait as f:
         LOGGER.warning(str(f))
@@ -72,7 +74,7 @@ async def copyMessage(chat_id:int, from_chat_id:int, message_id=int, message_thr
 
 async def forwardMessage(chat_id:int, from_chat_id:int, message_id=int, message_thread_id=None, unquote=True):
     try:
-        await bot.forward_messages(
+        return await bot.forward_messages(
                 chat_id=chat_id, 
                 from_chat_id=from_chat_id, 
                 message_id=message_id, 
