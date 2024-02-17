@@ -60,8 +60,6 @@ async def _onDownloadComplete(api, gid):
         download = await sync_to_async(api.get_download, gid)
     except:
         return
-    if download.options.follow_torrent == "false":
-        return
     if download.followed_by_ids:
         new_gid = download.followed_by_ids[0]
         LOGGER.info(f"Gid changed from {gid} to {new_gid}")
@@ -137,7 +135,7 @@ async def _onBtDownloadComplete(api, gid):
                         f"Seeding dihentikan!\nRatio : {task.ratio()} | Waktu : {task.seeding_time()}"
                     )
                     await sync_to_async(api.remove, [download], force=True, files=True)
-            else:
+            elif not task.listener.isCancelled:
                 async with task_dict_lock:
                     if task.listener.mid not in task_dict:
                         await sync_to_async(
@@ -148,6 +146,8 @@ async def _onBtDownloadComplete(api, gid):
                     task_dict[task.listener.mid].start_time = seed_start_time
                 LOGGER.info(f"Seeding started: {download.name} - Gid: {gid}")
                 await update_status_message(task.listener.message.chat.id)
+            else:
+                await sync_to_async(api.remove, [download], force=True, files=True)
         else:
             await sync_to_async(api.remove, [download], force=True, files=True)
 
