@@ -101,7 +101,7 @@ class TaskConfig:
         self.convertVideo = False
         self.screenShots = False
         self.asDoc = False
-        self.cancelled = False
+        self.isCancelled = False
         self.forceRun = False
         self.forceDownload = False
         self.forceUpload = False
@@ -451,14 +451,14 @@ class TaskConfig:
                             ]
                             if not pswd:
                                 del cmd[2]
-                            if self.cancelled:
+                            if self.isCancelled:
                                 return False
                             async with subprocess_lock:
                                 self.suproc = await create_subprocess_exec(
                                     *cmd, stderr=PIPE
                                 )
                             _, stderr = await self.suproc.communicate()
-                            if self.cancelled:
+                            if self.isCancelled:
                                 return False
                             code = self.suproc.returncode
                             if code != 0:
@@ -470,7 +470,7 @@ class TaskConfig:
                                     f"{stderr}. Unable to extract archive splits!. Path: {f_path}"
                                 )
                             elif code == -9:
-                                self.cancelled = True
+                                self.isCancelled = True
                                 return ""
                     if (
                         not self.seed
@@ -483,7 +483,7 @@ class TaskConfig:
                                 try:
                                     await remove(del_path)
                                 except:
-                                    self.cancelled = True
+                                    self.isCancelled = True
                 return up_path
             else:
                 up_path = get_base_name(dl_path)
@@ -501,12 +501,12 @@ class TaskConfig:
                 ]
                 if not pswd:
                     del cmd[2]
-                if self.cancelled:
+                if self.isCancelled:
                     return False
                 async with subprocess_lock:
                     self.suproc = await create_subprocess_exec(*cmd, stderr=PIPE)
                 _, stderr = await self.suproc.communicate()
-                if self.cancelled:
+                if self.isCancelled:
                     return False
                 code = self.suproc.returncode
                 if code == 0:
@@ -515,7 +515,7 @@ class TaskConfig:
                         try:
                             await remove(dl_path)
                         except:
-                            self.cancelled = True
+                            self.isCancelled = True
                     return up_path
                 elif code != -9:
                     try:
@@ -528,7 +528,7 @@ class TaskConfig:
                     self.newDir = ""
                     return dl_path
                 else:
-                    self.cancelled = True
+                    self.isCancelled = True
                     return ""
         except NotSupportedExtractionArchive:
             LOGGER.info(
@@ -581,13 +581,12 @@ class TaskConfig:
             del cmd[1]
             if not pswd:
                 del cmd[3]
-        if self.cancelled:
+        if self.isCancelled:
             return False
-            LOGGER.info(f"Zip: orig_path: {dl_path}, zip_path: {up_path}")
         async with subprocess_lock:
             self.suproc = await create_subprocess_exec(*cmd, stderr=PIPE)
         _, stderr = await self.suproc.communicate()
-        if self.cancelled:
+        if self.isCancelled:
             return
         code = self.suproc.returncode
         if code == 0:
@@ -612,7 +611,7 @@ class TaskConfig:
             LOGGER.error(f"{stderr}. Unable to zip this path: {dl_path}")
             return dl_path
         else:
-            self.cancelled = True
+            self.isCancelled = True
             return ""
 
     async def proceedSplit(self, up_dir, m_size, o_files, gid):
@@ -632,7 +631,7 @@ class TaskConfig:
                     res = await split_file(
                         f_path, f_size, dirpath, file_, self.splitSize, self
                     )
-                    if self.cancelled:
+                    if self.isCancelled:
                         return
                     if not res:
                         if f_size >= self.maxSplitSize:
@@ -706,7 +705,7 @@ class TaskConfig:
                             checked = True
                             await cpu_eater_lock.acquire()
                             LOGGER.info(f"Creating Sample videos: {self.name}")
-                        if self.cancelled:
+                        if self.isCancelled:
                             cpu_eater_lock.release()
                             return False
                         res = await createSampleVideo(
@@ -778,7 +777,7 @@ class TaskConfig:
                     await cpu_eater_lock.acquire()
                     LOGGER.info(f"Converting: {self.name}")
                 res = await convert_video(self, m_path, vext)
-                return False if self.cancelled else res
+                return False if self.isCancelled else res
             elif (
                 is_audio
                 and aext
@@ -797,7 +796,7 @@ class TaskConfig:
                     await cpu_eater_lock.acquire()
                     LOGGER.info(f"Converting: {self.name}")
                 res = await convert_audio(self, m_path, aext)
-                return False if self.cancelled else res
+                return False if self.isCancelled else res
             else:
                 return False
 
@@ -825,7 +824,7 @@ class TaskConfig:
         else:
             for dirpath, _, files in await sync_to_async(walk, dl_path, topdown=False):
                 for file_ in files:
-                    if self.cancelled:
+                    if self.isCancelled:
                         cpu_eater_lock.release()
                         return False
                     f_path = ospath.join(dirpath, file_)
