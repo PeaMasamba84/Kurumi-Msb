@@ -65,13 +65,12 @@ async def select_format(_, query, obj):
 
 class YtSelection:
     def __init__(self, listener):
-        self._listener = listener
+        self.listener = listener
         self._is_m4a = False
         self._reply_to = None
         self._time = time()
         self._timeout = 120
         self._is_playlist = False
-        self.is_cancelled = False
         self._main_buttons = None
         self.event = Event()
         self.formats = {}
@@ -80,9 +79,9 @@ class YtSelection:
     @new_thread
     async def _event_handler(self):
         pfunc = partial(select_format, obj=self)
-        handler = self._listener.client.add_handler(
+        handler = self.listener.client.add_handler(
             CallbackQueryHandler(
-                pfunc, filters=regex("^ytq") & user(self._listener.userId)
+                pfunc, filters=regex("^ytq") & user(self.listener.userId)
             ),
             group=-1,
         )
@@ -91,10 +90,10 @@ class YtSelection:
         except:
             await editMessage(self._reply_to, "<b>Waktu habis, Tugas dibatalkan!</b>")
             self.qual = None
-            self.is_cancelled = True
+            self.listener.isCancelled = True
             self.event.set()
         finally:
-            self._listener.client.remove_handler(*handler)
+            self.listener.client.remove_handler(*handler)
 
     async def get_quality(self, result):
         future = self._event_handler()
@@ -171,10 +170,10 @@ class YtSelection:
             self._main_buttons = buttons.build_menu(2)
             msg = f"<b>Pilih kualitas Video :</b>\n<b>Waktu habis :</b> <code>{get_readable_time(self._timeout - (time() - self._time))}</code>"
         self._reply_to = await sendMessage(
-            self._listener.message, msg, self._main_buttons
+            self.listener.message, msg, self._main_buttons
         )
         await wrap_future(future)
-        if not self.is_cancelled:
+        if not self.listener.isCancelled:
             await deleteMessage(self._reply_to)
         return self.qual
 
