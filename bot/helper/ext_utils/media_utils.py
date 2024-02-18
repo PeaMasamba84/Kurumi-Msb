@@ -6,7 +6,7 @@ from os import path as ospath, cpu_count
 from re import search as re_search
 from time import time
 
-from bot import LOGGER, subprocess_lock
+from bot import LOGGER, IS_HEROKU, subprocess_lock
 from bot.helper.ext_utils.bot_utils import cmd_exec
 from bot.helper.ext_utils.bot_utils import sync_to_async
 from bot.helper.ext_utils.files_utils import ARCH_EXT, get_mime_type
@@ -255,7 +255,7 @@ async def take_ss(video_file, ss_nb) -> list:
             cap_time += interval
             cmds.append(cmd_exec(cmd))
         try:
-            resutls = await wait_for(gather(*cmds), timeout=15)
+            resutls = await wait_for(gather(*cmds), timeout=(30 if IS_HEROKU else 15))
             if resutls[0][2] != 0:
                 LOGGER.error(
                     f"Error while creating sreenshots from video. Path: {video_file}. stderr: {resutls[0][1]}"
@@ -322,7 +322,7 @@ async def create_thumbnail(video_file, duration):
         des_dir,
     ]
     try:
-        _, err, code = await wait_for(cmd_exec(cmd), timeout=15)
+        _, err, code = await wait_for(cmd_exec(cmd), timeout=(30 if IS_HEROKU else 15))
         if code != 0 or not await aiopath.exists(des_dir):
             LOGGER.error(
                 f"Error while extracting thumbnail from video. Name: {video_file} stderr: {err}"
