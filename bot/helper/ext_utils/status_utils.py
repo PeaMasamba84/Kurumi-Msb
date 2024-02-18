@@ -199,7 +199,7 @@ async def get_readable_message(sid, is_user, page_no=1, status="All", page_step=
             msg += f"\n<b>├◭ Diupload: </b> <code>{task.uploaded_bytes()}</code>"
             msg += f"\n<b>├🛸 Kecepatan: </b> <code>{task.seed_speed()}</code>"
         else:
-            msg += f"\n<b>├📦 Ukuran: </b> <code>{task.size()}</code>
+            msg += f"\n<b>├📦 Ukuran : </b> <code>{task.size()}</code>"
             
         tgid = task.gid()
         msg += f"\n<b>├📟 GID:</b> <code>{tgid}</code>"
