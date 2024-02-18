@@ -684,13 +684,13 @@ class TaskConfig:
                         await makedirs(newfolder, exist_ok=True)
                         await gather(
                             copy2(dl_path, f"{newfolder}/{name}"),
-                            move(res, f"{newfolder}/SAMPLE.{name}"),
+                            move(res, f"{newfolder}/SV.{name}"),
                         )
                     else:
                         await makedirs(newfolder, exist_ok=True)
                         await gather(
                             move(dl_path, f"{newfolder}/{name}"),
-                            move(res, f"{newfolder}/SAMPLE.{name}"),
+                            move(res, f"{newfolder}/SV.{name}"),
                         )
                     return newfolder
             return dl_path
