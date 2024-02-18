@@ -14,7 +14,7 @@ from logging import (
     ERROR,
 )
 from myjd import __version__ as jdv
-from os import remove, path as ospath, environ, getcwd
+from os import remove, path as ospath, environ
 from pymongo import MongoClient
 from pyrogram import Client as tgClient, enums, __version__ as prv
 from qbittorrentapi import Client as qbClient
