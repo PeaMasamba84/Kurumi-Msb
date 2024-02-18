@@ -140,7 +140,7 @@ class YoutubeDLHelper:
             try:
                 result = ydl.extract_info(self._listener.link, download=False)
                 if result is None:
-                    raise ValueError("Info result is None")
+                    raise ValueError("Info tidak ditemukan!")
             except Exception as e:
                 return self._onDownloadError(str(e))
             if "entries" in result:
