@@ -8,7 +8,8 @@ from asyncio import (
 from asyncio.subprocess import PIPE
 from concurrent.futures import ThreadPoolExecutor
 from functools import partial, wraps
-from bot import user_data, config_dict, bot_loop
+
+from bot import IS_HEROKU, user_data, config_dict, bot_loop
 from bot.helper.ext_utils.help_messages import YT_HELP_DICT, MIRROR_HELP_DICT
 from bot.helper.ext_utils.telegraph_helper import telegraph
 from bot.helper.telegram_helper.button_build import ButtonMaker
@@ -162,9 +163,9 @@ def update_user_ldata(id_, key, value):
     user_data[id_][key] = value
 
 
-async def retry_function(func, *args, retry=10, **kwargs):
+async def retry_function(func, *args, retry=(20 if IS_HEROKU else 10), **kwargs):
     try:
-        return await sync_to_async(func, *args, **kwargs)
+        return await func(*args, **kwargs)
     except:
         if retry == 0:
             return "Unable to connect to JDServer!"
