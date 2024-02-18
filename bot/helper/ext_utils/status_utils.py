@@ -17,35 +17,35 @@ from bot.helper.telegram_helper.button_build import ButtonMaker
 SIZE_UNITS = ["B", "KB", "MB", "GB", "TB", "PB"]
 
 class MirrorStatus:
-    STATUS_DOWNLOADING = "📤𝑼𝒏𝒅𝒖𝒉"
-    STATUS_UPLOADING = "📥𝑼𝒏𝒈𝒈𝒂𝒉"
-    STATUS_QUEUEDL = "⌚️𝑨𝒏𝒕𝒓𝒊𝑫𝒐𝒘𝒏"
-    STATUS_QUEUEUP = "⌚️𝑨𝒏𝒕𝒓𝒊𝑼𝒑"
-    STATUS_PAUSED = "💤𝑱𝒆𝒅𝒂"
-    STATUS_ARCHIVING = "📚𝑨𝒓𝒔𝒊𝒑"
-    STATUS_EXTRACTING = "🔄𝑬𝒌𝒔𝒕𝒓𝒂𝒌"
-    STATUS_CLONING = "🧬𝑪𝒍𝒐𝒏𝒆"
-    STATUS_SEEDING = "🌱𝑺𝒆𝒆𝒅"
-    STATUS_SPLITTING = "✂𝑴𝒆𝒎𝒃𝒂𝒈𝒊"
-    STATUS_CHECKING = "📝𝑪𝒆𝒌"
-    STATUS_SAMVID = "🎞𝑺𝒂𝒎𝒑𝒍𝒆𝑽𝒊𝒅𝒆𝒐"
-    STATUS_CONVERTING = "🖲𝑲𝒐𝒏𝒗𝒆𝒓𝒔𝒊"    
+    STATUS_DOWNLOADING = "Unduh"
+    STATUS_UPLOADING = "Unggah"
+    STATUS_CLONING = "Clone"
+    STATUS_QUEUEDL = "AntriDownload"
+    STATUS_QUEUEUP = "AntriUpload"
+    STATUS_PAUSED = "Henti"
+    STATUS_CHECKING = "Cek"
+    STATUS_ARCHIVING = "Arsip"
+    STATUS_EXTRACTING = "Ekstrak"
+    STATUS_SEEDING = "Seed"
+    STATUS_SPLITTING = "Bagi"
+    STATUS_SAMVID = "SampelVideo"
+    STATUS_CONVERTING = "Konversi"
      
 STATUS_DICT = {
     "ALL": "All",
     "DL": MirrorStatus.STATUS_DOWNLOADING,
     "UP": MirrorStatus.STATUS_UPLOADING,
+    "CL": MirrorStatus.STATUS_CLONING,
     "QD": MirrorStatus.STATUS_QUEUEDL,
     "QU": MirrorStatus.STATUS_QUEUEUP,
+    "PA": MirrorStatus.STATUS_PAUSED,
+    "CK": MirrorStatus.STATUS_CHECKING,
     "AR": MirrorStatus.STATUS_ARCHIVING,
     "EX": MirrorStatus.STATUS_EXTRACTING,
     "SD": MirrorStatus.STATUS_SEEDING,
     "CM": MirrorStatus.STATUS_CONVERTING,
-    "CL": MirrorStatus.STATUS_CLONING,
     "SP": MirrorStatus.STATUS_SPLITTING,
-    "CK": MirrorStatus.STATUS_CHECKING,
     "SV": MirrorStatus.STATUS_SAMVID,
-    "PA": MirrorStatus.STATUS_PAUSED,
 }
 
 
@@ -221,7 +221,7 @@ async def get_readable_message(sid, is_user, page_no=1, status="All", page_step=
             msg = f"<b>Tidak ada Tugas</b> <code>{status}</code>!\n\n"
     buttons = ButtonMaker()
     if not is_user:
-        buttons.ibutton("Stats", "status 0 ov", position="header")
+        buttons.ibutton("👀", "status 0 ov", position="header")
     if len(tasks) > STATUS_LIMIT:
         # msg += f"<b>Step :</b> <code>{page_step}</code>"
         msg += f"<b>Halaman :</b> <code>{page_no}/{pages}</code>"
