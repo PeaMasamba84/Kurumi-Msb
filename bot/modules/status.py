@@ -19,7 +19,7 @@ from bot import (
     task_dict_lock,
     task_dict,
 )
-from bot.helper.ext_utils.bot_utils import new_task, sync_to_async
+from bot.helper.ext_utils.bot_utils import new_task
 from bot.helper.ext_utils.status_utils import (
     MirrorStatus,
     get_readable_file_size,
