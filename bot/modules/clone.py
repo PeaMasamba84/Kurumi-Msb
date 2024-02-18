@@ -1,10 +1,11 @@
 from asyncio import gather
+from html import escape
 from json import loads
 from pyrogram.filters import command
 from pyrogram.handlers import MessageHandler
 from secrets import token_urlsafe
 
-from bot import LOGGER, task_dict, task_dict_lock, bot
+from bot import LOGGER, USE_TELEGRAPH, task_dict, task_dict_lock, bot
 from bot.helper.ext_utils.bot_utils import (
     new_task,
     sync_to_async,
@@ -167,8 +168,30 @@ class Clone(TaskListener):
             if mime_type is None:
                 await sendMessage(self.message, self.name)
                 return
-            msg, button = await stop_duplicate_check(self)
-            if msg:
+            error, button = await stop_duplicate_check(self)
+            if error:
+                msg = f"<b>Hai {self.tag} !</b>"
+                msg += "\n<b>Tugasmu dihentikan karena :</b>"
+                msg += f"\n<code>{escape(error)}</code>"
+                
+                if (
+                    not USE_TELEGRAPH
+                    and "file/folder ini sudah ada di google drive!" in escape(error).lower()
+                ):
+                    content = [content for content in button for content in content.split("\n\n")]
+                    
+                    for _, data in enumerate(content, start=1):
+                        if "Hasil pencarian Google Drive" in data:
+                            data = data.replace("Hasil pencarian Google Drive", "")
+                            msg += data
+                            
+                        else:
+                            msg += "\n\n" + data
+                    
+                    button = None
+                    
+                    if len(msg) > 4096:
+                        msg = msg[:4090] + "\n..."
                 await sendMessage(self.message, msg, button)
                 return
             await self.onDownloadStart()
