@@ -6,7 +6,6 @@ from bot import config_dict, LOGGER, jd_lock, bot_name
 from bot.helper.ext_utils.bot_utils import (
     cmd_exec,
     new_task,
-    sync_to_async,
 )
 from myjd import Myjdapi
 from myjd.exception import (
@@ -32,10 +31,10 @@ class JDownloader(Myjdapi):
     async def initiate(self):
         self.device = None
         async with jd_lock:
-            is_connected = await sync_to_async(self.jdconnect)
+            is_connected = await self.jdconnect()
             if is_connected:
                 self.boot()
-                await sync_to_async(self.connectToDevice)
+                await self.connectToDevice()
 
     @new_task
     async def boot(self):
@@ -68,11 +67,11 @@ class JDownloader(Myjdapi):
             LOGGER.error(f"Failed to start JDownloader! Exited with Code {code}! Retrying...")
             self.boot()
 
-    def jdconnect(self):
+    async def jdconnect(self):
         if not config_dict["JD_EMAIL"] or not config_dict["JD_PASS"]:
             return False
         try:
-            self.connect(config_dict["JD_EMAIL"], config_dict["JD_PASS"])
+            await self.connect(config_dict["JD_EMAIL"], config_dict["JD_PASS"])
             LOGGER.info("JDownloader is connected!")
             return True
         except (
@@ -90,16 +89,16 @@ class JDownloader(Myjdapi):
             LOGGER.info(
                 f"Failed to connect with JDownloader! Retrying... ERROR: {self.error}"
             )
-            return self.jdconnect()
+            return await self.jdconnect()
 
-    def connectToDevice(self):
+    async def connectToDevice(self):
         self.error = "Menghubungkan ke Device..."
         while True:
             self.device = None
             if not config_dict["JD_EMAIL"] or not config_dict["JD_PASS"]:
                 return
             try:
-                self.update_devices()
+                await self.update_devices()
                 if not (devices := self.list_devices()):
                     continue
                 for device in devices:
@@ -111,7 +110,7 @@ class JDownloader(Myjdapi):
             except:
                 continue
             break
-        self.device.enable_direct_connection()
+        await self.device.enable_direct_connection()
         self.error = ""
         LOGGER.info("JDownloader Device have been Connected!")
 
