@@ -73,12 +73,12 @@ class TelegraphHelper:
                     nxt_page += 1
             await self.edit_page(
                 path=path[prev_page],
-                title="Pencari KQRM Bot",
+                title="Pea Masamba Bot",
                 content=content,
             )
         return
 
 
 telegraph = TelegraphHelper(
-    "KQRM", "https://t.me/arakurumi"
+    "Pea Masamba", "https://www.comelmuewa84.eu.org"
 )
