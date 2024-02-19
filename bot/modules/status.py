@@ -150,10 +150,10 @@ EX : {tasks['Extract']} | SP : {tasks['Split']} | QD : {tasks['QueueDl']} | QU :
 CL : {tasks['Clone']} | CK : {tasks['CheckUp']} | PA : {tasks['Pause']} | SV : {tasks['SamVid']}
 CM : {tasks['ConvertMedia']}
 
-Kec. Unduh : {get_readable_file_size(dl_speed)}/s
-Kec. Unggah : {get_readable_file_size(up_speed)}/s
+📤𝑺𝒑𝒆𝒆𝒅 𝑼𝒏𝒅𝒖𝒉 : {get_readable_file_size(dl_speed)}/s
+📥𝑺𝒑𝒆𝒆𝒅 𝑼𝒏𝒈𝒈𝒂𝒉 : {get_readable_file_size(up_speed)}/s
 
-@{bot_name}
+By: 🅿🅴🅰 🅼🅰🆂🅰🅼🅱🅰
 """
         await query.answer(msg, show_alert=True)
 
