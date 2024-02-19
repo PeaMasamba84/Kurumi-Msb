@@ -175,8 +175,8 @@ async def get_readable_message(sid, is_user, page_no=1, status="All", page_step=
             await task.progress()
             if iscoroutinefunction(task.progress)
             else task.progress()
-        )
-        msg += f"\n<b>┌┤{get_progress_bar_string(progress)} <code>{progress}</code>├┐</b>"
+        )        
+        msg += f"\n<b>┌┤{get_progress_bar_string(progress)} <code>»{progress}</code></b>"
         if task.listener.isSuperChat:
             msg += f"\n<b>├📲 Status:</b> <a href='{task.listener.message.link}'>{tstatus}</a>"
         else:
