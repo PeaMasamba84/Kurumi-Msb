@@ -5,7 +5,7 @@ from bot import bot
 from bot.helper.ext_utils.bot_utils import sync_to_async, new_task
 from bot.helper.ext_utils.links_utils import is_gdrive_link
 from bot.helper.ext_utils.status_utils import get_readable_file_size
-from bot.helper.mirror_utils.gdrive_utils.count import gdCount
+from bot.helper.mirror_leech_utils.gdrive_utils.count import gdCount
 from bot.helper.telegram_helper.bot_commands import BotCommands
 from bot.helper.telegram_helper.filters import CustomFilters
 from bot.helper.telegram_helper.message_utils import deleteMessage, sendMessage
@@ -43,13 +43,13 @@ async def countNode(_, message):
         if mime_type is None:
             await sendMessage(message, f"<b>{name}</b>")
             return
-        msg = f"<b>Nama :</b> <code>{name}</code>"
-        msg += f"\n\n<b>Ukuran :</b> <code>{get_readable_file_size(size)}</code>"
-        msg += f"\n\n<b>Tipe :</b> <code>{mime_type}</code>"
+        msg = f"<b>💾Nama :</b> <code>{name}</code>"
+        msg += f"\n\n<b>┌📦 Ukuran :</b> <code>{get_readable_file_size(size)}</code>"
+        msg += f"\n\n<b>└🗂Tipe :</b> <code>{mime_type}</code>"
         if mime_type == "Folder":
-            msg += f"\n\n<b>Sub Folders :</b> <code>{folders}</code>"
-            msg += f"\n\n<b>Files :</b> <code>{files}</code>"
-        msg += f"\n\n<b>Oleh :</b> {tag}"
+            msg += f"\n\n<b>┌📂Sub Folders :</b> <code>{folders}</code>"
+            msg += f"\n\n<b>└📄Files :</b> <code>{files}</code>"
+        msg += f"\n\n<b>💂‍♂️ Pemirror :</b> {tag}"
     else:
         msg = "<b>Kirim perintah dengan Link Google Drive atau balas Link Google Drive dengan perintah!</b>"
     await sendMessage(message, msg)
