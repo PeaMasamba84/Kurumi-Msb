@@ -25,15 +25,15 @@ from bot.helper.ext_utils.links_utils import (
     is_url,
 )
 from bot.helper.listeners.task_listener import TaskListener
-from bot.helper.mirror_utils.download_utils.aria2_download import add_aria2c_download
-from bot.helper.mirror_utils.download_utils.direct_downloader import add_direct_download
-from bot.helper.mirror_utils.download_utils.direct_link_generator import direct_link_generator
-from bot.helper.mirror_utils.download_utils.gd_download import add_gd_download
-from bot.helper.mirror_utils.download_utils.jd_download import add_jd_download
-from bot.helper.mirror_utils.download_utils.mega_download import add_mega_download
-from bot.helper.mirror_utils.download_utils.qbit_download import add_qb_torrent
-from bot.helper.mirror_utils.download_utils.rclone_download import add_rclone_download
-from bot.helper.mirror_utils.download_utils.telegram_download import TelegramDownloadHelper
+from bot.helper.mirror_leech_utils.download_utils.aria2_download import add_aria2c_download
+from bot.helper.mirror_leech_utils.download_utils.direct_downloader import add_direct_download
+from bot.helper.mirror_leech_utils.download_utils.direct_link_generator import direct_link_generator
+from bot.helper.mirror_leech_utils.download_utils.gd_download import add_gd_download
+from bot.helper.mirror_leech_utils.download_utils.jd_download import add_jd_download
+from bot.helper.mirror_leech_utils.download_utils.mega_download import add_mega_download
+from bot.helper.mirror_leech_utils.download_utils.qbit_download import add_qb_torrent
+from bot.helper.mirror_leech_utils.download_utils.rclone_download import add_rclone_download
+from bot.helper.mirror_leech_utils.download_utils.telegram_download import TelegramDownloadHelper
 from bot.helper.telegram_helper.bot_commands import BotCommands
 from bot.helper.telegram_helper.filters import CustomFilters
 from bot.helper.telegram_helper.message_utils import (
