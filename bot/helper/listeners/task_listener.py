@@ -1,4 +1,4 @@
-from aiofiles.os import path as aiopath, listdir, makedirs
+from aiofiles.os import path as aiopath, listdir, makedirs, remove
 from aioshutil import move
 from asyncio import sleep, gather
 from html import escape
@@ -33,13 +33,13 @@ from bot.helper.ext_utils.files_utils import (
 from bot.helper.ext_utils.links_utils import is_gdrive_id
 from bot.helper.ext_utils.status_utils import get_readable_file_size
 from bot.helper.ext_utils.task_manager import start_from_queued, check_running_tasks
-from bot.helper.mirror_utils.gdrive_utils.upload import gdUpload
-from bot.helper.mirror_utils.rclone_utils.transfer import RcloneTransferHelper
-from bot.helper.mirror_utils.status_utils.gdrive_status import GdriveStatus
-from bot.helper.mirror_utils.status_utils.queue_status import QueueStatus
-from bot.helper.mirror_utils.status_utils.rclone_status import RcloneStatus
-from bot.helper.mirror_utils.status_utils.telegram_status import TelegramStatus
-from bot.helper.mirror_utils.telegram_uploader import TgUploader
+from bot.helper.mirror_leech_utils.gdrive_utils.upload import gdUpload
+from bot.helper.mirror_leech_utils.rclone_utils.transfer import RcloneTransferHelper
+from bot.helper.mirror_leech_utils.status_utils.gdrive_status import GdriveStatus
+from bot.helper.mirror_leech_utils.status_utils.queue_status import QueueStatus
+from bot.helper.mirror_leech_utils.status_utils.rclone_status import RcloneStatus
+from bot.helper.mirror_leech_utils.status_utils.telegram_status import TelegramStatus
+from bot.helper.mirror_leech_utils.telegram_uploader import TgUploader
 from bot.helper.telegram_helper.button_build import ButtonMaker
 from bot.helper.telegram_helper.message_utils import (
     sendMessage,
@@ -155,6 +155,13 @@ class TaskListener(TaskConfig):
             up_dir, self.name = up_path.rsplit("/", 1)
             self.size = await get_path_size(up_dir)
 
+        if self.screenShots:
+            up_path = await self.generateScreenshots(up_path)
+            if self.isCancelled:
+                return
+            up_dir, self.name = up_path.rsplit("/", 1)
+            self.size = await get_path_size(up_dir)
+
         if self.convertAudio or self.convertVideo:
             up_path = await self.convertMedia(
                 up_path, gid, unwanted_files, unwanted_files_size, files_to_delete
@@ -246,17 +253,17 @@ class TaskListener(TaskConfig):
         ):
             await DbManager().rm_complete_task(self.message.link)
         msg = f"<b>💾 Nama :</b><blockquote><code>{escape(self.name)}</code></blockquote>\n"
-        msg += f"\n<b>┌📦 Ukuran :</b> <code>{get_readable_file_size(self.size)}</code>"
+        msg += f"\n\n<b>┌📦Ukuran :</b> <code>{get_readable_file_size(self.size)}</code>"
         LOGGER.info(f"Task Done: {self.name}")
         if self.isLeech:
-            msg += f"\n<b>└🗄 Jumlah File :</b> <code>{folders}</code>"
+            msg += f"\n\n<b>└🗄Jumlah File :</b> <code>{folders}</code>"
             if mime_type != 0:
-                msg += f"\n<b>└📕 File Rusak :</b> <code>{mime_type}</code>"
+                msg += f"\n\n<b>└📕File Rusak :</b> <code>{mime_type}</code>"
             msg += f'\n\n<b>💂‍♂️ Pemirror :</b> {self.tag}\n\n'
             if not files:
                 await sendMessage(self.message, msg)
             else:
-                fmsg = "<b>✅ List File :</b>\n"
+                fmsg = "<b>✅List File :</b>\n"
                 for index, (link, name) in enumerate(files.items(), start=1):
                     fmsg += f"<b>{index:02d}.</b> <a href='{link}'>{name}</a>\n"
                     if len(fmsg.encode() + msg.encode()) > 4000:
@@ -265,16 +272,8 @@ class TaskListener(TaskConfig):
                         fmsg = ""
                 if fmsg != "":
                     await sendMessage(self.message, msg + fmsg)
-            if self.seed:
-                if self.newDir:
-                    await clean_target(self.newDir)
-                async with queue_dict_lock:
-                    if self.mid in non_queued_up:
-                        non_queued_up.remove(self.mid)
-                await start_from_queued()
-                return
         else:
-            msg += f"\n<b>└🗂Tipe :</b> <code>{mime_type}</code>\n"
+            msg += f"\n\n<b>└🗂Tipe :</b> <code>{mime_type}</code>"
             if mime_type == "Folder":
                 msg += f"\n<b>┌📂 Jumlah Folder :</b> <code>{folders}</code>"
                 msg += f"\n<b>└📄 Jumlah File :</b> <code>{files}</code>"
@@ -288,7 +287,7 @@ class TaskListener(TaskConfig):
                 if link:
                     buttons.ubutton("🌩 Cloud", link)
                 if rclonePath:
-                    msg += f"\n\n<b>📙 Path :</b> <code>{rclonePath}</code>"
+                    msg += f"\n\n<b>📙Path :</b> <code>{rclonePath}</code>"
                 if (
                     rclonePath
                     and (RCLONE_SERVE_URL := config_dict["RCLONE_SERVE_URL"])
@@ -314,7 +313,7 @@ class TaskListener(TaskConfig):
                             buttons.ubutton("📺 Media Link", share_urls)
                 button = buttons.build_menu(2)
             else:
-                msg += f"\n\n<b>📙 Path :</b> <code>{rclonePath}</code>"
+                msg += f"\n\n<b>📙Path :</b> <code>{rclonePath}</code>"
                 button = None
             msg += f"\n\n<b>💂‍♂️ Pemirror :</b> {self.tag}"
             await sendMessage(self.message, msg, button)
@@ -354,15 +353,15 @@ class TaskListener(TaskConfig):
                     )
                 except Exception as e:
                     LOGGER.error(f"Failed to forward Message! ERROR: {e}")
-            if self.seed:
-                if self.newDir:
-                    await clean_target(self.newDir)
-                async with queue_dict_lock:
-                    if self.mid in non_queued_up:
-                        non_queued_up.remove(self.mid)
-                await start_from_queued()
-                return
-
+        
+        if self.seed:
+            if self.newDir:
+                await clean_target(self.newDir)
+            async with queue_dict_lock:
+                if self.mid in non_queued_up:
+                    non_queued_up.remove(self.mid)
+            await start_from_queued()
+            return
         await clean_download(self.dir)
         async with task_dict_lock:
             if self.mid in task_dict:
@@ -440,6 +439,8 @@ class TaskListener(TaskConfig):
         await clean_download(self.dir)
         if self.newDir:
             await clean_download(self.newDir)
+        if await aiopath.exists(self.thumb):
+            await remove(self.thumb)
 
     async def onUploadError(self, error):
         async with task_dict_lock:
@@ -477,3 +478,5 @@ class TaskListener(TaskConfig):
         await clean_download(self.dir)
         if self.newDir:
             await clean_download(self.newDir)
+        if await aiopath.exists(self.thumb):
+            await remove(self.thumb)
