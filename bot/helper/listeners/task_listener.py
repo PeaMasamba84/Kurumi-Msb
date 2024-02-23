@@ -478,5 +478,5 @@ class TaskListener(TaskConfig):
         await clean_download(self.dir)
         if self.newDir:
             await clean_download(self.newDir)
-         if self.thumb and await aiopath.exists(self.thumb):
+        if self.thumb and await aiopath.exists(self.thumb):
             await remove(self.thumb)
