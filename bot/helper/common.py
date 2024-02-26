@@ -7,19 +7,20 @@ from pyrogram.enums import ChatAction
 from secrets import token_urlsafe
 
 from bot import (
-    DOWNLOAD_DIR,
-    MAX_SPLIT_SIZE,
+    bot,
     config_dict,
-    user_data,
+    cpu_eater_lock,
+    DOWNLOAD_DIR,
+    GLOBAL_EXTENSION_FILTER,
     IS_PREMIUM_USER,
-    user,
-    multi_tags,
     LOGGER,
+    MAX_SPLIT_SIZE,
+    multi_tags,
+    subprocess_lock,
     task_dict_lock,
     task_dict,
-    GLOBAL_EXTENSION_FILTER,
-    cpu_eater_lock,
-    subprocess_lock,
+    user_data,
+    user,
 )
 from bot.helper.ext_utils.bot_utils import new_task, sync_to_async, getSizeBytes
 from bot.helper.ext_utils.bulk_links import extractBulkLinks
@@ -266,7 +267,7 @@ class TaskConfig:
 
                     if self.threadId.isdigit():
                         self.threadId = int(self.threadId)
-                
+                                
                 if self.userTransmission:
                     chat = await user.get_chat(self.upDest)
                     uploader_id = user.me.id
