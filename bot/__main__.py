@@ -121,14 +121,10 @@ async def stats(_, message):
 </pre>
 <b>💽𝗥𝗔𝗠</b> 
 <pre languange='bash'>
-<b>┌Terpakai     :</b> <code>{get_readable_file_size(memory.used)}</code>
+<b>┌Terpakai     :</b> <code>{get_readable_file_size(memory.used)}</code> [<code>{get_readable_file_size(Process(getpid()).memory_info().rss)}</code>]
 <b>├Tersedia     :</b> <code>{get_readable_file_size(memory.available)}</code>
 <b>├Total        :</b> <code>{get_readable_file_size(memory.total)}</code>
 └<code>{get_progress_bar_string(memory.percent)} - {memory.percent}%</code>
-</pre>
-<b>🪫 𝗣𝗲𝗺𝗮𝗸𝗮𝗶𝗮𝗻 𝗥𝗔𝗠</b>
-<pre languange='bash'>
-<b>Python        :</b> <code>{get_readable_file_size(Process(getpid()).memory_info().rss)}</code>
 </pre>
 <b>💾 𝗣𝗲𝗻𝘆𝗶𝗺𝗽𝗮𝗻𝗮𝗻</b> 
 <pre languange='bash'>
@@ -336,7 +332,7 @@ async def restart_notification():
         except Exception as e:
             LOGGER.error(e)
 
-    now = datetime.now(timezone(f"Asia/Jakarta"))
+    now = datetime.now(timezone("Asia/Jakarta"))
     if INCOMPLETE_TASK_NOTIFIER and DATABASE_URL:
         if notifier_dict := await DbManager().get_incomplete_tasks():
             for cid, data in notifier_dict.items():
@@ -348,7 +344,7 @@ async def restart_notification():
 </pre>           
 """
                 if data.items():
-                    msg += f"<b>Tugas yang belum selesai :</b>"
+                    msg += "<b>Tugas yang belum selesai :</b>"
                 for tag, links in data.items():
                     msg += f"\n{tag} :"
                     for index, link in enumerate(links, start=1):
