@@ -301,9 +301,7 @@ class TaskConfig:
                 and not self.isSuperChat
                 and len(config_dict["LEECH_CHAT_ID"]) == 0
             ):
-                raise ValueError(
-                    "<b>Gunakan SuperGroup/Dump Channel untuk mengupload menggunakan User Session pada Private Chat!</b>"
-                )
+                self.userTransmission = False
 
             if self.splitSize:
                 if self.splitSize.isdigit():
@@ -803,6 +801,8 @@ class TaskConfig:
                     checked = True
                     await cpu_eater_lock.acquire()
                     LOGGER.info(f"Converting: {self.name}")
+                else:
+                    LOGGER.info(f"Converting: {m_path}")
                 res = await convert_video(self, m_path, vext)
                 return "" if self.isCancelled else res
             elif (
@@ -822,6 +822,8 @@ class TaskConfig:
                     checked = True
                     await cpu_eater_lock.acquire()
                     LOGGER.info(f"Converting: {self.name}")
+                else:
+                    LOGGER.info(f"Converting: {m_path}")
                 res = await convert_audio(self, m_path, aext)
                 return "" if self.isCancelled else res
             else:
@@ -854,7 +856,6 @@ class TaskConfig:
                         cpu_eater_lock.release()
                         return ""
                     f_path = ospath.join(dirpath, file_)
-                    LOGGER.info(f"Converting: {f_path}")
                     res = await proceedConvert(f_path)
                     if res:
                         if self.seed and not self.newDir:
