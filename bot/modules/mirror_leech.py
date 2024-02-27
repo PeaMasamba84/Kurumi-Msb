@@ -1,4 +1,4 @@
-from aiofiles.os import path as aiopath
+from aiofiles.os import path as aiopath, remove
 from asyncio import sleep
 from base64 import b64encode
 from myjd.exception import MYJDException
@@ -279,7 +279,7 @@ class Mirror(TaskListener):
                     reply_to = None
             elif reply_to.document and (
                 file_.mime_type == "application/x-bittorrent"
-                or file_.file_name.endswith(".torrent")
+                or file_.file_name.endswith((".torrent", ".dlc"))
             ):
                 self.link = await reply_to.download()
                 file_ = None
@@ -368,6 +368,9 @@ class Mirror(TaskListener):
                 await sendMessage(self.message, f"{e}".strip())
                 self.removeFromSameDir()
                 return
+            finally:
+                if await aiopath.exists(self.link):
+                    await remove(self.link)
         elif self.isQbit:
             await add_qb_torrent(self, path, ratio, seed_time)
         elif is_gdrive_link(self.link) or is_gdrive_id(self.link):
