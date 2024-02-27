@@ -261,9 +261,9 @@ async def take_ss(video_file, ss_nb) -> bool:
                 )
                 await rmtree(dirpath, ignore_errors=True)
                 return False
-        except Exception as e:
+        except Exception:
             LOGGER.error(
-                f"Error while creating sreenshots from video. Path: {video_file}. Error: Timeout some issues with ffmpeg with specific arch! -> {e}"
+                f"Error while creating sreenshots from video. Path: {video_file}. Error: Timeout some issues with ffmpeg with specific arch!"
             )
             await rmtree(dirpath, ignore_errors=True)
             return False
