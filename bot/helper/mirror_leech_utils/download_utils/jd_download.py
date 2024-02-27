@@ -1,4 +1,7 @@
+from aiofiles import open as aiopen
+from aiofiles.os import path as aiopath
 from asyncio import wait_for, Event, wrap_future, sleep
+from base64 import b64encode
 from functools import partial
 from pyrogram.filters import regex, user
 from pyrogram.handlers import CallbackQueryHandler
@@ -120,7 +123,17 @@ async def add_jd_download(listener, path):
                     package_ids=odl_list,
                 )
 
-        await retry_function(
+        if await aiopath.exists(listener.link):
+            async with aiopen(listener.link, "rb") as dlc:
+                content = await dlc.read()
+            content = b64encode(content)
+            await retry_function(
+                jdownloader.device.linkgrabber.add_container,
+                "DLC",
+                f";base64,{content.decode()}",
+            )
+        else:
+            await retry_function(
             jdownloader.device.linkgrabber.add_links,
             [
                 {
