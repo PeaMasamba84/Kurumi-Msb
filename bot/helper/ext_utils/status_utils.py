@@ -8,7 +8,7 @@ from psutil import (
 )
 from time import time
 
-from bot import task_dict, task_dict_lock, botStartTime, config_dict
+from bot import DOWNLOAD_DIR, task_dict, task_dict_lock, botStartTime, config_dict, status_dict
 from bot.helper.ext_utils.bot_utils import sync_to_async
 from bot.helper.telegram_helper.bot_commands import BotCommands
 from bot.helper.telegram_helper.button_build import ButtonMaker
@@ -159,8 +159,10 @@ async def get_readable_message(sid, is_user, page_no=1, status="All", page_step=
     pages = (max(tasks_no, 1) + STATUS_LIMIT - 1) // STATUS_LIMIT
     if page_no > pages:
         page_no = (page_no - 1) % pages + 1
+        status_dict[sid]["page_no"] = page_no
     elif page_no < 1:
         page_no = pages - (abs(page_no) % pages)
+        status_dict[sid]["page_no"] = page_no
     start_position = (page_no - 1) * STATUS_LIMIT
 
     for _, task in enumerate(
