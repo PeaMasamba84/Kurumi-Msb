@@ -722,12 +722,14 @@ async def rssMonitor():
                         
                         item_title = item_title.replace(">", "").replace("<", "")
 
-                        # BlackListed p2p_group / p2p_name
+                        # BlackListed p2p_group / p2p_name (Based on my RSS Feed)
                         blacklist = [
-                            "ass", "audio", "audios", "br", "chan", "compilation", "dl", "dlrip", "empire", "en", 
-                            "eng", "global", "hd", "hen", "id", "in", "jap", "kaime", "kun", "la", "man", "media", 
-                            "off", "pot", "raw", "raws", "ray",  "rayrip", "res", "rip", "sai", "sama", "san", "srt", 
-                            "sub", "subs", "subtitle", "true", "us",
+                            "a", "ass", "activated", "audio", "audios", "audiobook", "br", "chan", "compilation", "dl", "dlrip", 
+                            "empire", "en", "eng", "flac", "global", "hd", "hen", "i", "id", "in", "jap", "kaime", "kun", "la", 
+                            "man", "media", "off", "pot", "raw", "raws", "ray",  "rayrip", "res", "rip", "sai", "sama", "san", 
+                            "srt", "sub", "subs", "subtitle", "true", "us", "x", "2160", "1080", "720", "480", "360", "2160p", 
+                            "1080p", "720p", "480p", "360p", "1080p-avc", "1080p-hevc", "1080p-av1", "1080p-vp9", "720p-avc", 
+                            "720p-hevc", "720p-av1", "720p-vp9"
                         ]
                         
                         if (
@@ -779,6 +781,9 @@ async def rssMonitor():
                             and "." in p2p_group
                         ):
                             p2p_group = p2p_group.replace(".", "")
+                        
+                        if str(p2p_group).isdigit():
+                            p2p_group = None
 
 
                         # Add Your custom RSS feed here
@@ -797,6 +802,8 @@ async def rssMonitor():
                         # https://ouo.si/
                         elif "ouo" in url.lower():
                             view = rss_d.entries[feed_count].get("id")
+                            if not category:
+                                category = "Anime"
                             description = re_sub(r"<.*?>", "", description).replace("\n", "")
                             description = f"""<b>CRC32 :</b> <code>{description.split('CRC32: ')[1].split('MediaInfo')[0]}</code>
 
@@ -809,6 +816,8 @@ async def rssMonitor():
                         # https://bangumi.moe/
                         elif "bangumi" in url.lower():
                             image = re_findall(r"\bhttps?://\S+?\.(?:png|jpe?g)\b", description)[0]
+                            if not category:
+                                category = "Anime"
                             description = None
 
                         # https://tgx.rs/
