@@ -19,6 +19,8 @@ async def convert_video(listener, video_file, ext, retry=False):
     if retry:
         cmd = [
             "opera",
+            "-timeout",
+            "600",
             "-i",
             video_file,
             "-c:v",
@@ -69,6 +71,8 @@ async def convert_audio(listener, audio_file, ext):
     output = f"{base_name}.{ext}"
     cmd = [
         "opera",
+        "-timeout",
+        "600",
         "-i",
         audio_file,
         "-threads",
@@ -241,6 +245,8 @@ async def take_ss(video_file, ss_nb) -> bool:
                 "-hide_banner",
                 "-loglevel",
                 "error",
+                "-timeout",
+                "600",
                 "-ss",
                 f"{cap_time}",
                 "-i",
@@ -254,7 +260,7 @@ async def take_ss(video_file, ss_nb) -> bool:
             cap_time += interval
             cmds.append(cmd_exec(cmd))
         try:
-            resutls = await wait_for(gather(*cmds), timeout=(150 if IS_HEROKU else 15))
+            resutls = await wait_for(gather(*cmds), timeout=(600 if IS_HEROKU else 60))
             if resutls[0][2] != 0:
                 LOGGER.error(
                     f"Error while creating sreenshots from video. Path: {video_file}. stderr: {resutls[0][1]}"
@@ -283,6 +289,8 @@ async def get_audio_thumb(audio_file):
         "-hide_banner",
         "-loglevel",
         "error",
+        "-timeout",
+        "600",
         "-i",
         audio_file,
         "-an",
@@ -313,6 +321,8 @@ async def create_thumbnail(video_file, duration):
         "-hide_banner",
         "-loglevel",
         "error",
+        "-timeout",
+        "600",
         "-ss",
         f"{duration}",
         "-i",
@@ -324,7 +334,7 @@ async def create_thumbnail(video_file, duration):
         des_dir,
     ]
     try:
-        _, err, code = await wait_for(cmd_exec(cmd), timeout=(150 if IS_HEROKU else 15))
+        _, err, code = await wait_for(cmd_exec(cmd), timeout=(600 if IS_HEROKU else 60))
         if code != 0 or not await aiopath.exists(des_dir):
             LOGGER.error(
                 f"Error while extracting thumbnail from video. Name: {video_file} stderr: {err}"
@@ -369,6 +379,8 @@ async def split_file(
                 "-hide_banner",
                 "-loglevel",
                 "error",
+                "-timeout",
+                "600",
                 "-ss",
                 str(start_time),
                 "-i",
@@ -524,6 +536,8 @@ async def createSampleVideo(listener, video_file, sample_duration, part_duration
 
     cmd = [
         "opera",
+        "-timeout",
+        "600",
         "-i",
         video_file,
         "-filter_complex",
