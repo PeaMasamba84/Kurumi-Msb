@@ -156,7 +156,7 @@ async def add_jd_download(listener, path):
         remove_unknown = False
         name = ""
         error = ""
-        while (time() - start_time) < 20:
+        while (time() - start_time) < 60:
             queued_downloads = await retry_function(
                 jdownloader.device.linkgrabber.query_packages,
                 [
@@ -234,6 +234,8 @@ async def add_jd_download(listener, path):
                     jdownloader.device.linkgrabber.remove_links,
                     package_ids=packages_to_remove,
                 )
+            async with jd_lock:
+                del jd_downloads[gid]
             return
 
         jd_downloads[gid]["ids"] = online_packages
@@ -283,6 +285,8 @@ async def add_jd_download(listener, path):
             await event.wait()
             if listener.isCancelled:
                 return
+            async with queue_dict_lock:
+                non_queued_dl.add(listener.mid)
     else:
         add_to_queue = False
 
@@ -311,6 +315,8 @@ async def add_jd_download(listener, path):
 
     if not packages:
         await listener.onDownloadError("Unduhan dibatalkan secara manual oleh Bot!")
+        async with jd_lock:
+            del jd_downloads[gid]
         return
 
     await retry_function(
@@ -320,9 +326,6 @@ async def add_jd_download(listener, path):
 
     async with task_dict_lock:
         task_dict[listener.mid] = JDownloaderStatus(listener, f"{gid}")
-
-    async with queue_dict_lock:
-        non_queued_dl.add(listener.mid)
 
     await onDownloadStart()
 
