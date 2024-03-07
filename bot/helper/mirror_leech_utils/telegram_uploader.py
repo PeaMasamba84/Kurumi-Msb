@@ -538,7 +538,7 @@ class TgUploader:
                         )
                 except Exception as e:
                     LOGGER.error(f"Failed to forward Message! ERROR: {e}")
-        except FloodWait as f:
+        except FloodWait as f: # for later
             LOGGER.warning(str(f))
             await sleep(f.value)
         except Exception as err:
