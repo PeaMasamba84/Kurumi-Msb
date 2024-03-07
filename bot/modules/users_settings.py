@@ -130,9 +130,8 @@ async def get_user_settings(from_user):
     else:
         sd_msg = "Disabled"
 
-    upload_pathes = "Exists" if user_dict.get("upload_pathes", False) else "Not Exists"
-    buttons.ibutton("Upload Pathes", f"userset {user_id} upload_pathes")
-
+    upload_paths = "Exists" if user_dict.get("upload_paths", False) else "Not Exists"
+    buttons.ibutton("Upload Paths", f"userset {user_id} upload_paths")
 
     default_upload = (
         user_dict.get("default_upload", "") or config_dict["DEFAULT_UPLOAD"]
@@ -174,7 +173,7 @@ async def get_user_settings(from_user):
 <b>Rclone Path      :</b> <code>{rccpath}</code>
 <b>Gdrive Token     :</b> <code>{tokenmsg}</code>
 <b>Gdrive ID        :</b> <code>{gdrive_id}</code>
-<b>Upload Path      :</b> <code>{upload_pathes}</code>
+<b>Upload Path      :</b> <code>{upload_paths}</code>
 <b>Index Link       :</b> <code>{index}</code>
 <b>Stop Duplicate   :</b> <code>{sd_msg}</code>
 <b>Default Upload   :</b> <code>{du}</code>
@@ -240,16 +239,17 @@ async def add_token_pickle(_, message, pre_event):
 async def delete_path(_, message, pre_event):
     user_id = message.from_user.id
     handler_dict[user_id] = False
-    name = message.text
     user_dict = user_data.get(user_id, {})
-    if name in user_dict["upload_pathes"]:
-        del user_dict["upload_pathes"][name]
-        new_value = user_dict["upload_pathes"]
-        update_user_ldata(user_id, "upload_pathes", new_value)
+    names = message.text.split()
+    for name in names:
+        if name in user_dict["upload_paths"]:
+            del user_dict["upload_paths"][name]
+    new_value = user_dict["upload_paths"]
+    update_user_ldata(user_id, "upload_paths", new_value)
     await deleteMessage(message)
     await update_user_settings(pre_event)
     if DATABASE_URL:
-        await DbManager().update_user_doc(user_id, "upload_pathes", new_value)
+        await DbManager().update_user_doc(user_id, "upload_paths", new_value)
 
 
 async def set_option(_, message, pre_event, option):
@@ -269,12 +269,14 @@ async def set_option(_, message, pre_event, option):
         for x in fx:
             x = x.lstrip(".")
             value.append(x.strip().lower())
-    elif option == "upload_pathes":
-        name, path = value.split(maxsplit=1)
+    elif option == "upload_paths":
         user_dict = user_data.get(user_id, {})
-        user_dict.setdefault("upload_pathes", {})
-        user_dict["upload_pathes"][name] = path
-        value = user_dict["upload_pathes"]
+        user_dict.setdefault("upload_paths", {})
+        lines = value.split("/n")
+        for line in lines:
+            name, path = line.split(maxsplit=1)
+            user_dict["upload_paths"][name] = path
+        value = user_dict["upload_paths"]
     update_user_ldata(user_id, option, value)
     await deleteMessage(message)
     await update_user_settings(pre_event)
@@ -693,15 +695,13 @@ Check all yt-dlp api options from this <a href='https://github.com/yt-dlp/yt-dlp
         await update_user_settings(query)
         if DATABASE_URL:
             await DbManager().update_user_data(user_id)
-    elif data[2] == "upload_pathes":
+    elif data[2] == "upload_paths":
         await query.answer()
         buttons = ButtonMaker()
         buttons.ibutton("New Path", f"userset {user_id} new_path")
         if user_dict.get(data[2], False):
-            buttons.ibutton("Show All Pathes", f"userset {user_id} show_path")
-            buttons.ibutton(
-                "Remove Path", f"userset {user_id} rm_path"
-            )
+            buttons.ibutton("Show All Paths", f"userset {user_id} show_path")
+            buttons.ibutton("Remove Path", f"userset {user_id} rm_path")
         buttons.ibutton("Back", f"userset {user_id} back")
         buttons.ibutton("Close", f"userset {user_id} close")
         await editMessage(
@@ -712,23 +712,23 @@ Check all yt-dlp api options from this <a href='https://github.com/yt-dlp/yt-dlp
     elif data[2] == "new_path":
         await query.answer()
         buttons = ButtonMaker()
-        buttons.ibutton("Back", f"userset {user_id} upload_pathes")
+        buttons.ibutton("Back", f"userset {user_id} upload_paths")
         buttons.ibutton("Close", f"userset {user_id} close")
         await editMessage(
             message,
-            "Send path name which you will use it as a shortcut and the path/id seperated by space. Timeout: 60 sec. Timeout: 60 sec",
+            "Send path name(no space in name) which you will use it as a shortcut and the path/id seperated by space. You can add multiple names and paths separated by new line. Timeout: 60 sec",
             buttons.build_menu(1),
         )
-        pfunc = partial(set_option, pre_event=query, option="upload_pathes")
+        pfunc = partial(set_option, pre_event=query, option="upload_paths")
         await event_handler(client, query, pfunc)
     elif data[2] == "rm_path":
         await query.answer()
         buttons = ButtonMaker()
-        buttons.ibutton("Back", f"userset {user_id} upload_pathes")
+        buttons.ibutton("Back", f"userset {user_id} upload_paths")
         buttons.ibutton("Close", f"userset {user_id} close")
         await editMessage(
             message,
-            "Send path name which you want to delete. Timeout: 60 sec",
+            "Send paths names which you want to delete, separated by space. Timeout: 60 sec",
             buttons.build_menu(1),
         )
         pfunc = partial(delete_path, pre_event=query)
@@ -736,11 +736,12 @@ Check all yt-dlp api options from this <a href='https://github.com/yt-dlp/yt-dlp
     elif data[2] == "show_path":
         await query.answer()
         buttons = ButtonMaker()
-        buttons.ibutton("Back", f"userset {user_id} upload_pathes")
+        buttons.ibutton("Back", f"userset {user_id} upload_paths")
         buttons.ibutton("Close", f"userset {user_id} close")
         user_dict = user_data.get(user_id, {})
         msg = "".join(
-            f"<b>{key}</b>: <code>{value}</code>\n" for key, value in user_dict["upload_pathes"].items()
+            f"<b>{key}</b>: <code>{value}</code>\n"
+            for key, value in user_dict["upload_paths"].items()
         )
         await editMessage(
             message,
