@@ -20,6 +20,7 @@ from bot.helper.telegram_helper.message_utils import (
     sendStatusMessage,
 )
 
+client = get_qb_client()
 
 """
 Only v1 torrents
@@ -41,7 +42,6 @@ def _get_hash_file(fpath):
 
 
 async def add_qb_torrent(listener, path, ratio, seed_time):
-    client = await sync_to_async(get_qb_client)
     ADD_TIME = time()
     try:
         url = listener.link
@@ -143,4 +143,3 @@ async def add_qb_torrent(listener, path, ratio, seed_time):
     finally:
         if await aiopath.exists(listener.link):
             await remove(listener.link)
-        await sync_to_async(client.auth_log_out)
