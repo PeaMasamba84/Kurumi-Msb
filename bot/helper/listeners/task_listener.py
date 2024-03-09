@@ -383,7 +383,7 @@ class TaskListener(TaskConfig):
             self.removeFromSameDir()
         
         msg = f"<b>Hai {self.tag} !</b>"
-        msg += "\n<b>Tugasmu diberhentikan karena :</b>"
+        msg += "\n<b>Tugasmu dihentikan karena :</b>"
         msg += f"\n<code>{escape(error)}</code>"
         
         if (
