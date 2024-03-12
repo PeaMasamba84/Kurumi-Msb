@@ -1,4 +1,3 @@
-from asyncio import gather
 from psutil import (
     cpu_percent, 
     virtual_memory, 
@@ -19,7 +18,7 @@ from bot import (
     task_dict_lock,
     task_dict,
 )
-from bot.helper.ext_utils.bot_utils import new_task
+from bot.helper.ext_utils.bot_utils import new_task, sync_to_async
 from bot.helper.ext_utils.status_utils import (
     MirrorStatus,
     get_readable_file_size,
@@ -42,7 +41,7 @@ async def mirror_status(_, message):
     async with task_dict_lock:
         count = len(task_dict)
     if count == 0:
-        msg = "<b>Tidak ada Tugas AKTIF!</b>"
+        msg = "<b>Tidak ada Mirror!</b>"
         msg += f"\n\n<b>Note :</b>\nTambahkan <code>me</code> atau <code>userId</code> setelah perintah untuk menampilkan Tugas secara spesifik!"
         msg += "\n___________________________"
         msg += (
@@ -109,9 +108,8 @@ async def status_pages(_, query):
         up_speed = 0
         seed_speed = 0
         async with task_dict_lock:
-            statuses = await gather(*[tk.status() for tk in task_dict.values()])
-            for download, status in zip(task_dict.values(), statuses):
-                match status:
+            for download in task_dict.values():
+                match await sync_to_async(download.status):
                     case MirrorStatus.STATUS_DOWNLOADING:
                         tasks["Download"] += 1
                         dl_speed += speed_string_to_bytes(download.speed())
