@@ -148,6 +148,9 @@ async def get_user_settings(from_user):
     else:
         ex_ex = "None"
 
+    ns_msg = "Exists" if user_dict.get("name_sub", False) else "Not Exists"
+    buttons.ibutton("Name Substitute", f"userset {user_id} name_subtitute")
+
     buttons.ibutton("YT-DLP Options", f"userset {user_id} yto")
     if user_dict.get("yt_opt", False):
         ytopt = user_dict["yt_opt"]
@@ -155,8 +158,10 @@ async def get_user_settings(from_user):
         ytopt = YTO
     else:
         ytopt = "None"
+
     if user_dict:
         buttons.ibutton("Reset All", f"userset {user_id} reset")
+
     buttons.ibutton("Close", f"userset {user_id} close")
 
     text = f"""
@@ -177,6 +182,7 @@ async def get_user_settings(from_user):
 <b>Index Link       :</b> <code>{index}</code>
 <b>Stop Duplicate   :</b> <code>{sd_msg}</code>
 <b>Default Upload   :</b> <code>{du}</code>
+<b>Name Subtitution :</b> <code>{ns_msg}</code>
 <b>Excluded Ext     :</b> <code>{ex_ex}</code>
 <b>YT-DLP Options   :</b> <code>{escape(ytopt)}</code>
 </pre>
@@ -356,7 +362,13 @@ async def edit_user_settings(client, query):
         else:
             await query.answer("Old Settings", show_alert=True)
             await update_user_settings(query)
-    elif data[2] in ["yt_opt", "lprefix", "index_url", "excluded_extensions"]:
+    elif data[2] in [
+        "yt_opt",
+        "lprefix",
+        "index_url",
+        "excluded_extensions",
+        "name_sub",
+    ]:
         await query.answer()
         update_user_ldata(user_id, data[2], "")
         await update_user_settings(query)
@@ -687,6 +699,28 @@ Check all yt-dlp api options from this <a href='https://github.com/yt-dlp/yt-dlp
             buttons.build_menu(1),
         )
         pfunc = partial(set_option, pre_event=query, option="excluded_extensions")
+        await event_handler(client, query, pfunc)
+    elif data[2] == "name_subtitute":
+        await query.answer()
+        buttons = ButtonMaker()
+        if user_dict.get(data[2], False):
+            buttons.ibutton("Remove Name Subtitute", f"userset {user_id} name_sub")
+        buttons.ibutton("Back", f"userset {user_id} back")
+        buttons.ibutton("Close", f"userset {user_id} close")
+        emsg = f"""Word Subtitions. You can add pattern instead of normal text. Timeout: 60 sec
+Example: 'text : code : s|mirror : leech|tea :  : s|clone'
+1. text will get replaced by code with sensitive case
+2. mirror will get replaced by leech
+4. tea will get removed with sensitive case
+5. clone will get removed
+Your Current Value is {user_dict.get('name_sub') or 'not added yet!'}
+"""
+        await editMessage(
+            message,
+            emsg,
+            buttons.build_menu(1),
+        )
+        pfunc = partial(set_option, pre_event=query, option="name_sub")
         await event_handler(client, query, pfunc)
     elif data[2] in ["gd", "rc"]:
         await query.answer()
