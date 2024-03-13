@@ -154,13 +154,13 @@ class TaskListener(TaskConfig):
                 return
             up_dir, self.name = up_path.rsplit("/", 1)
             self.size = await get_path_size(up_dir)
-            
-       if self.nameSub:
+
+        if self.nameSub:
             up_path = await self.substitute(up_path)
             if self.isCancelled:
                 return
             self.name = up_path.rsplit("/", 1)[1]
-            
+
         if self.screenShots:
             up_path = await self.generateScreenshots(up_path)
             if self.isCancelled:
@@ -255,18 +255,18 @@ class TaskListener(TaskConfig):
             and DATABASE_URL
         ):
             await DbManager().rm_complete_task(self.message.link)
-        msg = f"<b>💾 Nama :</b><blockquote><code>{escape(self.name)}</code></blockquote>\n"
-        msg += f"\n\n<b>┌📦Ukuran :</b> <code>{get_readable_file_size(self.size)}</code>"
+        msg = f"<b>Nama :</b> <code>{escape(self.name)}</code>"
+        msg += f"\n\n<b>Ukuran :</b> <code>{get_readable_file_size(self.size)}</code>"
         LOGGER.info(f"Task Done: {self.name}")
         if self.isLeech:
-            msg += f"\n\n<b>└🗄Jumlah File :</b> <code>{folders}</code>"
+            msg += f"\n\n<b>Jumlah File :</b> <code>{folders}</code>"
             if mime_type != 0:
-                msg += f"\n\n<b>└📕File Rusak :</b> <code>{mime_type}</code>"
-            msg += f'\n\n<b>💂‍♂️ Pemirror :</b> {self.tag}\n\n'
+                msg += f"\n\n<b>File Rusak :</b> <code>{mime_type}</code>"
+            msg += f'\n\n<b>Oleh :</b> {self.tag}\n\n'
             if not files:
                 await sendMessage(self.message, msg)
             else:
-                fmsg = "<b>✅List File :</b>\n"
+                fmsg = "<b>List File :</b>\n"
                 for index, (link, name) in enumerate(files.items(), start=1):
                     fmsg += f"<b>{index:02d}.</b> <a href='{link}'>{name}</a>\n"
                     if len(fmsg.encode() + msg.encode()) > 4000:
@@ -276,10 +276,10 @@ class TaskListener(TaskConfig):
                 if fmsg != "":
                     await sendMessage(self.message, msg + fmsg)
         else:
-            msg += f"\n\n<b>└🗂Tipe :</b> <code>{mime_type}</code>"
+            msg += f"\n\n<b>Tipe :</b> <code>{mime_type}</code>"
             if mime_type == "Folder":
-                msg += f"\n<b>┌📂 Jumlah Folder :</b> <code>{folders}</code>"
-                msg += f"\n<b>└📄 Jumlah File :</b> <code>{files}</code>"
+                msg += f"\n\n<b>Jumlah Folder :</b> <code>{folders}</code>"
+                msg += f"\n\n<b>Jumlah File :</b> <code>{files}</code>"
             if (
                 link
                 or rclonePath
@@ -288,9 +288,9 @@ class TaskListener(TaskConfig):
             ):
                 buttons = ButtonMaker()
                 if link:
-                    buttons.ubutton("🌩 Cloud", link)
+                    buttons.ubutton("☁️ Cloud", link)
                 if rclonePath:
-                    msg += f"\n\n<b>📙Path :</b> <code>{rclonePath}</code>"
+                    msg += f"\n\n<b>Path :</b> <code>{rclonePath}</code>"
                 if (
                     rclonePath
                     and (RCLONE_SERVE_URL := config_dict["RCLONE_SERVE_URL"])
@@ -313,12 +313,12 @@ class TaskListener(TaskConfig):
                         buttons.ubutton("⚡ Index", share_url)
                         if mime_type.startswith(("image", "video", "audio")):
                             share_urls = f"{INDEX_URL}findpath?id={dir_id}&view=true"
-                            buttons.ubutton("📺 Media Link", share_urls)
+                            buttons.ubutton("🎬 View", share_urls)
                 button = buttons.build_menu(2)
             else:
-                msg += f"\n\n<b>📙Path :</b> <code>{rclonePath}</code>"
+                msg += f"\n\n<b>Path :</b> <code>{rclonePath}</code>"
                 button = None
-            msg += f"\n\n<b>💂‍♂️ Pemirror :</b> {self.tag}"
+            msg += f"\n\n<b>Oleh :</b> {self.tag}"
             await sendMessage(self.message, msg, button)
             # Log Chat
             LOG_CHAT_ID = None
