@@ -276,7 +276,7 @@ class TaskListener(TaskConfig):
                 if fmsg != "":
                     await sendMessage(self.message, msg + fmsg)
         else:
-            msg += f"\n\n<b>└🗂 Tipe :</b> <code>{mime_type}</code>"
+            msg += f"\n<b>└🗂 Tipe :</b> <code>{mime_type}</code>"
             if mime_type == "Folder":
                 msg += f"\n<b>┌📂 Jumlah Folder :</b> <code>{folders}</code>"
                 msg += f"\n<b>└📄 Jumlah File :</b> <code>{files}</code>"
