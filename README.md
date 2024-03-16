@@ -2,13 +2,14 @@
   <b>𝑷𝒆𝒂 𝑴𝒂𝒔𝒂𝒎𝒃𝒂 𝑩𝒐𝒕</b>
 </h1>
 
-![Anurag's GitHub stats](https://github-readme-stats.vercel.app/api?username=PeaMasamba84&show_icons=true&theme=radical)
+
+<h1 align="center"![Anurag's GitHub stats](https://github-readme-stats.vercel.app/api?username=PeaMasamba84&show_icons=true&theme=radical)
 
 [![Readme Card](https://github-readme-stats.vercel.app/api/pin/?username=PeaMasamba84&repo=Kurumi-Msb)](https://github.com/PeaMasamba84/Kurumi-Msb)
 
 [![Harlok's WakaTime stats](https://github-readme-stats.vercel.app/api/wakatime?username=@peamasamba)](https://github.com/PeaMasamba84/Kurumi-Msb)
 
-[![Top Langs](https://github-readme-stats.vercel.app/api/top-langs/?username=PeaMasamba84)](https://github.com/PeaMasamba84/Kurumi-Msb)
+[![Top Langs](https://github-readme-stats.vercel.app/api/top-langs/?username=PeaMasamba84)](https://github.com/PeaMasamba84/Kurumi-Msb)</h1>
 
 
 
