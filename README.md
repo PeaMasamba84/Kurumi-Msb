@@ -8,7 +8,7 @@
 
 [![Harlok's WakaTime stats](https://github-readme-stats.vercel.app/api/wakatime?username=@peamasamba)](https://github.com/PeaMasamba84/Kurumi-Msb)
 
-[![Top Langs](https://github-readme-stats.vercel.app/api/top-langs/?username=PeaMasamba84)](https://github.com/PeaMasamba84/Kurumi-Msb))
+[![Top Langs](https://github-readme-stats.vercel.app/api/top-langs/?username=PeaMasamba84)](https://github.com/PeaMasamba84/Kurumi-Msb)
 
 
 
