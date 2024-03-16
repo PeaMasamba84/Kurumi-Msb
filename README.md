@@ -1,5 +1,21 @@
+<h1 align="center">
+  <b>𝑷𝒆𝒂 𝑴𝒂𝒔𝒂𝒎𝒃𝒂 𝑩𝒐𝒕</b>
+</h1>
+
+![Anurag's GitHub stats](https://github-readme-stats.vercel.app/api?username=PeaMasamba84&show_icons=true&theme=radical)
+
+[![Readme Card](https://github-readme-stats.vercel.app/api/pin/?username=PeaMasamba84&repo=Kurumi-Msb)](https://github.com/PeaMasamba84/Kurumi-Msb)
+
+[![Harlok's WakaTime stats](https://github-readme-stats.vercel.app/api/wakatime?username=@nadifmasamba)](https://github.com/PeaMasamba84/Kurumi-Msb)
+
+[![Top Langs](https://github-readme-stats.vercel.app/api/top-langs/?username=PeaMasamba84)](https://github.com/PeaMasamba84/Kurumi-Msb))
+
+
+
 
 [![Typing SVG](https://readme-typing-svg.herokuapp.com/?lines=𝑊𝑒𝑙𝑐𝑜𝑚𝑒,Repo+B𝑦+Pea+Masamba;𝐴+𝑠𝑖𝑚𝑝𝑙𝑒+𝑎𝑛𝑑+𝑝𝑜𝑤𝑒𝑟𝑓𝑢𝑙+𝐵𝑜𝑡!;Speed+Good+Support+Leech+4𝐺𝐵)](https://github.com/PeaMasamba84/Kurumi-Msb)
+
+
 
 # Features
 
