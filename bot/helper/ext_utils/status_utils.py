@@ -172,7 +172,7 @@ async def get_readable_message(sid, is_user, page_no=1, status="All", page_step=
     ):
         tstatus = await sync_to_async(task.status) if status == "All" else status
         if task.listener.isPrivateChat:             
-            msg += f"\n💾 File :<blockquote><code>>RAHASIA YA</code></blockquote>"
+            msg += f"\n💾 File :<blockquote><code>RAHASIA YA</code></blockquote>"
         else: 
             msg += f"\n💾 File :<blockquote><code>{escape(f'{task.name()}')}</code></blockquote>\n"
         progress = (
@@ -214,8 +214,8 @@ async def get_readable_message(sid, is_user, page_no=1, status="All", page_step=
         msg += f"\n<b>├📟 GID:</b> <code>{tgid}</code>"
         
         if task.listener.isPrivateChat: 
-            msg += f"\n<b>├🆔 UID:</b> <code>PRIVATE</code>"
-            msg += f"\n<b>├🦹 User:</b> <code>PRIVATE</code>"
+            msg += f"\n<b>├🆔 UID:</b> <code>RAHASIA YA</code>"
+            msg += f"\n<b>├🦹 User:</b> <code>RAHASIA YA</code>"
         else:
             msg += f"\n<b>├🆔 UID:</b> <code>{task.listener.userId}</code>"
             msg += f"\n<b>├🦹 User:</b> <code>{task.listener.user.first_name} {(task.listener.user.last_name or '')}</code>"
