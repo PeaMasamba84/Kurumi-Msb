@@ -6,7 +6,7 @@
 
 [![Readme Card](https://github-readme-stats.vercel.app/api/pin/?username=PeaMasamba84&repo=Kurumi-Msb)](https://github.com/PeaMasamba84/Kurumi-Msb)
 
-[![Harlok's WakaTime stats](https://github-readme-stats.vercel.app/api/wakatime?username=@nadifmasamba)](https://github.com/PeaMasamba84/Kurumi-Msb)
+[![Harlok's WakaTime stats](https://github-readme-stats.vercel.app/api/wakatime?username=@peamasamba)](https://github.com/PeaMasamba84/Kurumi-Msb)
 
 [![Top Langs](https://github-readme-stats.vercel.app/api/top-langs/?username=PeaMasamba84)](https://github.com/PeaMasamba84/Kurumi-Msb))
 
