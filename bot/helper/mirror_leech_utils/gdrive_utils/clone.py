@@ -89,7 +89,7 @@ class gdClone(GoogleDriveHelper):
                 err = err.last_attempt.exception()
             err = str(err).replace(">", "").replace("<", "")
             if "User rate limit exceeded" in err:
-                msg = "Limit harian file tercapai!\nCoba lagi kapan kapan :D"
+                msg = "Limit harian file tercapai!\nJangan tanya kapan, hanya waktu yang bisa menjawab :D"
             elif "File not found" in err:
                 if not self.alt_auth and self.use_sa:
                     self.alt_auth = True
