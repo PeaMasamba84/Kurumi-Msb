@@ -59,21 +59,23 @@ class TgUploader:
         self._is_corrupted = False
         self._media_dict = {"videos": {}, "documents": {}}
         self._last_msg_in_group = False
-        self._session = ""
+        # self._session = ""
         self._up_path = ""
         self._lprefix = ""
         self._media_group = False
         self._is_private = False
+        self._user_session = self._listener.userTransmission
         self._forwardMsg = None
         self._forwardChatId = None
         self._forwardThreadId = None
 
     async def _upload_progress(self, current, _):
         if self._listener.isCancelled:
-            if (
-                self._listener.userTransmission
-                or self._session == "user"
-            ):
+            # if (
+            #     self._listener.userTransmission
+            #     or self._session == "user"
+            # ):
+            if self._user_session:
                 user.stop_transmission()
             else:
                 self._listener.client.stop_transmission()
@@ -136,10 +138,12 @@ class TgUploader:
                 else self._listener.message.text.lstrip("/")
             )
             try:
-                if (
-                    self._listener.userTransmission
-                    and self._session == "user"
-                ):
+                # if (
+                #     self._user_session
+                #     and self._session == "user"
+                # ):
+
+                if self._user_session:
                     client = user
                 else:
                     client = self._listener.client
@@ -150,14 +154,15 @@ class TgUploader:
                     text=msg,
                     message_thread_id=self._listener.threadId
                 )
-                # self._is_private = self._sent_msg.chat.type.name == "PRIVATE"
+                self._is_private = self._sent_msg.chat.type.name == "PRIVATE"
             except Exception as e:
                 await self._listener.onUploadError(str(e))
                 return False
-        elif (
-            self._listener.userTransmission
-            and self._session == "user"
-        ):
+        # elif (
+        #     self._user_session
+        #     and self._session == "user"
+        # ):
+        elif self._user_session:
             self._sent_msg = await user.get_messages(
                 chat_id=self._listener.message.chat.id, 
                 message_ids=self._listener.mid
@@ -269,6 +274,15 @@ class TgUploader:
             LOGGER.error(f"Failed to forward Message! ERROR: {e}")
 
     async def _send_media_group(self, subkey, key, msgs):
+        for index, msg in enumerate(msgs):
+            if self._listener.mixedLeech or not self.self._user_session:
+                msgs[index] = await self._listener.client.get_messages(
+                    chat_id=msg[0], message_ids=msg[1]
+                )
+            else:
+                msgs[index] = await user.get_messages(
+                    chat_id=msg[0], message_ids=msg[1]
+                )
         msgs_list = await msgs[0].reply_to_message.reply_media_group(
             media=self._get_input_media(subkey, key),
             quote=True,
@@ -286,9 +300,9 @@ class TgUploader:
 
     async def upload(self, o_files, ft_delete):
         await self._user_settings()
-        # res = await self._msg_to_reply()
-        # if not res:
-        #     return
+        res = await self._msg_to_reply()
+        if not res:
+            return
         for dirpath, _, files in natsorted(await sync_to_async(walk, self._path)):
             if dirpath.endswith("/yt-dlp-thumb"):
                 continue
@@ -309,14 +323,28 @@ class TgUploader:
                     continue
                 try:
                     f_size = await aiopath.getsize(self._up_path)
+                    if self._listener.mixedLeech:
+                        self._user_session = f_size > 2097152000
+                        if self._user_session:
+                            self._sent_msg = await user.get_messages(
+                                chat_id=self._sent_msg.chat.id,
+                                message_ids=self._sent_msg.id,
+                            )
+                        else:
+                            self._sent_msg = await self._listener.client.get_messages(
+                                chat_id=self._sent_msg.chat.id,
+                                message_ids=self._sent_msg.id,
+                            )
+
                     # Force uploads below 2GB using Bot session and above 2GB using User session
-                    if f_size < 2097152000:
-                        self._session = "bot"
-                    else:
-                        self._session = "user"
-                    res = await self._msg_to_reply()
-                    if not res:
-                        return
+                    # if f_size < 2097152000:
+                    #     self._session = "bot"
+                    # else:
+                    #     self._session = "user"
+                    # res = await self._msg_to_reply()
+                    # if not res:
+                    #     return
+                            
                     self._total_files += 1
                     if f_size == 0:
                         LOGGER.error(
@@ -339,7 +367,7 @@ class TgUploader:
                                         await self._send_media_group(subkey, key, msgs)
                     self._last_msg_in_group = False
                     self._last_uploaded = 0
-                    LOGGER.info(f"Leech Started: {self._listener.name} | Using: {self._session.upper()} Session")
+                    LOGGER.info(f"Leech by {('user' if self._user_session else 'bot').title()}: {self._listener.name}")
                     await self._upload_file(cap_mono, file_, f_path)
                     if self._listener.isCancelled:
                         return
@@ -509,16 +537,21 @@ class TgUploader:
                 if match := re_match(r".+(?=\.0*\d+$)|.+(?=\.part\d+\..+$)", o_path):
                     pname = match.group(0)
                     if pname in self._media_dict[key].keys():
-                        self._media_dict[key][pname].append(self._sent_msg)
+                        self._media_dict[key][pname].append(
+                            [self._sent_msg.chat.id, self._sent_msg.id]
+                        )
                     else:
-                        self._media_dict[key][pname] = [self._sent_msg]
+                        self._media_dict[key][pname] = [
+                            [self._sent_msg.chat.id, self._sent_msg.id]
+                        ]
                     msgs = self._media_dict[key][pname]
                     if len(msgs) == 10:
                         await self._send_media_group(pname, key, msgs)
                     else:
                         self._last_msg_in_group = True
 
-            if (self._thumb is None
+            if (
+                self._thumb is None
                 and thumb is not None
                 and await aiopath.exists(thumb)
             ):
@@ -538,11 +571,12 @@ class TgUploader:
                         )
                 except Exception as e:
                     LOGGER.error(f"Failed to forward Message! ERROR: {e}")
-        except FloodWait as f: # for later
+        except FloodWait as f:
             LOGGER.warning(str(f))
             await sleep(f.value)
         except Exception as err:
-            if (self._thumb is None
+            if (
+                self._thumb is None
                 and thumb is not None
                 and await aiopath.exists(thumb)
             ):
