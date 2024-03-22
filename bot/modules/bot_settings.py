@@ -990,6 +990,9 @@ async def load_config():
     NAME_SUBSTITUTE = environ.get("NAME_SUBSTITUTE", "")
     NAME_SUBSTITUTE = "" if len(NAME_SUBSTITUTE) == 0 else NAME_SUBSTITUTE
 
+    MIXED_LEECH = environ.get("MIXED_LEECH", "")
+    MIXED_LEECH = MIXED_LEECH.lower() == "true" and IS_PREMIUM_USER
+
     await (await create_subprocess_exec("pkill", "-9", "-f", "gunicorn")).wait()
     BASE_URL = environ.get("BASE_URL", "").rstrip("/")
     if len(BASE_URL) == 0:
@@ -1056,6 +1059,7 @@ async def load_config():
             "LEECH_SPLIT_SIZE": LEECH_SPLIT_SIZE,
             "LOG_CHAT_ID": LOG_CHAT_ID,
             "MEDIA_GROUP": MEDIA_GROUP,
+            "MIXED_LEECH": MIXED_LEECH,
             "NAME_SUBSTITUTE": NAME_SUBSTITUTE,
             "OWNER_ID": OWNER_ID,
             "QUEUE_ALL": QUEUE_ALL,
