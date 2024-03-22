@@ -54,7 +54,8 @@
 - Equal split size settings (global and user option)
 - Ability to leech split file parts in a media group (global and user option)
 - Download restricted messages (document or link) by tg private/public/super links (task option)
-- Choose transfer by bot or user session in case you have a premium plan (global and user option)
+- Choose transfer by bot or user session in case you have a premium plan (global, user option and task option)
+- Mix upload between user and bot session with respect to file size (global, user option and task option)
 
 ## Google Drive
 
