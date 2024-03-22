@@ -93,6 +93,7 @@ class Mirror(TaskListener):
             "-f": False,
             "-fd": False,
             "-fu": False,
+            "-ml": False,
             "-i": 0,
             "-sp": 0,
             "link": "",
@@ -130,6 +131,7 @@ class Mirror(TaskListener):
         self.convertAudio = args["-ca"]
         self.convertVideo = args["-cv"]
         self.nameSub = args["-ns"]
+        self.mixedLeech = args["-ml"]
 
         headers = args["-h"]
         isBulk = args["-b"]
