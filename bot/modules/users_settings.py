@@ -101,6 +101,16 @@ async def get_user_settings(from_user):
     else:
         leech_method = "bot"
 
+    if (
+        IS_PREMIUM_USER
+        and user_dict.get("mixed_leech", False)
+        or "mixed_leech" not in user_dict
+        and config_dict["MIXED_LEECH"]
+    ):
+        mixed_leech = "Enabled"
+    else:
+        mixed_leech = "Disabled"
+
     buttons.ibutton("Leech", f"userset {user_id} leech")
 
     buttons.ibutton("Rclone", f"userset {user_id} rclone")
@@ -171,6 +181,7 @@ async def get_user_settings(from_user):
 <b>Leech Type       :</b> <code>{ltype}</code>
 <b>Leech Prefix     :</b> <code>{escape(lprefix)}</code>
 <b>Leech Split Size :</b> <code>{split_size}</code>
+<b>Mixed Leech      :</b> <code>{mixed_leech}</code>
 <b>Equal Splits     :</b> <code>{equal_splits}</code>
 <b>Media Group      :</b> <code>{media_group}</code>
 <b>Custom Thumbnail :</b> <code>{thumbmsg}</code>
@@ -339,6 +350,7 @@ async def edit_user_settings(client, query):
         "media_group",
         "user_transmission",
         "stop_duplicate",
+        "mixed_leech",
     ]:
         update_user_ldata(user_id, data[2], data[3] == "true")
         await query.answer()
@@ -461,6 +473,26 @@ async def edit_user_settings(client, query):
             )
         else:
             leech_method = "bot"
+
+
+        if (
+            IS_PREMIUM_USER
+            and user_dict.get("mixed_leech", False)
+            or "mixed_leech" not in user_dict
+            and config_dict["MIXED_LEECH"]
+        ):
+            mixed_leech = "Enabled"
+            buttons.ibutton(
+                "Disable Mixed Leech", f"userset {user_id} mixed_leech false"
+            )
+        elif IS_PREMIUM_USER:
+            mixed_leech = "Disabled"
+            buttons.ibutton(
+                "Enable Mixed Leech", f"userset {user_id} mixed_leech true"
+            )
+        else:
+            mixed_leech = "Disabled"
+
         buttons.ibutton("Back", f"userset {user_id} back")
         buttons.ibutton("Close", f"userset {user_id} close")
         text = f"""
@@ -470,6 +502,7 @@ async def edit_user_settings(client, query):
 <b>Leech Type       :</b> <code>{ltype}</code>
 <b>Leech Split Size :</b> <code>{split_size}</code>
 <b>Leech Prefix     :</b> <code>{escape(lprefix)}</code>
+<b>Mixed Leech      :</b> <code>{mixed_leech}</code>
 <b>Equal Splits     :</b> <code>{equal_splits}</code>
 <b>Media Group      :</b> <code>{media_group}</code>
 <b>Custom Thumbnail :</b> <code>{thumbmsg}</code>
