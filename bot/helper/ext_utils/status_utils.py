@@ -24,19 +24,19 @@ from bot.helper.telegram_helper.button_build import ButtonMaker
 SIZE_UNITS = ["B", "KB", "MB", "GB", "TB", "PB"]
 
 class MirrorStatus:
-    STATUS_DOWNLOADING = "Unduh"
-    STATUS_UPLOADING = "Unggah"
-    STATUS_CLONING = "Clone"
-    STATUS_QUEUEDL = "AntriDownload"
-    STATUS_QUEUEUP = "AntriUpload"
-    STATUS_PAUSED = "Henti"
-    STATUS_CHECKING = "Cek"
-    STATUS_ARCHIVING = "Arsip"
-    STATUS_EXTRACTING = "Ekstrak"
-    STATUS_SEEDING = "Seed"
-    STATUS_SPLITTING = "Bagi"
-    STATUS_SAMVID = "SampelVideo"
-    STATUS_CONVERTING = "Konversi"
+    STATUS_DOWNLOADING = "𝚄𝚗𝚍𝚞𝚑"
+    STATUS_UPLOADING = "𝚄𝚗𝚐𝚐𝚊𝚑"
+    STATUS_CLONING = "𝙺𝚕𝚘𝚗𝚒𝚗𝚐"
+    STATUS_QUEUEDL = "𝙰𝚗𝚝𝚛𝚒𝚄𝚗𝚍𝚞𝚑"
+    STATUS_QUEUEUP = "𝙰𝚗𝚝𝚛𝚒𝚄𝚗𝚐𝚐𝚊𝚑"
+    STATUS_PAUSED = "𝙹𝚎𝚍𝚊"
+    STATUS_CHECKING = "𝙼𝚎𝚗𝚐𝚎𝚌𝚎𝚔"
+    STATUS_ARCHIVING = "𝙼𝚎𝚗𝚐𝚊𝚛𝚜𝚒𝚙"
+    STATUS_EXTRACTING = "𝙼𝚎𝚗𝚐𝚎𝚔𝚜𝚝𝚛𝚊𝚔"
+    STATUS_SEEDING = "𝚂𝚎𝚎𝚍"
+    STATUS_SPLITTING = "𝙼𝚎𝚖𝚋𝚊𝚐𝚒"
+    STATUS_SAMVID = "𝚂𝚊𝚖𝚙𝚎𝚕𝚅𝚒𝚍𝚎𝚘"
+    STATUS_CONVERTING = "𝙺𝚘𝚗𝚟𝚎𝚛𝚜𝚒"
      
 STATUSES = {
     "ALL": "All",
@@ -69,9 +69,7 @@ async def getTaskByGid(gid: str):
 def getSpecificTasks(status, userId):
     if status == "All":
         if userId:
-            return [
-                tk for tk in list(task_dict.values()) if tk.listener.userId == userId
-            ]
+            return [tk for tk in task_dict.values() if tk.listener.userId == userId]
         else:
             return list(task_dict.values())
     elif userId:
@@ -80,7 +78,8 @@ def getSpecificTasks(status, userId):
             for tk in list(task_dict.values())
             if tk.listener.userId == userId
             and (
-                (st := tk.status() == status)
+                (st := tk.status())
+                and st == status
                 or status == MirrorStatus.STATUS_DOWNLOADING
                 and st not in list(STATUSES.values())
             )
@@ -89,7 +88,8 @@ def getSpecificTasks(status, userId):
         return [
             tk
             for tk in list(task_dict.values())
-            if (st := tk.status() == status)
+            if (st := tk.status())
+            and st == status
             or status == MirrorStatus.STATUS_DOWNLOADING
             and st not in list(STATUSES.values())
         ]
