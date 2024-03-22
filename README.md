@@ -78,6 +78,7 @@
 - Status buttons to get specific tasks for the chosen status regarding transfer type if the number of tasks is more than
   30 (global and user option)
 - Steps buttons for how much next/previous buttons should step backward/forward (global and user option)
+- - Status for each user (no auto refresh)
 
 ## Yt-dlp
 
@@ -91,10 +92,10 @@
 ## JDownloader
 
 - Synchronize Settings (global option)
-- Wating to select (enable/disable files or change variants) before download start
+- Waiting to select (enable/disable files or change variants) before download start
 - DLC file support
 - All settings can be edited from the remote access to your JDownloader with Web Interface, Android App, iPhone App or
-  Browser Extensions.
+  Browser Extensions
 
 ## Mongo Database
 
@@ -319,7 +320,8 @@ quotes, even if it's `Int`, `Bool` or `List`.
 - `EQUAL_SPLITS`: Split files larger than **LEECH_SPLIT_SIZE** into equal parts size (Not working with zip cmd). Default
   is `False`. `Bool`
 - `MEDIA_GROUP`: View Uploaded splitted file parts in media group. Default is `False`. `Bool`.
-- `USER_TRANSMISSION`: Upload/Download by user session. Default is `False`. `Bool`
+- `USER_TRANSMISSION`: Upload/Download by user session. Only in superChat. Default is `False`. `Bool`
+- `MIXED_LEECH`: Upload by user and bot session with respect to file size. Only in superChat. Default is `False`. `Bool`
 - `LEECH_FILENAME_PREFIX`: Add custom word to leeched file name. `Str`
 - `LEECH_DUMP_CHAT`: ID or USERNAME or PM(private message) to where files would be uploaded. `Int`|`Str`. Add `-100` before channel/superGroup id.
 
