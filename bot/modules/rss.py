@@ -8,7 +8,7 @@ from io import BytesIO
 from pyrogram.filters import command, regex, create
 from pyrogram.handlers import MessageHandler, CallbackQueryHandler
 from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton
-from re import split as re_split, sub as re_sub, findall as re_findall
+from re import sub as re_sub, findall as re_findall
 from time import time
 
 from bot import scheduler, rss_dict, LOGGER, DATABASE_URL, config_dict, bot
@@ -746,12 +746,12 @@ async def rssMonitor():
 
                         # BlackListed p2p_group / p2p_name (Based on my RSS Feed)
                         blacklist = [
-                            "a", "ass", "activated", "audio", "audios", "audiobook", "br", "chan", "compilation", "dl", "dlrip", 
-                            "empire", "en", "eng", "flac", "global", "hd", "hen", "i", "id", "in", "jap", "kaime", "kun", "la", 
-                            "man", "media", "off", "pot", "raw", "raws", "ray",  "rayrip", "res", "rip", "sai", "sama", "san", 
-                            "srt", "sub", "subs", "subtitle", "true", "us", "x", "2160", "1080", "720", "480", "360", "2160p", 
-                            "1080p", "720p", "480p", "360p", "1080p-avc", "1080p-hevc", "1080p-av1", "1080p-vp9", "720p-avc", 
-                            "720p-hevc", "720p-av1", "720p-vp9"
+                            "-", "a", "ass", "activated", "audio", "audios", "audiobook", "br", "chan", "compilation", "dl",
+                            "dlrip", "empire", "en", "eng", "flac", "global", "hd", "hen", "i", "id", "in", "jap", "kaime", 
+                            "kun", "la", "man", "media", "off", "pot", "raw", "raws", "ray",  "rayrip", "res", "rip", "sai", 
+                            "sama", "san", "srt", "sub", "subs", "subtitle", "true", "us", "x", "2160", "1080", "720", "480",
+                            "360", "2160p", "1080p", "720p", "480p", "360p", "1080p-avc", "1080p-hevc", "1080p-av1", "1080p-vp9", 
+                            "720p-avc", "720p-hevc", "720p-av1", "720p-vp9"
                         ]
                         
                         if (
