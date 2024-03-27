@@ -64,6 +64,7 @@ class TgUploader:
         self._lprefix = ""
         self._media_group = False
         self._is_private = False
+        self._sent_msg = None
         self._user_session = self._listener.userTransmission
         self._forwardMsg = None
         self._forwardChatId = None
@@ -323,19 +324,7 @@ class TgUploader:
                     continue
                 try:
                     f_size = await aiopath.getsize(self._up_path)
-                    if self._listener.mixedLeech:
-                        self._user_session = f_size > 2097152000
-                        if self._user_session:
-                            self._sent_msg = await user.get_messages(
-                                chat_id=self._sent_msg.chat.id,
-                                message_ids=self._sent_msg.id,
-                            )
-                        else:
-                            self._sent_msg = await self._listener.client.get_messages(
-                                chat_id=self._sent_msg.chat.id,
-                                message_ids=self._sent_msg.id,
-                            )
-
+                    
                     # Force uploads below 2GB using Bot session and above 2GB using User session
                     # if f_size < 2097152000:
                     #     self._session = "bot"
@@ -344,7 +333,7 @@ class TgUploader:
                     # res = await self._msg_to_reply()
                     # if not res:
                     #     return
-                            
+
                     self._total_files += 1
                     if f_size == 0:
                         LOGGER.error(
@@ -365,6 +354,18 @@ class TgUploader:
                                 for subkey, msgs in list(value.items()):
                                     if len(msgs) > 1:
                                         await self._send_media_group(subkey, key, msgs)
+                    if self._listener.mixedLeech:
+                        self._user_session = f_size > 2097152000
+                        if self._user_session:
+                            self._sent_msg = await user.get_messages(
+                                chat_id=self._sent_msg.chat.id,
+                                message_ids=self._sent_msg.id,
+                            )
+                        else:
+                            self._sent_msg = await self._listener.client.get_messages(
+                                chat_id=self._sent_msg.chat.id,
+                                message_ids=self._sent_msg.id,
+                            )
                     self._last_msg_in_group = False
                     self._last_uploaded = 0
                     LOGGER.info(f"Leech by {('user' if self._user_session else 'bot').title()}: {self._listener.name}")
