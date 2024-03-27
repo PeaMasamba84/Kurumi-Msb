@@ -172,7 +172,7 @@ async def get_readable_message(sid, is_user, page_no=1, status="All", page_step=
     ):
         tstatus = await sync_to_async(task.status) if status == "All" else status
         if task.listener.isPrivateChat:             
-            msg += f"\n💾 File :<blockquote><code>RAHASIA YA</code></blockquote>"
+            msg += f"\n💾 File :<blockquote><code>TASK ADMIN</code></blockquote>"
         else: 
             msg += f"\n💾 File :<blockquote><code>{escape(f'{task.name()}')}</code></blockquote>\n"
         progress = (
@@ -214,8 +214,8 @@ async def get_readable_message(sid, is_user, page_no=1, status="All", page_step=
         msg += f"\n<b>├📟 GID:</b> <code>{tgid}</code>"
         
         if task.listener.isPrivateChat: 
-            msg += f"\n<b>├🆔 UID:</b> <code>RAHASIA YA</code>"
-            msg += f"\n<b>├🦹 User:</b> <code>RAHASIA YA</code>"
+            msg += f"\n<b>├🆔 UID:</b> <code>TASK ADMIN</code>"
+            msg += f"\n<b>├🦹 User:</b> <code>TASK ADMIN</code>"
         else:
             msg += f"\n<b>├🆔 UID:</b> <code>{task.listener.userId}</code>"
             msg += f"\n<b>├🦹 User:</b> <code>{task.listener.user.first_name} {(task.listener.user.last_name or '')}</code>"
@@ -246,7 +246,7 @@ async def get_readable_message(sid, is_user, page_no=1, status="All", page_step=
                 buttons.ibutton(label, f"status {sid} st {status_value}")
     buttons.ibutton("Refresh", f"status {sid} ref", position="header")
     button = buttons.build_menu(8)
-    msg += "<a href='https://saweria.co/peamasamba'><center>═══❰ 𝐃𝐎𝐍𝐀𝐓𝐄 ❱═══</a></center>"
+    msg += "<a href='https://saweria.co/peamasamba'><center>   ═══❰ 𝐃𝐎𝐍𝐀𝐓𝐄 ❱═══</a></center>"
     msg += f"\n<b>💿CPU:</b> <code>{cpu_percent()}%</code> | <b>🚦RAM:</b> <code>{virtual_memory().percent}%</code>"
     msg += f"\n<b>▼:</b> <code>{get_readable_file_size(net_io_counters().bytes_recv)}</code> | <b>▲:</b> <code>{get_readable_file_size(net_io_counters().bytes_sent)}</code>"
     return msg, button
