@@ -77,7 +77,7 @@ async def get_telegraph_list(telegraph_content):
     path = [
         (
             await telegraph.create_page(
-                title="Pencari Pea Masamba Bot", content=content
+                title="Pea Masamba Bot", content=content
             )
         )["path"]
         for content in telegraph_content
