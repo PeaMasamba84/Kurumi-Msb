@@ -257,7 +257,7 @@ class TaskListener(TaskConfig):
             await DbManager().rm_complete_task(self.message.link)
         msg = f"<b>💾 Nama :</b><blockquote><code>{escape(self.name)}</code></blockquote>\n"        
         msg += f"\n\n<b>┌📦Ukuran :</b> <code>{get_readable_file_size(self.size)}</code>"
-        msg += f"<b>Elp:</b> {get_readable_time(time.time() - self.message.date.timestamp())}\n"
+        msg += f"<b>Elp:</b> {get_readable_time(time() - self.message.date.timestamp())}"
         LOGGER.info(f"Task Done: {self.name}")
         if self.isLeech:
             msg += f"\n\n<b>└🗄Jumlah File :</b> <code>{folders}</code>"
