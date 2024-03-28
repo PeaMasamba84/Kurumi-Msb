@@ -176,7 +176,7 @@ class gdSearch(GoogleDriveHelper):
                         msg += f' <b>| <a href="{url}">⚡ Index</a></b>'
                         if mime_type.startswith(("image", "video", "audio")):
                             urlv = f'{index_url}findpath?id={file.get("id")}&view=true'
-                            msg += f' <b>| <a href="{urlv}">🎬 View</a></b>'
+                            msg += f' <b>| <a href="{urlv}">📺 Media Link</a></b>'
 
                 if USE_TELEGRAPH:
                     msg += "<br><br>"
