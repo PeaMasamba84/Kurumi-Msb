@@ -175,6 +175,7 @@ class Clone(TaskListener):
                 msg = f"<b>Hai {self.tag} !</b>"
                 msg += "\n<b>Tugasmu dihentikan karena :</b>"
                 msg += f"\n<code>{escape(error)}</code>"
+                msg += f"\n<b>Elap:</b> </code>{get_readable_time(elapsed)}"
                 
                 if not USE_TELEGRAPH:
                     content = [content for content in button for content in content.split("\n\n")]
