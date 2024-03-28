@@ -20,16 +20,16 @@ telegram_list_lock = Lock()
 async def list_buttons(user_id, isRecursive=True, user_token=False):
     buttons = ButtonMaker()
     buttons.ibutton(
-        "Folders", f"list_types {user_id} folders {isRecursive} {user_token}"
+        "Folder", f"list_types {user_id} folders {isRecursive} {user_token}"
     )
-    buttons.ibutton("Files", f"list_types {user_id} files {isRecursive} {user_token}")
+    buttons.ibutton("File", f"list_types {user_id} files {isRecursive} {user_token}")
     buttons.ibutton("Keduanya", f"list_types {user_id} both {isRecursive} {user_token}")
     buttons.ibutton(
-        f"Recursive : {isRecursive}",
+        f"Rekursif : {isRecursive}",
         f"list_types {user_id} rec {isRecursive} {user_token}",
     )
     buttons.ibutton(
-        f"User Token : {user_token}",
+        f"Token User: {user_token}",
         f"list_types {user_id} ut {isRecursive} {user_token}",
     )
     buttons.ibutton("Batalkan", f"list_types {user_id} cancel")
@@ -63,7 +63,7 @@ async def _list_drive(key, message, item_type, isRecursive, user_token, user_id)
                 await editMessage(message, e)
                 return
 
-            msg = f"<b>Menemukan</b> <code>{contents_no}</code> <b>hasil untuk kata kunci :</b>\n<code>{key}</code>"
+            msg = f"<b>Ditemukan</b> <code>{contents_no}</code> <b>hasil untuk kata kunci :</b>\n<code>{key}</code>"
             await editMessage(message, msg, button)
         
         else:
@@ -147,7 +147,7 @@ async def select_type(_, query):
     msg += f"\n╾────────────╼\n"
     msg += f"<b>Tipe :</b> <code>{item_type.capitalize()}</code>"
     msg += f"\n<b>Recursive :</b> <code>{'Yes' if isRecursive else 'No'}</code>"
-    msg += f"\n<b>User Token :</b> <code>{'Yes' if user_token else 'No'}</code>"
+    msg += f"\n<b>Token User :</b> <code>{'Yes' if user_token else 'No'}</code>"
     msg += f"\n<b>Kata Kunci :</b> <code>{key.title()}</code>"
     msg += "\n╾────────────╼\n"
     await editMessage(message, msg)
