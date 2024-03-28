@@ -340,7 +340,8 @@ async def restart_notification():
 {'<b>Bot berhasil dimulai ulang!</b>' if cid == chat_id else '<b>Bot dimulai ulang!</b>'}
 <pre languange="bash"><b>Hari      :</b> <code>{now.strftime('%A')}</code>
 <b>Tanggal   :</b> <code>{now.strftime('%d %B %Y')}</code>
-<b>Waktu     :</b> <code>{now.strftime('%H:%M:%S WIB')}</code>
+<b>Waktu     :</b> <code>{now.strftime('%H:%M:%S WITA')}</code>
+<b>Wilayah   :</b> <code>Sulawesi Selatan</code>
 </pre>           
 """
                 if data.items():
