@@ -391,8 +391,7 @@ class TaskListener(TaskConfig):
             self.removeFromSameDir()
         
         msg = f"<b>Hai {self.tag} !</b>"
-        msg += "\n<b>Tugasmu dihentikan karena :</b>"
-        msg += f"<b>Elapsed: </b>{get_readable_time(time() - self.extra_details['startTime'])}\n"
+        msg += "\n<b>Tugasmu dihentikan karena :</b>"    
         msg += f"\n<code>{escape(error)}</code>"
         
         if (
