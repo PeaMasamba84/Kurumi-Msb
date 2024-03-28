@@ -280,7 +280,7 @@ class TaskListener(TaskConfig):
             if mime_type == "Folder":
                 msg += f"\n<b>┌📂 Jumlah Folder :</b> <code>{folders}</code>"
                 msg += f"\n<b>└📄 Jumlah File :</b> <code>{files}</code>"
-                msg += f"\n\n<b>🙏 File hasil mirror ini kami cuma simpan sementara di drive kami, silahkan download atau copas secepatnya ke drive kalian. Thanks!<b></code>\n"
+                msg += f"\n\n<b><blockquote><code>🙏 File hasil mirror ini kami cuma simpan sementara di drive kami, silahkan download atau copas secepatnya ke drive kalian. Thanks!<b></code>\n"
             if (
                 link
                 or rclonePath
