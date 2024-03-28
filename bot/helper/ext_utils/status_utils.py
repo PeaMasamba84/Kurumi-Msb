@@ -153,6 +153,7 @@ def get_progress_bar_string(pct) -> str:
 async def get_readable_message(sid, is_user, page_no=1, status="All", page_step=1):
     msg = "<a href='https://subscene.com/u/1271292'>𝐒𝐔𝐁𝐓𝐈𝐓𝐋𝐄 𝐏𝐄𝐀 𝐌𝐀𝐒𝐀𝐌𝐁𝐀</a>\n"
     button = None
+    currentTime = get_readable_time(time() - botStartTime)
 
     tasks = await sync_to_async(getSpecificTasks, status, sid if is_user else None)
 
