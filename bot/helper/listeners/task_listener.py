@@ -277,10 +277,11 @@ class TaskListener(TaskConfig):
                     await sendMessage(self.message, msg + fmsg)
         else:
             msg += f"\n<b>└🗂 Tipe :</b> <code>{mime_type}</code>"
+            msg += f"\n\n<b><blockquote><code>🙏 File hasil mirror kalian akan kami simpan sementara di drive kami, jadi silahkan download atau backup secepatnya ke drive kalian. Thanks.<b></code></blockquote>\n"
             if mime_type == "Folder":
                 msg += f"\n<b>┌📂 Jumlah Folder :</b> <code>{folders}</code>"
                 msg += f"\n<b>└📄 Jumlah File :</b> <code>{files}</code>"
-                msg += f"\n\n<b><blockquote><code>🙏 File hasil mirror kalian akan kami simpan sementara di drive kami, jadi silahkan download atau backup secepatnya ke drive kalian. Thanks.<b></code>\n"
+                msg += f"\n\n<b><blockquote><code>🙏 File hasil mirror kalian akan kami simpan sementara di drive kami, jadi silahkan download atau backup secepatnya ke drive kalian. Thanks.<b></code></blockquote>\n"
             if (
                 link
                 or rclonePath
