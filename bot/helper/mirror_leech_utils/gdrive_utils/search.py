@@ -139,9 +139,9 @@ class gdSearch(GoogleDriveHelper):
                 Title = True
             if drive_name:
                 if USE_TELEGRAPH:
-                    msg += f"╾────────────╼<br><b>Drive : {drive_name}</b><br><b>Kata Kunci : {fileName.title()}<br><br>╾────────────╼<br>"
+                    msg += f"╾────────────╼<br>Drive : {drive_name}<br>Kata Kunci : {fileName.title()}<br><br>╾────────────╼<br>"
                 else:
-                    msg += f"\n╾────────────╼\n<b>Drive :</b> <code>{drive_name}</code>\n<b>Kata Kunci :</b> <code>{fileName.title()}</code>\n╾────────────╼\n"
+                    msg += f"\n╾────────────╼\nDrive : <code>{drive_name}</code>\nKata Kunci : <code>{fileName.title()}</code>\n╾────────────╼\n"
             num = 0
             for file in response.get("files", []):
                 num += 1
