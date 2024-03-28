@@ -214,11 +214,9 @@ async def get_readable_message(sid, is_user, page_no=1, status="All", page_step=
         msg += f"\n<b>├📟 GID:</b> <code>{tgid}</code>"
         
         if task.listener.isPrivateChat: 
-            msg += f"\n<b>├🆔 UID:</b> <code>A D M I N</code>"
-            msg += f"\n<b>├🦹 User:</b> <code>A D M I N</code>"
+            msg += f"\n<b>├🦹 User:</b> <code>A D M I N</code>"            
         else:
-            msg += f"\n<b>├🆔 UID:</b> <code>{task.listener.userId}</code>"
-            msg += f"\n<b>├🦹 User:</b> <code>{task.listener.user.first_name} {(task.listener.user.last_name or '')}</code>"
+            msg += f"\n<b>├🦹 User:</b> <code>{task.listener.user.first_name} {(task.listener.user.last_name or '')}</code>"            
             
         msg += f"\n<b>├📵 Stop:</b> <code>/{BotCommands.CancelTaskCommand[1]} {tgid}</code>"
         msg += f"\n<b>└💉 Force: <code>/{BotCommands.ForceStartCommand[1]} {tgid}</code>\n\n"
