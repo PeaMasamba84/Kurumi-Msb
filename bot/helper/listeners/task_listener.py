@@ -260,7 +260,7 @@ class TaskListener(TaskConfig):
         LOGGER.info(f"Task Done: {self.name}")
         if self.isLeech:
             msg += f"\n\n<b>└🗄Jumlah File :</b> <code>{folders}</code>"
-            msg += f"<b>Elapsed: </b>{get_readable_time(time() - self.message.date.timestamp())}\n"
+            msg += f"<b>Elapsed: </b>{get_readable_time(time() - self.extra_details['startTime'])}\n"
             if mime_type != 0:
                 msg += f"\n\n<b>└📕File Rusak :</b> <code>{mime_type}</code>"
             msg += f'\n\n<b>💂‍♂️ Pemirror :</b> {self.tag}\n\n'
@@ -392,7 +392,7 @@ class TaskListener(TaskConfig):
         
         msg = f"<b>Hai {self.tag} !</b>"
         msg += "\n<b>Tugasmu dihentikan karena :</b>"
-        msg += f"<b>Elapsed: </b>{get_readable_time(time() - self.message.date.timestamp())}\n"
+        msg += f"<b>Elapsed: </b>{get_readable_time(time() - self.extra_details['startTime'])}\n"
         msg += f"\n<code>{escape(error)}</code>"
         
         if (
@@ -454,7 +454,7 @@ class TaskListener(TaskConfig):
                 del task_dict[self.mid]
             count = len(task_dict)
         msg = f"<b>Hai {self.tag} !</b>\n<b>Tugasmu dihentikan karena :</b>\n<code>{escape(error)}</code>"
-        msg += f'<b>Elapsed:</b> {get_readable_time(time() - self.message.date.timestamp())}'
+        msg += f"<b>Elapsed:</b> {get_readable_time(time() - self.extra_details['startTime'])}"
         await sendMessage(self.message, msg)
         if count == 0:
             await self.clean()
