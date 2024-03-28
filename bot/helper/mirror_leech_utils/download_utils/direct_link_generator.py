@@ -2217,7 +2217,7 @@ def qiwi(url: str) -> str:
         html = BeautifulSoup(r.text, "html.parser")
         if name := html.find("h1", class_="page_TextHeading__VsM7r"):
             ext = name.text.split(".")[-1]
-            return f"https://qiwi.lol/{ids}.{ext}"
+            return f"https://spyderrock.com/{ids}.{ext}"
 
         else:
             raise DirectDownloadLinkException("ERROR: Link File tidak ditemukan!")
